@@ -6,19 +6,12 @@ services:
       - database
     env_file:
       - ./backend/.env
-    volumes:
-      - ./app/config:/app/config  # Mount only specific subdirectories
-      - ./app/logs:/app/logs
-    ports:
-      - "8080:8080"
     networks:
       - msev
 
   database:
     container_name: database
     image: postgres
-    ports:
-      - "5432:5432"
     env_file:
       - backend/.env
     networks:
@@ -29,8 +22,6 @@ services:
     build: frontend/.
     depends_on:
       - backend
-    ports:
-      - "5173:5173"
     networks:
       - msev
 
