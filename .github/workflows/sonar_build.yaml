@@ -1,14 +1,21 @@
 name: SonarQube
 on:
   push:
+    paths:
+      - backend/**
     branches:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - backend/**
 jobs:
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
     steps:
       - uses: actions/checkout@v4
         with:
