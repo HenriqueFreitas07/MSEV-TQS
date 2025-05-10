@@ -1,0 +1,30 @@
+services:
+  backend:
+    build: backend/.
+    container_name: backend
+    depends_on:
+      - database
+    env_file:
+      - ./backend/.env
+    networks:
+      - msev
+
+  database:
+    container_name: database
+    image: postgres
+    env_file:
+      - backend/.env
+    networks:
+      - msev
+
+  prod_conf:
+    build: .
+    container_name: nginx_frontend
+    depends_on:
+      - backend
+    env_file:
+      - .env.prod
+
+networks:
+  msev:
+    driver: bridge
