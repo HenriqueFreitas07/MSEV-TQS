@@ -10,21 +10,24 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v2
 
-      # prepare the certificates on the server in advance
-      - name: Git pull      
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.SSH_VM_PRIVATE_KEY }}" > key
-          chmod 600 key
-          ssh -o StrictHostKeyChecking=no -i key hfreitas@deti-tqs-22.ua.pt << 'EOF'
-          rm key
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
           cd MSEV-TQS 
-          docker compose down
           git restore .
           git checkout main
           git pull origin main
           chmod +x deploy.sh
           ./deploy.sh
           EOF
-
-
 

@@ -17,13 +17,17 @@ services:
     networks:
       - msev
 
-  prod_conf:
+  frontend:
     build: .
     container_name: nginx_frontend
+    networks:
+      - msev
+    ports:
+      - "443:443"
     depends_on:
       - backend
     env_file:
-      - .env.prod
+      - .env
 
 networks:
   msev:
