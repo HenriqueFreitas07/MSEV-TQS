@@ -17,7 +17,7 @@
     <properties>
         <java.version>17</java.version>
 
-        <sonar.organization>HenriqueFreitas07</sonar.organization>
+        <sonar.organization>henriquefreitas07</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <jacoco.version>0.8.13</jacoco.version>
         <unit.coverage.file>${project.build.directory}/jacoco-output/jacoco-unit-tests.exec</unit.coverage.file>
@@ -33,6 +33,7 @@
         <selenium-java.version>4.29.0</selenium-java.version>
         <webdrivermanager.version>5.9.3</webdrivermanager.version>
         <cucumber.version>7.21.1</cucumber.version>
+
     </properties>
     <dependencies>
         <dependency>
@@ -83,6 +84,8 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>2.8.5</version>
         </dependency>
+
+
         <dependency>
             <groupId>app.getxray</groupId>
             <artifactId>xray-junit-extensions</artifactId>
@@ -308,7 +311,6 @@
                                 ${project.reporting.outputDirectory}/jacoco-merged-test-coverage-report</outputDirectory>
                         </configuration>
                     </execution>
-
                 </executions>
                 <configuration>
                     <excludes>
