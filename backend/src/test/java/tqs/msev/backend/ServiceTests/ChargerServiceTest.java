@@ -12,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import java.util.UUID;
 import java.util.Optional;
-import java.util.List;  
+import java.util.List;
+import java.util.NoSuchElementException;  
 
 @ExtendWith(MockitoExtension.class)
 public class ChargerServiceTest {
@@ -44,7 +45,7 @@ public class ChargerServiceTest {
         
         try {
             chargerService.getChargerById(chargerId);
-        } catch (RuntimeException e) {
+        } catch (NoSuchElementException e) {
             assertEquals("Charger not found", e.getMessage());
         }
     }

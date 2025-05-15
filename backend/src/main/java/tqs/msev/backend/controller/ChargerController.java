@@ -24,7 +24,7 @@ public class ChargerController {
         this.chargerService = chargerService;
     }
 
-    @GetMapping("/{stationId}")
+    @GetMapping("station/{stationId}")
     public List<Charger> getChargersByStation(@PathVariable("stationId") UUID stationId) {
         return chargerService.getChargersByStation(stationId);
     }

@@ -5,6 +5,7 @@ import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
@@ -21,6 +22,6 @@ public class ChargerService {
 
     public Charger getChargerById(UUID chargerId) {
         return chargerRepository.findById(chargerId)
-                .orElseThrow(() -> new RuntimeException("Charger not found"));
+                .orElseThrow(() -> new NoSuchElementException("Charger not found"));
     }
 }
