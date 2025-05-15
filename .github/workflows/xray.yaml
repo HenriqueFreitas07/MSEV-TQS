@@ -13,9 +13,13 @@ name: CI with Maven
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - backend/**/test/*
   pull_request:
     branches: [ "main" ]
     types: [opened, synchronize]
+    paths:
+      - backend/**/test/*
   workflow_dispatch:
 
 jobs:
