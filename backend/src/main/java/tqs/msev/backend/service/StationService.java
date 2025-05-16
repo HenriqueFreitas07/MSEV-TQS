@@ -31,4 +31,12 @@ public class StationService {
                 .filter(station -> station.getName().toLowerCase().startsWith(query.toLowerCase()))
                 .toList();
     }
+
+    public List<Station> searchByAddress(String address) {
+        List<Station> stations = stationRepository.findAll();
+
+        return stations.stream()
+                .filter(station -> station.getAddress().toLowerCase().startsWith(address.toLowerCase()))
+                .toList();
+    }
 }

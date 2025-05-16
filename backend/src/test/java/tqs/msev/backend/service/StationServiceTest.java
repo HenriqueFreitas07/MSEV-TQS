@@ -13,10 +13,12 @@ import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.StationRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,14 +34,17 @@ class StationServiceTest {
     void setup() {
         UUID id1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
         Station station1 = new Station();
+        station1.setId(id1);
         station1.setLatitude(40);
         station1.setLongitude(-0.5);
         station1.setName("Station 1");
+        station1.setAddress("NY Street, 1");
 
         Station station2 = new Station();
         station2.setLatitude(41);
         station2.setLongitude(-0.5);
         station2.setName("Station 2");
+        station2.setAddress("Idk Street, 2");
 
         when(repository.findAll()).thenReturn(List.of(station1, station2));
         when(repository.findById(id1)).thenReturn(Optional.of(station1));
@@ -50,7 +55,52 @@ class StationServiceTest {
     void whenGetAllStations_thenReturnAllStations() {
         List<Station> stations = service.getAllStations();
 
+        assertThat(stations).hasSize(2);
         assertThat(stations).extracting(Station::getName).containsAll(List.of("Station 1", "Station 2"));
+        verify(repository, times(1)).findAll();
+    }
+
+    @Test
+    void whenGetExistingStation_thenReturnStation() {
+        UUID id1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+        Station station = service.getStationById(id1);
+
+        assertThat(station.getId()).isEqualTo(id1);
+        verify(repository, times(1)).findById(id1);
+    }
+
+    @Test
+    void whenGetInvalidStation_thenThrowException() {
+        UUID invalidId = UUID.fromString("11111111-1111-1111-1111-111111111112");
+
+        assertThatThrownBy(() -> service.getStationById(invalidId)).isInstanceOf(NoSuchElementException.class);
+        verify(repository, times(1)).findById(invalidId);
+    }
+
+    @Test
+    void whenSearchStationByName_thenReturnStations() {
+        String name = "stati";
+
+        List<Station> stations = service.searchByName(name);
+
+        assertThat(stations).hasSize(2);
+        assertThat(stations).extracting(Station::getName).containsAll(List.of("Station 1", "Station 2"));
+
+        stations = service.searchByName("Station 1");
+
+        assertThat(stations).hasSize(1);
+        assertThat(stations).extracting(Station::getName).containsAll(List.of("Station 1"));
+        verify(repository, times(2)).findAll();
+    }
+
+    @Test
+    void whenSearchStationByAddress_thenReturnStations() {
+        List<Station> stations = service.searchByAddress("NY");
+
+        assertThat(stations).hasSize(1);
+        assertThat(stations).extracting(Station::getName).containsAll(List.of("Station 1"));
+
         verify(repository, times(1)).findAll();
     }
 }

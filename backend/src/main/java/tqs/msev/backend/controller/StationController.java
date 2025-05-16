@@ -26,8 +26,13 @@ public class StationController {
         return stationService.getStationById(id);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search-by-name")
     public List<Station> searchStationByName(@RequestParam String name) {
         return stationService.searchByName(name);
+    }
+
+    @GetMapping("/search-by-address")
+    public List<Station> searchStationByAddress(@RequestParam String address) {
+        return stationService.searchByAddress(address);
     }
 }
