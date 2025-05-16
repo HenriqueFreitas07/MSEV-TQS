@@ -1,5 +1,6 @@
 package tqs.msev.backend.controller;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,6 +28,7 @@ class StationControllerTest {
     private StationService service;
 
     @Test
+    @Requirement("MSEV-16")
     void givenManyStations_whenGetStations_thenReturnStations() throws Exception {
         Station station1 = new Station();
         station1.setName("Station 1");
@@ -43,6 +45,7 @@ class StationControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void givenOneStation_whenGetStation_thenReturnStation() throws Exception {
         UUID id = UUID.randomUUID();
         Station station1 = new Station();
@@ -57,6 +60,7 @@ class StationControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenGetInvalidStation_thenReturnNotFound() throws Exception {
         UUID id = UUID.randomUUID();
 
@@ -67,6 +71,7 @@ class StationControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void givenManyStations_whenSearchStationsByName_thenReturnStations() throws Exception {
         Station station1 = new Station();
         station1.setName("Station 1");
@@ -79,6 +84,7 @@ class StationControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void givenManyStations_whenSearchStationsByAddress_thenReturnStations() throws Exception {
         Station station1 = new Station();
         station1.setName("Station 1");
