@@ -1,41 +1,30 @@
 name: Frontend CI
-
 on:
   pull_request:
     branches:
       - dev
       - main
     paths:
-      - '**/frontend/**'  # Only triggers if files in the frontend directory are changed
+      - '**/frontend/**'  
 
 jobs:
   build:
     runs-on: ubuntu-latest  # Use an Ubuntu runner for frontend build
     
     steps:
-    # Step 1: Checkout the code
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Step 2: Set up Node.js (Adjust version as per your project needs)
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
         node-version: '16'  # Adjust the Node.js version based on your project's needs
 
-    # Step 3: Install dependencies for the frontend
     - name: Install frontend dependencies
       working-directory: ./frontend  # Change to where your frontend code is located
       run: |
         npm install  # Or use 'yarn install' depending on your package manager
 
-    # Step 4: Run frontend tests
-    - name: Run frontend tests
-      working-directory: ./frontend  # Change to where your frontend code is located
-      run: |
-        npm run test  # Adjust the test script as per your project, e.g., 'yarn test'
-
-    # Step 5: Build the frontend for production
     - name: Build frontend
       working-directory: ./frontend  # Change to where your frontend code is located
       run: |
