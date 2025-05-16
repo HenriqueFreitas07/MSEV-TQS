@@ -1,13 +1,11 @@
 package tqs.msev.backend.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.service.StationService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/stations")
@@ -21,6 +19,11 @@ public class StationController {
     @GetMapping
     public List<Station> getAllStations() {
         return stationService.getAllStations();
+    }
+
+    @GetMapping("/{id}")
+    public Station getStationById(@PathVariable UUID id) {
+        return stationService.getStationById(id);
     }
 
     @GetMapping("/search")

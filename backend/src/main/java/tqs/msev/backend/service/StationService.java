@@ -5,6 +5,8 @@ import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.StationRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 public class StationService {
@@ -16,6 +18,10 @@ public class StationService {
 
     public List<Station> getAllStations() {
         return stationRepository.findAll();
+    }
+
+    public Station getStationById(UUID id) {
+        return stationRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Invalid station id"));
     }
 
     public List<Station> searchByName(String query) {
