@@ -50,7 +50,7 @@ class StationServiceTest {
         when(repository.findById(id1)).thenReturn(Optional.of(station1));
     }
 
-    @Requirement("MSEV-52")
+    @Requirement("MSEV-16")
     @Test
     void whenGetAllStations_thenReturnAllStations() {
         List<Station> stations = service.getAllStations();
