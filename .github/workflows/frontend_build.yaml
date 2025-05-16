@@ -1,0 +1,32 @@
+name: Frontend CI
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+    paths:
+      - '**/frontend/**'  
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Use an Ubuntu runner for frontend build
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'  # Adjust the Node.js version based on your project's needs
+
+    - name: Install frontend dependencies
+      working-directory: ./frontend  # Change to where your frontend code is located
+      run: |
+        npm install  # Or use 'yarn install' depending on your package manager
+
+    - name: Build frontend
+      working-directory: ./frontend  # Change to where your frontend code is located
+      run: |
+        npm run build  # Adjust build command as per your project, e.g., 'yarn build'
+
