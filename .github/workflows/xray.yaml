@@ -1,25 +1,15 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# we can build and run tests in a single step or do it in multiple steps...
-# the "package" phase on maven implicitly will download dependencies, build classes, run unit tests, and package classes
 name: CI with Maven
 
 on:
   push:
     branches: [ "main", "dev" ]
     paths:
-      - backend/**/test/*
+      - backend/**
   pull_request:
     branches: [ "main", "dev" ]
     types: [opened, synchronize]
     paths:
-      - backend/**/test/*
+      - backend/**
   workflow_dispatch:
 
 jobs:
