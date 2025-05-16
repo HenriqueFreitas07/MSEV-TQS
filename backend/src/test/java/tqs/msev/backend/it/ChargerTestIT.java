@@ -42,6 +42,7 @@ public class ChargerTestIT {
     @Autowired
     private MockMvc mockMvc;
 
+    
     @Container
     public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
         .withDatabaseName("testdb")
