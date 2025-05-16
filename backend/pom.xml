@@ -327,7 +327,7 @@
                     <cloud>true</cloud>
                     <projectKey>MSEV</projectKey>
                     <reportFormat>junit</reportFormat>
-                    <reportFile>reports/TEST-*.xml</reportFile>
+                    <reportFile>reports/TEST-junit-jupiter.xml</reportFile>
                 </configuration>
             </plugin>
         </plugins>
