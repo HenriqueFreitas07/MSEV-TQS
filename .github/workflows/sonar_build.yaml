@@ -5,6 +5,7 @@ on:
       - backend/**
     branches:
       - main
+      - dev
   pull_request:
     types: [opened, synchronize, reopened]
     paths:

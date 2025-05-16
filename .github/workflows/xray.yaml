@@ -12,11 +12,11 @@ name: CI with Maven
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
     paths:
       - backend/**/test/*
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
     types: [opened, synchronize]
     paths:
       - backend/**/test/*
