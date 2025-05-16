@@ -4,12 +4,12 @@ on:
   push:
     branches: [ "main", "dev" ]
     paths:
-      - backend/**/test/**
+      - backend/**
   pull_request:
     branches: [ "main", "dev" ]
     types: [opened, synchronize]
     paths:
-      - backend/**/test/**
+      - backend/**
   workflow_dispatch:
 
 jobs:
