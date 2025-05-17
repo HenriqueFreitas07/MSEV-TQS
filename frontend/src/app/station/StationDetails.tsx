@@ -1,4 +1,4 @@
-
+import NavLayout from "../../layouts/NavLayout";
 const staticData = [{
     connectorType: "Type 2",
     price: 0.25,
@@ -18,10 +18,56 @@ const staticData = [{
     status: "OUT_OF_ORDER",
 }]
 
+const station = {
+    name: "123 Estação",
+    latitude: 45,
+    longitude: 45,
+    status: "ENABLED"
+}
+
+// type StationDTO = {
+//     name: string,
+//     latitude: number;
+//     longitude: number;
+//     status: string;
+// }
+
 function StationDetails() {
+    let color = "text-black";
+    let color_station = "text-black";
+    const position: [number, number] = [station.latitude, station.longitude];
+
+    const getColorChargers = (status: string) => {
+        if (status === "AVAILABLE") {
+            color = "text-blue-400";
+        }
+        else if (status === "IN_USE") {
+            color = "text-green-400";
+        }
+        else if (status === "OUT_OF_ORDER") {
+            color = "text-orange-400";
+        }
+        else if (status === "TEMPORARILY_DISABLED") {
+            color = "text-red-400";
+        }
+        return color;
+    }
+
+    const getColorStation = (status: string) => {
+        if (status === "ENABLED") {
+            color_station = "text-green-400"
+        }
+        else if (status === "DISABLED") {
+            color_station = "text-red-400"
+        }
+        return color_station;
+    }
 
     return (
         <div className="items-center justify-center">
+            <NavLayout />
+            <p className={`text-4xl p-4 text-center ${getColorStation(station.status)}`}>Station {station.name}</p>
+
             <p className="text-4xl p-4 text-center">Chargers</p>
             <div className="flex grid grid-cols-2 ">
                 {staticData.map(
@@ -38,7 +84,7 @@ function StationDetails() {
                                 <p className="font-bold">Price: </p><p> {charger.price}</p>
                                 <p className="font-bold">Connector Type: </p><p> {charger.connectorType}</p>
                                 <p className="font-bold">Charging Speed: </p><p> {charger.chargingSpeed}</p>
-                                <p className="font-bold">Status: </p><p> {charger.status}</p>
+                                <p className="font-bold">Status: </p><p className={`${getColorChargers(charger.status)}`}> {charger.status}</p>
                                 <div className="card-actions justify-end">
                                     <button className="btn btn-primary">Reserve now</button>
                                 </div>
