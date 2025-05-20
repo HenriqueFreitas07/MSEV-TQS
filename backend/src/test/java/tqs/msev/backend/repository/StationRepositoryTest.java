@@ -21,7 +21,6 @@ class StationRepositoryTest {
     private StationRepository stationRepository;
 
     @Test
-    @Requirement("MSEV-16")
     void whenValidId_thenReturnStation() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -37,7 +36,6 @@ class StationRepositoryTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenInvalidId_thenReturnNull() {
         Station station = stationRepository.findById(UUID.randomUUID()).orElse(null);
 
@@ -45,7 +43,6 @@ class StationRepositoryTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void givenSetOfStations_whenFindAll_thenReturnAllStations() {
         Station station1 = new Station();
         station1.setLatitude(40);

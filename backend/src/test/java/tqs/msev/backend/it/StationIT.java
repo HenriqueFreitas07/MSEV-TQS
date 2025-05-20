@@ -54,7 +54,6 @@ public class StationIT {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenGetStations_thenReturnStations() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -81,7 +80,6 @@ public class StationIT {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenGetStationByValidId_thenReturnStation() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -101,7 +99,6 @@ public class StationIT {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenGetStationByInvalidId_thenReturnNotFound() {
         given()
                 .when()
@@ -112,7 +109,6 @@ public class StationIT {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenSearchStationByValidName_thenReturnStations() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -140,7 +136,6 @@ public class StationIT {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenSearchStationByAddress_thenReturnStations() {
         Station station1 = new Station();
         station1.setLatitude(40);

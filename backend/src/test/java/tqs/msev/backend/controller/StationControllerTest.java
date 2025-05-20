@@ -1,6 +1,7 @@
 package tqs.msev.backend.controller;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import app.getxray.xray.junit.customjunitxml.annotations.XrayTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -28,6 +29,7 @@ class StationControllerTest {
     private StationService service;
 
     @Test
+    @XrayTest(key = "MSEV-56")
     @Requirement("MSEV-16")
     void givenManyStations_whenGetStations_thenReturnStations() throws Exception {
         Station station1 = new Station();
@@ -45,6 +47,7 @@ class StationControllerTest {
     }
 
     @Test
+    @XrayTest(key = "MSEV-57")
     @Requirement("MSEV-16")
     void givenOneStation_whenGetStation_thenReturnStation() throws Exception {
         UUID id = UUID.randomUUID();
