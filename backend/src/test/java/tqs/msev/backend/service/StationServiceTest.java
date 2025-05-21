@@ -51,7 +51,6 @@ class StationServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenGetAllStations_thenReturnAllStations() {
         List<Station> stations = service.getAllStations();
 
@@ -61,7 +60,6 @@ class StationServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenGetExistingStation_thenReturnStation() {
         UUID id1 = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
@@ -72,7 +70,6 @@ class StationServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenGetInvalidStation_thenThrowException() {
         UUID invalidId = UUID.fromString("11111111-1111-1111-1111-111111111112");
 
@@ -81,7 +78,6 @@ class StationServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenSearchStationByName_thenReturnStations() {
         String name = "stati";
 
@@ -98,7 +94,6 @@ class StationServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
     void whenSearchStationByAddress_thenReturnStations() {
         List<Station> stations = service.searchByAddress("NY");
 
