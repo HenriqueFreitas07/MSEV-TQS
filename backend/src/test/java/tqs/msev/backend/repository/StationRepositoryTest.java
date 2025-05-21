@@ -1,6 +1,5 @@
 package tqs.msev.backend.repository;
 
-import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

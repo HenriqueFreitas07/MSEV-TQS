@@ -101,7 +101,7 @@ public class StationIT {
     void whenGetStationByInvalidId_thenReturnNotFound() {
         given()
                 .when()
-                .get("/api/v1/stations/" + UUID.randomUUID().toString())
+                .get("/api/v1/stations/" + UUID.randomUUID())
                 .then()
                 .assertThat()
                 .statusCode(404);
