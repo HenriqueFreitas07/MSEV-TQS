@@ -16,6 +16,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
+
     strategy:
       matrix:
         java: [ '21' ]
