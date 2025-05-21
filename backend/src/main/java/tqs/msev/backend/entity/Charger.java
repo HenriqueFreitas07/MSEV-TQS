@@ -42,7 +42,7 @@ public class Charger {
 
 
     public enum ChargerStatus {
-        AVAILABLE, IN_USE, OUT_OF_ORDER, TEMPORARILY_DISABLED
+        AVAILABLE, IN_USE, OUT_OF_ORDER, TEMPORARILY_DISABLED, BOOKED
     }
 
 }

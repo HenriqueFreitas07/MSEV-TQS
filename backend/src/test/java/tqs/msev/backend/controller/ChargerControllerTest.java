@@ -81,4 +81,18 @@ public class ChargerControllerTest {
         .andExpect(content().string(containsString("Charger not found")));
     }
 
+    @Test
+    public void whenChargerStatusExists_thenReturnChargerStatus() throws Exception {
+        UUID chargerId = UUID.randomUUID();
+        Charger.ChargerStatus mockStatus = Charger.ChargerStatus.AVAILABLE;
+        
+        when(chargerService.getChargerStatus(chargerId)).thenReturn(mockStatus);
+        
+        mockMvc.perform(
+            get("/api/v1/chargers/{chargerId}/status", chargerId)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").value(mockStatus.toString()));
+    }
+
 }

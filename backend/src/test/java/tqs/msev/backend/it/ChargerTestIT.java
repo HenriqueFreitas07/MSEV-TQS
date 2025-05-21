@@ -141,5 +141,32 @@ public class ChargerTestIT {
                 .andExpect(jsonPath("$").isEmpty());
     }
 
+    @Test
+    public void whenChargerStatusExists_thenReturnChargerStatus() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        UUID chargerId = charger.getId();
+        mockMvc.perform(get("/api/v1/chargers/{chargerId}/status", chargerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("AVAILABLE"));
+    }
+
 
 }

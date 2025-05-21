@@ -24,4 +24,9 @@ public class ChargerService {
         return chargerRepository.findById(chargerId)
                 .orElseThrow(() -> new NoSuchElementException("Charger not found"));
     }
+
+    public Charger.ChargerStatus getChargerStatus(UUID chargerId) {
+        Charger charger = getChargerById(chargerId);
+        return charger.getStatus();
+    }
 }

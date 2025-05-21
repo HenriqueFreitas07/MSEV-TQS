@@ -34,4 +34,8 @@ public class ChargerController {
         return chargerService.getChargerById(chargerId);
     }
 
+    @GetMapping("/{chargerId}/status")
+    public Charger.ChargerStatus getChargerStatus(@PathVariable("chargerId") UUID chargerId) {
+        return chargerService.getChargerStatus(chargerId);
+    }
 }
