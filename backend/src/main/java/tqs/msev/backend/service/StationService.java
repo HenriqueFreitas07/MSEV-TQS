@@ -1,9 +1,12 @@
 package tqs.msev.backend.service;
 
 import org.springframework.stereotype.Service;
+import tqs.msev.backend.dto.Coordinates;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.StationRepository;
+import tqs.msev.backend.util.Util;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -11,9 +14,11 @@ import java.util.UUID;
 @Service
 public class StationService {
     private final StationRepository stationRepository;
+    private final GeocodingService geocodingService;
 
-    public StationService(StationRepository stationRepository) {
+    public StationService(StationRepository stationRepository, GeocodingService geocodingService) {
         this.stationRepository = stationRepository;
+        this.geocodingService = geocodingService;
     }
 
     public List<Station> getAllStations() {
@@ -33,10 +38,13 @@ public class StationService {
     }
 
     public List<Station> searchByAddress(String address) {
+        Coordinates coordinates = geocodingService.getCoordinatesForAddress(address);
+
         List<Station> stations = stationRepository.findAll();
 
-        return stations.stream()
-                .filter(station -> station.getAddress().toLowerCase().startsWith(address.toLowerCase()))
-                .toList();
+        return stations.stream().sorted(Comparator.comparingDouble(station ->
+            Util.distanceBetweenCoordinates(coordinates.getLat(), coordinates.getLon(),
+                    station.getLatitude(), station.getLongitude())
+        )).toList();
     }
 }

@@ -1,6 +1,5 @@
 package tqs.msev.backend.it;
 
-import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,20 +144,21 @@ public class StationIT {
 
         Station station2 = new Station();
         station2.setLatitude(41);
-        station2.setLongitude(-0.5);
+        station2.setLongitude(-8);
         station2.setName("Station 2");
         station2.setAddress("Idk Street, 2");
 
         stationRepository.saveAllAndFlush(List.of(station1, station2));
 
         given()
-                .queryParam("address", "Idk")
+                .queryParam("address", "Aveiro")
                 .when()
                 .get("/api/v1/stations/search-by-address")
                 .then()
                 .assertThat()
                 .statusCode(200)
-                .body("$", hasSize(1))
-                .body("name", hasItems("Station 2"));
+                .body("$", hasSize(2))
+                .body("[0].name", is("Station 2"))
+                .body("[1].name", is("Station 1"));
     }
 }

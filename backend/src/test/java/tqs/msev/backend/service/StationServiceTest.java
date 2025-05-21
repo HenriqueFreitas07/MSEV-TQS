@@ -1,14 +1,15 @@
 package tqs.msev.backend.service;
 
-import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import tqs.msev.backend.dto.Coordinates;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.StationRepository;
 
@@ -24,6 +25,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class StationServiceTest {
+    @Mock
+    private GeocodingService geocodingService;
+
     @Mock
     private StationRepository repository;
 
@@ -41,8 +45,8 @@ class StationServiceTest {
         station1.setAddress("NY Street, 1");
 
         Station station2 = new Station();
-        station2.setLatitude(41);
-        station2.setLongitude(-0.5);
+        station2.setLatitude(40);
+        station2.setLongitude(-8.0);
         station2.setName("Station 2");
         station2.setAddress("Idk Street, 2");
 
@@ -95,11 +99,14 @@ class StationServiceTest {
 
     @Test
     void whenSearchStationByAddress_thenReturnStations() {
-        List<Station> stations = service.searchByAddress("NY");
+        when(geocodingService.getCoordinatesForAddress(Mockito.anyString())).thenReturn(new Coordinates(40.6254255, -8.6514061));
+        List<Station> stations = service.searchByAddress("Avenida da Universidade Aveiro");
 
-        assertThat(stations).hasSize(1);
-        assertThat(stations).extracting(Station::getName).containsAll(List.of("Station 1"));
+        assertThat(stations).hasSize(2);
+        assertThat(stations.get(0)).extracting(Station::getName).isEqualTo("Station 2");
+        assertThat(stations.get(1)).extracting(Station::getName).isEqualTo("Station 1");
 
         verify(repository, times(1)).findAll();
+        verify(geocodingService, times(1)).getCoordinatesForAddress(Mockito.anyString());
     }
 }
