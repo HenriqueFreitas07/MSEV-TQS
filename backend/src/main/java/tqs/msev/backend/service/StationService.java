@@ -40,6 +40,8 @@ public class StationService {
     public List<Station> searchByAddress(String address) {
         Coordinates coordinates = geocodingService.getCoordinatesForAddress(address);
 
+        if (coordinates == null) return List.of();
+
         List<Station> stations = stationRepository.findAll();
 
         return stations.stream().sorted(Comparator.comparingDouble(station ->

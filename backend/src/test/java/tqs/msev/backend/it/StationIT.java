@@ -161,4 +161,30 @@ public class StationIT {
                 .body("[0].name", is("Station 2"))
                 .body("[1].name", is("Station 1"));
     }
+
+    @Test
+    void whenSearchStationByInvalidAddress_thenReturnEmptyList() {
+        Station station1 = new Station();
+        station1.setLatitude(40);
+        station1.setLongitude(-0.5);
+        station1.setName("Station 1");
+        station1.setAddress("NY Street, 1");
+
+        Station station2 = new Station();
+        station2.setLatitude(41);
+        station2.setLongitude(-8);
+        station2.setName("Station 2");
+        station2.setAddress("Idk Street, 2");
+
+        stationRepository.saveAllAndFlush(List.of(station1, station2));
+
+        given()
+                .queryParam("address", "gdais dhasdiasd iasd sa ias")
+                .when()
+                .get("/api/v1/stations/search-by-address")
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("$", hasSize(0));
+    }
 }

@@ -1,6 +1,7 @@
 package tqs.msev.backend.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,11 @@ public class GeocodingService {
 
         log.info("Making an HTTP request to geocoding API for address {}", address);
         JSONObject json = new JSONObject(restTemplate.getForEntity(url, String.class).getBody());
+        JSONArray resultsArray = json.getJSONArray("results");
 
-        JSONObject results = json.getJSONArray("results").getJSONObject(0);
+        if (resultsArray.isEmpty()) return null;
+
+        JSONObject results = resultsArray.getJSONObject(0);
 
         double lat = results.getDouble("lat");
         double lon = results.getDouble("lon");
