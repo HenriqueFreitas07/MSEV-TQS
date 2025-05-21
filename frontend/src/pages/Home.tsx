@@ -3,7 +3,7 @@ import hero_image from  "../assets/hero_charging_tesla.jpg"
 export default function Home() {
     return (
         <>
-            <NavLayout title="Home Page">
+            <NavLayout title="MSEV">
                 <div
                     style={
                         {
@@ -15,10 +15,9 @@ export default function Home() {
                     <div className="hero-overlay"></div>
                     <div className="hero-content text-neutral-content text-center">
                         <div className="max-w-md">
-                            <h1 className="mb-5 text-5xl font-bold">Hello there</h1>
+                            <h1 className="mb-5 text-5xl font-bold">Welcome to MSEV!</h1>
                             <p className="mb-5">
-                                Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem
-                                quasi. In deleniti eaque aut repudiandae et a id nisi.
+                                Our platform provides a comprehensive solution for station owners and users alike, making it easy to find, reserve, and manage charging stations.
                             </p>
                             <button className="btn btn-primary">Get Started</button>
                         </div>
