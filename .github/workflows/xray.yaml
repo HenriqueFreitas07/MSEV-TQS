@@ -16,6 +16,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
+
     strategy:
       matrix:
         java: [ '21' ]
@@ -38,6 +41,10 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Run integration tests
       run: mvn -B integration-test verify --file pom.xml
+    - name: Check test result file exists and is valid
+      run: |
+        ls -l ./reports
+        cat ./reports/TEST-*.xml || true
     - name: Add code coverage information to PR
       id: jacoco-pr
       uses: madrapps/jacoco-report@v1.7.1
