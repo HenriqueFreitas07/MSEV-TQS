@@ -2,6 +2,7 @@ package tqs.msev.backend.service;
 
 import org.springframework.stereotype.Service;
 import tqs.msev.backend.entity.Charger;
+import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.repository.ChargerRepository;
 
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.UUID;
 @Service
 public class ChargerService {
     private final ChargerRepository chargerRepository;
+    private final ReservationService reservationService;
 
-    public ChargerService(ChargerRepository chargerRepository) {
+    public ChargerService(ChargerRepository chargerRepository, ReservationService reservationService) {
         this.chargerRepository = chargerRepository;
+        this.reservationService = reservationService;
     }
 
     public List<Charger> getChargersByStation(UUID stationId) {
@@ -23,10 +26,5 @@ public class ChargerService {
     public Charger getChargerById(UUID chargerId) {
         return chargerRepository.findById(chargerId)
                 .orElseThrow(() -> new NoSuchElementException("Charger not found"));
-    }
-
-    public Charger.ChargerStatus getChargerStatus(UUID chargerId) {
-        Charger charger = getChargerById(chargerId);
-        return charger.getStatus();
     }
 }

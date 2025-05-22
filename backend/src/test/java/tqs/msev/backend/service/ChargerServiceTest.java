@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.NoSuchElementException;  
 
 @ExtendWith(MockitoExtension.class)
-public class ChargerServiceTest {
+class ChargerServiceTest {
 
     @Mock
     ChargerRepository chargerRepository;
@@ -25,19 +25,21 @@ public class ChargerServiceTest {
 
 
     @Test
-    public void whenChargerExists_thenReturnCharger() {
+    void whenChargerExists_thenReturnCharger() {
         UUID chargerId = UUID.randomUUID();
         Charger mockCharger = new Charger();
+        Charger.ChargerStatus status = Charger.ChargerStatus.AVAILABLE;
         
         when(chargerRepository.findById(chargerId)).thenReturn(Optional.of(mockCharger));
         
         Charger charger = chargerService.getChargerById(chargerId);
         
         assertEquals(mockCharger, charger);
+        assertEquals(status, charger.getStatus());
     }
 
     @Test
-    public void whenChargerDoesNotExist_thenThrowException() {
+    void whenChargerDoesNotExist_thenThrowException() {
         UUID chargerId = UUID.randomUUID();
         
         when(chargerRepository.findById(chargerId)).thenReturn(Optional.empty());
@@ -50,7 +52,7 @@ public class ChargerServiceTest {
     }
 
     @Test
-    public void whenStationExists_thenReturnChargers() {
+    void whenStationExists_thenReturnChargers() {
         UUID stationId = UUID.randomUUID();
         List<Charger> mockChargers = List.of(new Charger(), new Charger());
         
@@ -62,7 +64,7 @@ public class ChargerServiceTest {
     }
 
     @Test
-    public void whenStationDoesNotExist_thenReturnEmptyList() {
+    void whenStationDoesNotExist_thenReturnEmptyList() {
         UUID stationId = UUID.randomUUID();
         
         when(chargerRepository.findByStationId(stationId)).thenReturn(List.of());
@@ -71,17 +73,4 @@ public class ChargerServiceTest {
         
         assertEquals(0, chargers.size());
     }
-
-    @Test
-    public void whenChargerStatusExists_thenReturnChargerStatus() {
-        UUID chargerId = UUID.randomUUID();
-        Charger mockCharger = new Charger();
-        mockCharger.setStatus(Charger.ChargerStatus.AVAILABLE);
-        
-        when(chargerRepository.findById(chargerId)).thenReturn(Optional.of(mockCharger));
-        
-        Charger.ChargerStatus status = chargerService.getChargerStatus(chargerId);
-        
-        assertEquals(Charger.ChargerStatus.AVAILABLE, status);
-    }   
 }

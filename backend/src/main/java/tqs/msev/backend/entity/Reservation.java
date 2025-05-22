@@ -1,15 +1,17 @@
 package tqs.msev.backend.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.UUID;
+
+import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
+
+import java.util.Date;
 
 @Entity
 @AllArgsConstructor
@@ -18,33 +20,28 @@ import java.util.UUID;
 @Setter
 @Getter
 @Data
-public class Charger {
+public class Reservation {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "station_id", nullable = false)
-    private Station station;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "charger_id", nullable = false)
+    private Charger charger;
 
     @Column(nullable = false)
-    private String connectorType;
-
-    @DecimalMin(value = "0")
-    @Column(nullable = false)
-    private double price;
+    private Date startTimestamp;
 
     @Column(nullable = false)
-    private int chargingSpeed;
+    private Date endTimestamp;
 
     @Column(nullable = false)
     @Builder.Default
-    private ChargerStatus status= ChargerStatus.AVAILABLE;
-
-
-    public enum ChargerStatus {
-        AVAILABLE, IN_USE, OUT_OF_ORDER, TEMPORARILY_DISABLED
-    }
+    private boolean used = false;
 
 }

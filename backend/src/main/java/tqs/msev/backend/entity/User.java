@@ -1,7 +1,6 @@
 package tqs.msev.backend.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,33 +17,22 @@ import java.util.UUID;
 @Setter
 @Getter
 @Data
-public class Charger {
+public class User {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "station_id", nullable = false)
-    private Station station;
+    @Column(nullable = false)
+    private String name;
 
     @Column(nullable = false)
-    private String connectorType;
-
-    @DecimalMin(value = "0")
-    @Column(nullable = false)
-    private double price;
+    private String email;
 
     @Column(nullable = false)
-    private int chargingSpeed;
+    private String password;
 
     @Column(nullable = false)
-    @Builder.Default
-    private ChargerStatus status= ChargerStatus.AVAILABLE;
-
-
-    public enum ChargerStatus {
-        AVAILABLE, IN_USE, OUT_OF_ORDER, TEMPORARILY_DISABLED
-    }
+    private boolean isOperator;
 
 }

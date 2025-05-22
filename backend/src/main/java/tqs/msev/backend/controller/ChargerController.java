@@ -1,17 +1,14 @@
 package tqs.msev.backend.controller;
 
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.entity.Charger;
+import tqs.msev.backend.entity.Reservation;
 import java.util.UUID;
 import tqs.msev.backend.service.ChargerService;
-import org.springframework.web.bind.annotation.PostMapping;
+import tqs.msev.backend.service.ReservationService;
 
 import java.util.List;
 
@@ -19,9 +16,11 @@ import java.util.List;
 @RequestMapping("/api/v1/chargers")
 public class ChargerController {
     private final ChargerService chargerService;
+    private final ReservationService reservationService;
 
-    public ChargerController(ChargerService chargerService) {
+    public ChargerController(ChargerService chargerService, ReservationService reservationService) {
         this.chargerService = chargerService;
+        this.reservationService = reservationService;
     }
 
     @GetMapping("/station/{stationId}")
@@ -34,8 +33,8 @@ public class ChargerController {
         return chargerService.getChargerById(chargerId);
     }
 
-    @GetMapping("/{chargerId}/status")
-    public Charger.ChargerStatus getChargerStatus(@PathVariable("chargerId") UUID chargerId) {
-        return chargerService.getChargerStatus(chargerId);
+    @GetMapping("/{chargerId}/reservations")
+    public List<Reservation> getChargerAvailability(@PathVariable("chargerId") UUID chargerId) {
+        return reservationService.getFutureReservationsOnCharger(chargerId);
     }
 }
