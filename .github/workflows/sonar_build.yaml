@@ -17,6 +17,8 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
+    env:
+      GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
     steps:
       - uses: actions/checkout@v4
         with:

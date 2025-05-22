@@ -23,7 +23,6 @@ class ChargerServiceTest {
     @InjectMocks
     private ChargerService chargerService;
 
-
     @Test
     void whenChargerExists_thenReturnCharger() {
         UUID chargerId = UUID.randomUUID();

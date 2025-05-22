@@ -1,12 +1,12 @@
 package tqs.msev.backend.controller;
 
-
 import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
@@ -23,7 +23,6 @@ import static org.hamcrest.Matchers.containsString;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.service.ReservationService;
 
-
 @WebMvcTest(ChargerController.class)
 @Import(GlobalExceptionHandler.class) 
 class ChargerControllerTest {
@@ -34,12 +33,14 @@ class ChargerControllerTest {
     @MockitoBean
     ChargerService chargerService;
 
+
     @MockitoBean
     ReservationService reservationService;
 
 
     @Autowired
     ChargerController chargerController;
+
 
     @Test
     void whenStationExists_thenReturnChargers() throws Exception {
@@ -120,5 +121,4 @@ class ChargerControllerTest {
     }
 
  
-
 }

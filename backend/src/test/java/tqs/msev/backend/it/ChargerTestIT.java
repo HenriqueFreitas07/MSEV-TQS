@@ -12,11 +12,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.junit.jupiter.Container;
-
 import java.util.Date;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +76,7 @@ class ChargerTestIT {
         station.setName("Test Station");
         station.setLongitude(-74.0060);
         station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
         station.setStatus(Station.StationStatus.ENABLED);
 
         station = stationRepository.save(station);
@@ -114,6 +113,7 @@ class ChargerTestIT {
         station.setName("Test Station");
         station.setLongitude(-74.0060);
         station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
         station.setStatus(Station.StationStatus.ENABLED);
 
         station = stationRepository.save(station);
@@ -193,5 +193,4 @@ class ChargerTestIT {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0]").isNotEmpty());
     }
-
 }
