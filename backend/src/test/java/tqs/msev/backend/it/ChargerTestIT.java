@@ -157,7 +157,7 @@ class ChargerTestIT {
         station.setLongitude(-74.0060);
         station.setLatitude(40.7128);
         station.setStatus(Station.StationStatus.ENABLED);
-
+        station.setAddress("Idk St.");
         station = stationRepository.save(station);
         stationRepository.flush();
 
