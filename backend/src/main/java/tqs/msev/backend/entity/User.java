@@ -17,6 +17,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @Data
+@Table(name = "app_user")
 public class User {
     
     @Id
