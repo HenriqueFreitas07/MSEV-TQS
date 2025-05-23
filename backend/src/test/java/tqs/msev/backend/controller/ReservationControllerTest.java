@@ -113,6 +113,64 @@ class ReservationControllerTest {
         .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationExistsAndValid_thenCancelReservation() throws Exception {
+        UUID reservationId = UUID.randomUUID();
+        Reservation mockReservation = new Reservation();
+        
+        when(reservationService.cancelReservation(reservationId)).thenReturn(mockReservation);
+        
+        mockMvc.perform(
+            get("/api/v1/reservations/{reservationId}/cancel", reservationId)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isNotEmpty());
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationNonExistent_thenThrowExceptionOnCancel() throws Exception {
+        UUID reservationId = UUID.randomUUID();
+        
+        when(reservationService.cancelReservation(reservationId)).thenThrow(new NoSuchElementException("Reservation not found"));
+        
+        mockMvc.perform(
+            get("/api/v1/reservations/{reservationId}/cancel", reservationId)
+        )
+        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationExists_thenReturnReservation() throws Exception {
+        UUID reservationId = UUID.randomUUID();
+        Reservation mockReservation = new Reservation();
+        
+        when(reservationService.getReservationById(reservationId)).thenReturn(mockReservation);
+        
+        mockMvc.perform(
+            get("/api/v1/reservations/{reservationId}", reservationId)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isNotEmpty());
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationExistsAndValid_thenMarkAsUsed() throws Exception {
+        UUID reservationId = UUID.randomUUID();
+        Reservation mockReservation = new Reservation();
+        
+        when(reservationService.markReservationAsUsed(reservationId)).thenReturn(mockReservation);
+        
+        mockMvc.perform(
+            get("/api/v1/reservations/{reservationId}/used", reservationId)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isNotEmpty());
+    }
+
 
    
  

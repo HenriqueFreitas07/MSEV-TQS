@@ -157,7 +157,63 @@ class ReservationServiceTest {
         
         Reservation usedReservation = reservationService.markReservationAsUsed(reservationId);
         
-        assertEquals(usedReservation.isUsed(), true);
+        assertEquals(true, usedReservation.isUsed());
     }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationUsedAlready_thenThrowException() {
+        UUID reservationId = UUID.randomUUID();
+        Reservation mockReservation = new Reservation();
+        mockReservation.setId(reservationId);
+        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60)); 
+        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
+        mockReservation.setUsed(true);
+        
+        when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(mockReservation));
+        
+        try {
+            reservationService.markReservationAsUsed(reservationId);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Reservation already marked as used", e.getMessage());
+        }
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationNotStartedYet_thenThrowException() {
+        UUID reservationId = UUID.randomUUID();
+        Reservation mockReservation = new Reservation();
+        mockReservation.setId(reservationId);
+        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
+        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)); 
+        
+        when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(mockReservation));
+        
+        try {
+            reservationService.markReservationAsUsed(reservationId);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Reservation not started yet", e.getMessage());
+        }
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationAlreadyEnded_thenThrowException() {
+        UUID reservationId = UUID.randomUUID();
+        Reservation mockReservation = new Reservation();
+        mockReservation.setId(reservationId);
+        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60)); 
+        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 30)); 
+        
+        when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(mockReservation));
+        
+        try {
+            reservationService.markReservationAsUsed(reservationId);
+        } catch (IllegalArgumentException e) {
+            assertEquals("Reservation already ended", e.getMessage());
+        }
+    }
+    
    
 }

@@ -1,8 +1,6 @@
 package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
-import java.time.Duration;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
@@ -13,8 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.junit.jupiter.Container;
-
-import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
@@ -122,8 +118,6 @@ class ReservationTestIT {
                 .andExpect(jsonPath("$[0].user.id").value(user.getId().toString()))
                 .andExpect(jsonPath("$[0].charger.id").value(charger.getId().toString()));
     }
-
-    
 
     @Test
     @Requirement("MSEV-19")

@@ -11,6 +11,7 @@ import java.util.UUID;
 @Service
 public class ReservationService {
     private final ReservationRepository reservationRepository;
+    private final String RESERVATION_NOT_FOUND = "Reservation not found";
 
     public ReservationService(ReservationRepository reservationRepository) {
         this.reservationRepository = reservationRepository;
@@ -52,21 +53,20 @@ public class ReservationService {
 
     public Reservation cancelReservation(UUID reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NoSuchElementException("Reservation not found"));
+                .orElseThrow(() -> new NoSuchElementException(RESERVATION_NOT_FOUND));
         reservationRepository.delete(reservation);
         reservationRepository.flush();
         return reservation;
     }
 
     public Reservation getReservationById(UUID reservationId){
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NoSuchElementException("Reservation not found"));
-        return reservation;
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NoSuchElementException(RESERVATION_NOT_FOUND));
     }
 
     public Reservation markReservationAsUsed(UUID reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_FOUND));
         if(reservation.isUsed()) {
             throw new IllegalArgumentException("Reservation already marked as used");
         }
