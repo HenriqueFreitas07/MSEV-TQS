@@ -9,7 +9,9 @@ import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
+import static org.hamcrest.Matchers.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import java.util.UUID;
 import java.util.Date;
@@ -57,6 +59,19 @@ class ReservationServiceTest {
         List<Reservation> reservations = reservationService.getFutureReservationsOnCharger(chargerId);
         
         assertEquals(0, reservations.size());
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationCorrect_thenReturnReservation() {
+        Reservation mockReservation = new Reservation();
+        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
+        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)); 
+        when(reservationRepository.findByChargerId(any())).thenReturn(List.of());
+        when(reservationRepository.save(mockReservation)).thenReturn(mockReservation);
+        Reservation reservation = reservationService.createReservation(mockReservation);
+        
+        assertEquals(mockReservation, reservation);
     }
 
 
