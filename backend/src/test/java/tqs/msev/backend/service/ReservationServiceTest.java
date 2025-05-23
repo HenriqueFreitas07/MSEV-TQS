@@ -8,8 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
-
-import static org.hamcrest.Matchers.empty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

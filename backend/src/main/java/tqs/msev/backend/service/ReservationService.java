@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.repository.ReservationRepository;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public class ReservationService {
 
     public Reservation cancelReservation(UUID reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+                .orElseThrow(() -> new NoSuchElementException("Reservation not found"));
         reservationRepository.delete(reservation);
         reservationRepository.flush();
         return reservation;

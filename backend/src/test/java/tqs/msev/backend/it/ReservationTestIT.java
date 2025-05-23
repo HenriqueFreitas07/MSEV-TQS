@@ -1,14 +1,10 @@
 package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
-import groovy.transform.Undefined.EXCEPTION;
-
 import org.springframework.boot.test.context.SpringBootTest;
-
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
-
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -121,8 +117,8 @@ class ReservationTestIT {
                 .andExpect(jsonPath("$[0].id").value(reservation.getId().toString()))
                 .andExpect(jsonPath("$[0].user.id").value(user.getId().toString()))
                 .andExpect(jsonPath("$[0].charger.id").value(charger.getId().toString()))
-                .andExpect(jsonPath("$[0].startTimestamp").value(nowPlusOneHour.toString()))
-                .andExpect(jsonPath("$[0].endTimestamp").value(nowPlusOneHour.toString()));
+                .andExpect(jsonPath("$[0].startTimestamp").value(nowPlusOneHour))
+                .andExpect(jsonPath("$[0].endTimestamp").value(nowPlusOneHour));
     }
 
     @Test
@@ -155,23 +151,17 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date now = new Date();
-        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
-        Reservation reservation = Reservation.builder()
-                .charger(charger)
-                .user(user)
-                .startTimestamp(nowPlusOneHour)
-                .endTimestamp(nowPlusOneHour)
-                .build();
+        Date nowPlusHalfHourDate = new Date(new Date().getTime() + 1800000);
+        Date nowPlusOneHour = new Date(nowPlusHalfHourDate.getTime() + 3600000);
         mockMvc.perform(post("/api/v1/reservations/create")
                 .contentType("application/json")
-                .content("{\"chargerId\":\"" + reservation.getCharger().getId() + "\", \"userId\":\"" + reservation.getUser().getId() + "\", \"startTimestamp\":\"" + nowPlusOneHour.toString() + "\", \"endTimestamp\":\"" + nowPlusOneHour.toString() + "\"}"))
+                .content("{\"userId\":\"" + user.getId() + "\", \"chargerId\":\"" + charger.getId() + "\", \"startTimestamp\":\"" + nowPlusHalfHourDate + "\", \"endTimestamp\":\"" + nowPlusOneHour + "\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.user.id").value(user.getId().toString()))
                 .andExpect(jsonPath("$.charger.id").value(charger.getId().toString()))
-                .andExpect(jsonPath("$.startTimestamp").value(nowPlusOneHour.toString()))
-                .andExpect(jsonPath("$.endTimestamp").value(nowPlusOneHour.toString()));
+                .andExpect(jsonPath("$.startTimestamp").value(nowPlusHalfHourDate))
+                .andExpect(jsonPath("$.endTimestamp").value(nowPlusOneHour));
     }
 
     @Test
