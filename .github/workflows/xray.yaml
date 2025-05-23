@@ -1,4 +1,4 @@
-name: CI with Maven
+name: Xray Cloud 
 
 on:
   push:

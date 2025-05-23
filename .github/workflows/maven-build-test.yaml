@@ -1,4 +1,4 @@
-name: Spring Boot CI
+name: Build Backend 
 
 on:
   pull_request:
