@@ -212,7 +212,7 @@ class ReservationTestIT {
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
-                .startTimestamp(nowPlusOneHour)
+                .startTimestamp(now)
                 .endTimestamp(nowPlusOneHour)
                 .build();
         reservationRepository.save(reservation);
