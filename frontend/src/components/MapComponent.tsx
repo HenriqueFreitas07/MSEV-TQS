@@ -1,4 +1,3 @@
-import React from 'react'
 import { Pin, APIProvider, Map, AdvancedMarker, type AdvancedMarkerProps } from '@vis.gl/react-google-maps';
 
 type Props = {
