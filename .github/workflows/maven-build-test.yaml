@@ -28,8 +28,6 @@ jobs:
         mvn clean install  
     - name: Build Spring Boot application
       working-directory: ./backend  
-      env:
-          - GEOCODING_APIKEY:${{secrets.GEOCODING_APIKEY}}
       run: |
         mvn package  
 
