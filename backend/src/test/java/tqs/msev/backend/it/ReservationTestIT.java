@@ -1,6 +1,8 @@
 package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import java.time.Duration;
+
 import org.springframework.boot.test.context.SpringBootTest;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
@@ -11,6 +13,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.junit.jupiter.Container;
+
+import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
@@ -149,24 +153,25 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date nowPlusHalfHourDate = new Date(System.currentTimeMillis() + 1000 * 60 * 30);
-        Date nowPlusOneHour = new Date(System.currentTimeMillis() + 1000 * 60 * 60);
+        Instant start = Instant.now().plus(Duration.ofMinutes(30));
+        Instant end = Instant.now().plus(Duration.ofHours(1));
+
         mockMvc.perform(post("/api/v1/reservations/create")
                 .contentType("application/json")
-                .content("{\"userId\":\"" + user.getId() + "\", \"chargerId\":\"" + charger.getId() + "\", \"startTimestamp\":\"" + nowPlusHalfHourDate + "\", \"endTimestamp\":\"" + nowPlusOneHour + "\"}"))
+                .content("{\"userId\":\"" + user.getId() + "\", \"chargerId\":\"" + charger.getId() + "\", \"startTimestamp\":\"" + start.toString() + "\", \"endTimestamp\":\"" + end.toString() + "\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNotEmpty())
                 .andExpect(jsonPath("$.user.id").value(user.getId().toString()))
                 .andExpect(jsonPath("$.charger.id").value(charger.getId().toString()))
-                .andExpect(jsonPath("$.startTimestamp").value(nowPlusHalfHourDate))
-                .andExpect(jsonPath("$.endTimestamp").value(nowPlusOneHour));
+                .andExpect(jsonPath("$.startTimestamp").value(start))
+                .andExpect(jsonPath("$.endTimestamp").value(start));
     }
 
     @Test
     @Requirement("MSEV-19")
     void whenReservationUnexistent_thenReturnNotFound() throws Exception {
         UUID reservationId = UUID.randomUUID();
-        mockMvc.perform(get("/api/v1/reservations/" + reservationId))
+        mockMvc.perform(post("/api/v1/reservations/" + reservationId+"/cancel"))
                 .andExpect(status().isNotFound());
     }
 
