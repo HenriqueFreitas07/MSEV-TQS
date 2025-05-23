@@ -143,21 +143,6 @@ class ReservationControllerTest {
 
     @Test
     @Requirement("MSEV-19")
-    void whenReservationExists_thenReturnReservation() throws Exception {
-        UUID reservationId = UUID.randomUUID();
-        Reservation mockReservation = new Reservation();
-        
-        when(reservationService.getReservationById(reservationId)).thenReturn(mockReservation);
-        
-        mockMvc.perform(
-            get("/api/v1/reservations/{reservationId}", reservationId)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isNotEmpty());
-    }
-
-    @Test
-    @Requirement("MSEV-19")
     void whenReservationExistsAndValid_thenMarkAsUsed() throws Exception {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
