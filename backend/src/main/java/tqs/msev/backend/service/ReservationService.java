@@ -66,9 +66,19 @@ public class ReservationService {
     public Reservation markReservationAsUsed(UUID reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        if(reservation.isUsed()) {
+            throw new IllegalArgumentException("Reservation already marked as used");
+        }
+        if(reservation.getStartTimestamp().after(new Date())) {
+            throw new IllegalArgumentException("Reservation not started yet");
+        }
+        if(reservation.getEndTimestamp().before(new Date())) {
+            throw new IllegalArgumentException("Reservation already ended");
+        }
         reservation.setUsed(true);
-
-        return reservationRepository.save(reservation);
+        reservationRepository.save(reservation);
+        reservationRepository.flush();
+        return reservation;
     }
     
 }
