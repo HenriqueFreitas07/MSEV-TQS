@@ -116,7 +116,7 @@ class ReservationTestIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(reservation.getId().toString()))
                 .andExpect(jsonPath("$[0].user.id").value(user.getId().toString()))
-                .andExpect(jsonPath("$[0].charger.id").value(charger.getId().toString()))
+                .andExpect(jsonPath("$[0].charger.id").value(charger.getId().toString()));
     }
 
     @Test
