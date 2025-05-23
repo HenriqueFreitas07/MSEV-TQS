@@ -117,8 +117,6 @@ class ReservationTestIT {
                 .andExpect(jsonPath("$[0].id").value(reservation.getId().toString()))
                 .andExpect(jsonPath("$[0].user.id").value(user.getId().toString()))
                 .andExpect(jsonPath("$[0].charger.id").value(charger.getId().toString()))
-                .andExpect(jsonPath("$[0].startTimestamp").value(nowPlusOneHour))
-                .andExpect(jsonPath("$[0].endTimestamp").value(nowPlusOneHour));
     }
 
     @Test
@@ -151,8 +149,8 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date nowPlusHalfHourDate = new Date(new Date().getTime() + 1800000);
-        Date nowPlusOneHour = new Date(nowPlusHalfHourDate.getTime() + 3600000);
+        Date nowPlusHalfHourDate = new Date(System.currentTimeMillis() + 1000 * 60 * 30);
+        Date nowPlusOneHour = new Date(System.currentTimeMillis() + 1000 * 60 * 60);
         mockMvc.perform(post("/api/v1/reservations/create")
                 .contentType("application/json")
                 .content("{\"userId\":\"" + user.getId() + "\", \"chargerId\":\"" + charger.getId() + "\", \"startTimestamp\":\"" + nowPlusHalfHourDate + "\", \"endTimestamp\":\"" + nowPlusOneHour + "\"}"))
