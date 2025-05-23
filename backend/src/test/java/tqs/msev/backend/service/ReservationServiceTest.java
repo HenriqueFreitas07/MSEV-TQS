@@ -5,18 +5,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.ReservationRepository;
-import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import java.util.UUID;
-import java.util.Optional;
 import java.util.Date;
 import java.util.List;
-import java.util.NoSuchElementException;  
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
@@ -28,6 +25,7 @@ class ReservationServiceTest {
     private  ReservationService reservationService;
 
     @Test
+    @Requirement("MSEV-17")
     void whenReservationsExist_thenReturnReservations() {
         UUID chargerId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
@@ -44,6 +42,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @Requirement("MSEV-17")
     void whenReservationsNotInCloseFuture_thenReturnEmptyList() {
         UUID chargerId = UUID.randomUUID();
         

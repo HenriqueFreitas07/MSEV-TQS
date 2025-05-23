@@ -11,7 +11,7 @@ import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import java.util.UUID;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
@@ -90,6 +90,7 @@ class ChargerControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-17")
     void whenThereAreNoCloseReservations__thenReturnEmptyList() throws Exception {
         UUID chargerId = UUID.randomUUID();
         List<Reservation> mockReservations = List.of();
@@ -105,6 +106,7 @@ class ChargerControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-17")
     void whenThereAreCloseReservations__thenReturnList() throws Exception {
         UUID chargerId = UUID.randomUUID();
         List<Reservation> mockReservations = List.of(new Reservation(), new Reservation());

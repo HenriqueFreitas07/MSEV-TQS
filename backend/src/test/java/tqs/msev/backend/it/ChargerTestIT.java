@@ -26,6 +26,7 @@ import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 
 
@@ -153,6 +154,7 @@ class ChargerTestIT {
     }
 
     @Test
+    @Requirement("MSEV-17")
     void whenThereAreCloseReservations__thenReturnList() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
