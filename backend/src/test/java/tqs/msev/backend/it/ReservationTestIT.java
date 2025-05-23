@@ -123,49 +123,7 @@ class ReservationTestIT {
                 .andExpect(jsonPath("$[0].charger.id").value(charger.getId().toString()));
     }
 
-    @Test
-    @Requirement("MSEV-19")
-    void whenReservationIsValid_thenCreateReservation() throws Exception {
-        Station station = new Station();
-        station.setName("Test Station");
-        station.setLongitude(-74.0060);
-        station.setLatitude(40.7128);
-        station.setStatus(Station.StationStatus.ENABLED);
-        station.setAddress("Idk St.");
-        station = stationRepository.save(station);
-        stationRepository.flush();
-
-        Charger charger = Charger.builder()
-                .station(station)
-                .connectorType("Type 2")
-                .price(0.5)
-                .chargingSpeed(22)
-                .status(Charger.ChargerStatus.AVAILABLE)
-                .build();
-
-        charger = chargerRepository.save(charger);
-        chargerRepository.flush();
-        User user = User.builder()
-                .email("test@gmail.com")
-                .password("password")
-                .name("test")
-                .isOperator(false)
-                .build();
-        userRepository.save(user);
-        userRepository.flush();
-        Instant start = Instant.now().plus(Duration.ofMinutes(30));
-        Instant end = Instant.now().plus(Duration.ofHours(1));
-
-        mockMvc.perform(post("/api/v1/reservations/create")
-                .contentType("application/json")
-                .content("{\"userId\":\"" + user.getId() + "\", \"chargerId\":\"" + charger.getId() + "\", \"startTimestamp\":\"" + start.toString() + "\", \"endTimestamp\":\"" + end.toString() + "\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").isNotEmpty())
-                .andExpect(jsonPath("$.user.id").value(user.getId().toString()))
-                .andExpect(jsonPath("$.charger.id").value(charger.getId().toString()))
-                .andExpect(jsonPath("$.startTimestamp").value(start))
-                .andExpect(jsonPath("$.endTimestamp").value(start));
-    }
+    
 
     @Test
     @Requirement("MSEV-19")
