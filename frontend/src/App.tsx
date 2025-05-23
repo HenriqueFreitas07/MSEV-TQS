@@ -5,7 +5,7 @@ import {
 import Home from "./pages/Home";
 import "./index.css"
 import NotFound from "./pages/NotFound";
-import  Stations from "./pages/Stations";
+import  Stations from "./pages/StationDiscovery";
 
 const router = createBrowserRouter([
   {

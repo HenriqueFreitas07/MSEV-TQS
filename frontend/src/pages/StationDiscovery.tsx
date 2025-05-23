@@ -1,11 +1,7 @@
-import React from 'react'
 import NavLayout from '../layouts/NavLayout'
 import MapComponent from '../components/MapComponent';
 
-type Props = {
-}
-
-export default function Stations({}: Props) {
+export default function StationsDiscovery() {
   const markers = [
     {
       position: { lat: 50.8503, lng: 4.3517 },
