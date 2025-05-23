@@ -16,6 +16,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
+
     strategy:
       matrix:
         java: [ '21' ]
@@ -38,6 +41,10 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Run integration tests
       run: mvn -B integration-test verify --file pom.xml
+    - name: Check test result file exists and is valid
+      run: |
+        ls -l ./reports
+        cat ./reports/TEST-*.xml || true
     - name: Add code coverage information to PR
       id: jacoco-pr
       uses: madrapps/jacoco-report@v1.7.1
@@ -53,7 +60,4 @@ jobs:
       env:
         XRAYCLOUD_CLIENT_ID: ${{ secrets.CLIENT_ID_XRAY }}
         XRAYCLOUD_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_XRAY }}
-        XRAYCLOUD_TEST_PLAN_KEY: ${{ vars.XRAYCLOUD_TEST_PLAN_KEY }}
-        REVISON: ${{ github.ref_name}}
-        TEST_ENVIRONMENT: java${{ matrix.java }}
-      run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} -Dxray.testPlanKey=${{ env.XRAYCLOUD_TEST_PLAN_KEY }} -Dxray.revision=${{ env.REVISON }} xray:import-results  
+      run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} xray:import-results  

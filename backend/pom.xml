@@ -19,6 +19,7 @@
 
         <sonar.organization>henriquefreitas07</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco-merged-test-coverage-report/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
         <jacoco.version>0.8.13</jacoco.version>
         <unit.coverage.file>${project.build.directory}/jacoco-output/jacoco-unit-tests.exec</unit.coverage.file>
         <it.coverage.file>${project.build.directory}/jacoco-output/jacoco-it-tests.exec</it.coverage.file>
@@ -68,6 +69,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.skyscreamer</groupId>
+                    <artifactId>jsonassert</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -145,6 +152,16 @@
             <version>${webdrivermanager.version}</version>
 
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20250517</version>
         </dependency>
     </dependencies>
 
@@ -352,7 +369,7 @@
                     <cloud>true</cloud>
                     <projectKey>MSEV</projectKey>
                     <reportFormat>junit</reportFormat>
-                    <reportFile>reports/TEST-*.xml</reportFile>
+                    <reportFile>reports/TEST-junit-jupiter.xml</reportFile>
                 </configuration>
             </plugin>
         </plugins>

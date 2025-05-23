@@ -1,18 +1,18 @@
 package tqs.msev.backend.controller;
 
-
 import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import java.util.UUID;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -21,23 +21,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.hamcrest.Matchers.containsString;
 
-
 @WebMvcTest(ChargerController.class)
 @Import(GlobalExceptionHandler.class) 
-public class ChargerControllerTest {
+class ChargerControllerTest {
     
     @Autowired
     MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     ChargerService chargerService;
 
-
-    @Autowired
-    ChargerController chargerController;
-
     @Test
-    public void whenStationExists_thenReturnChargers() throws Exception {
+    @Requirement("MSEV-18")
+    void whenStationExists_thenReturnChargers() throws Exception {
 
         UUID stationId = UUID.randomUUID();
         List<Charger> mockChargers = List.of(new Charger(), new Charger());
@@ -54,7 +50,8 @@ public class ChargerControllerTest {
     }
 
     @Test
-    public void whenChargerExists_thenReturnCharger()  throws Exception {
+    @Requirement("MSEV-18")
+    void whenChargerExists_thenReturnCharger()  throws Exception {
         UUID chargerId = UUID.randomUUID();
         Charger mockCharger = new Charger();
         
@@ -69,7 +66,8 @@ public class ChargerControllerTest {
     }
 
     @Test
-    public void whenChargerDoesNotExist_thenThrowException() throws Exception {
+    @Requirement("MSEV-18")
+    void whenChargerDoesNotExist_thenThrowException() throws Exception {
         UUID chargerId = UUID.randomUUID();
         
         when(chargerService.getChargerById(chargerId)).thenThrow(new NoSuchElementException("Charger not found"));
@@ -80,5 +78,4 @@ public class ChargerControllerTest {
         .andExpect(status().isNotFound())
         .andExpect(content().string(containsString("Charger not found")));
     }
-
 }

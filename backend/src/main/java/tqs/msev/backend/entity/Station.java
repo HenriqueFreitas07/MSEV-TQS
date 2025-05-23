@@ -21,6 +21,9 @@ public class Station {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String address;
+
     @DecimalMax(value = "90")
     @DecimalMin(value = "-90")
     @Column(nullable = false)
@@ -31,7 +34,8 @@ public class Station {
     @Column(nullable = false)
     private double longitude;
 
-    private StationStatus status;
+    @Column(nullable = false)
+    private StationStatus status = StationStatus.ENABLED;
 
     public enum StationStatus {
         ENABLED, DISABLED

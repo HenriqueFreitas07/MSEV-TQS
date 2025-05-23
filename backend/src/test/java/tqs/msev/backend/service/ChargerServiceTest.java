@@ -1,5 +1,6 @@
 package tqs.msev.backend.service;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;  
 
 @ExtendWith(MockitoExtension.class)
-public class ChargerServiceTest {
+class ChargerServiceTest {
 
     @Mock
     ChargerRepository chargerRepository;
@@ -23,9 +24,9 @@ public class ChargerServiceTest {
     @InjectMocks
     private ChargerService chargerService;
 
-
     @Test
-    public void whenChargerExists_thenReturnCharger() {
+    @Requirement("MSEV-18")
+    void whenChargerExists_thenReturnCharger() {
         UUID chargerId = UUID.randomUUID();
         Charger mockCharger = new Charger();
         
@@ -37,7 +38,8 @@ public class ChargerServiceTest {
     }
 
     @Test
-    public void whenChargerDoesNotExist_thenThrowException() {
+    @Requirement("MSEV-18")
+    void whenChargerDoesNotExist_thenThrowException() {
         UUID chargerId = UUID.randomUUID();
         
         when(chargerRepository.findById(chargerId)).thenReturn(Optional.empty());
@@ -50,7 +52,8 @@ public class ChargerServiceTest {
     }
 
     @Test
-    public void whenStationExists_thenReturnChargers() {
+    @Requirement("MSEV-18")
+    void whenStationExists_thenReturnChargers() {
         UUID stationId = UUID.randomUUID();
         List<Charger> mockChargers = List.of(new Charger(), new Charger());
         
@@ -62,7 +65,8 @@ public class ChargerServiceTest {
     }
 
     @Test
-    public void whenStationDoesNotExist_thenReturnEmptyList() {
+    @Requirement("MSEV-18")
+    void whenStationDoesNotExist_thenReturnEmptyList() {
         UUID stationId = UUID.randomUUID();
         
         when(chargerRepository.findByStationId(stationId)).thenReturn(List.of());
@@ -71,5 +75,4 @@ public class ChargerServiceTest {
         
         assertEquals(0, chargers.size());
     }
-    
 }
