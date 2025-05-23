@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.hamcrest.Matchers.containsString;
+import tqs.msev.backend.entity.Reservation;
+import tqs.msev.backend.service.ReservationService;
 
 @WebMvcTest(ChargerController.class)
 @Import(GlobalExceptionHandler.class) 
@@ -30,6 +32,15 @@ class ChargerControllerTest {
 
     @MockitoBean
     ChargerService chargerService;
+
+
+    @MockitoBean
+    ReservationService reservationService;
+
+
+    @Autowired
+    ChargerController chargerController;
+
 
     @Test
     @Requirement("MSEV-18")
@@ -54,6 +65,7 @@ class ChargerControllerTest {
     void whenChargerExists_thenReturnCharger()  throws Exception {
         UUID chargerId = UUID.randomUUID();
         Charger mockCharger = new Charger();
+        mockCharger.setStatus(Charger.ChargerStatus.AVAILABLE);
         
         when(chargerService.getChargerById(chargerId)).thenReturn(mockCharger);
         
@@ -62,7 +74,8 @@ class ChargerControllerTest {
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isNotEmpty())
-        .andExpect(jsonPath("$").value(mockCharger));        
+        .andExpect(jsonPath("$").value(mockCharger))
+        .andExpect(jsonPath("$.status").value(Charger.ChargerStatus.AVAILABLE.toString()));       
     }
 
     @Test
@@ -78,4 +91,39 @@ class ChargerControllerTest {
         .andExpect(status().isNotFound())
         .andExpect(content().string(containsString("Charger not found")));
     }
+
+    @Test
+    @Requirement("MSEV-17")
+    void whenThereAreNoCloseReservations__thenReturnEmptyList() throws Exception {
+        UUID chargerId = UUID.randomUUID();
+        List<Reservation> mockReservations = List.of();
+        
+        when(reservationService.getFutureReservationsOnCharger(chargerId)).thenReturn(mockReservations);
+        
+        mockMvc.perform(
+            get("/api/v1/chargers/{chargerId}/reservations", chargerId)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @Requirement("MSEV-17")
+    void whenThereAreCloseReservations__thenReturnList() throws Exception {
+        UUID chargerId = UUID.randomUUID();
+        List<Reservation> mockReservations = List.of(new Reservation(), new Reservation());
+        
+        when(reservationService.getFutureReservationsOnCharger(chargerId)).thenReturn(mockReservations);
+        
+        mockMvc.perform(
+            get("/api/v1/chargers/{chargerId}/reservations", chargerId)
+        )
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$[0]").isNotEmpty())
+        .andExpect(jsonPath("$[1]").isNotEmpty());
+    }
+
+ 
 }

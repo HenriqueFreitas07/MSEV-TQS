@@ -29,12 +29,14 @@ class ChargerServiceTest {
     void whenChargerExists_thenReturnCharger() {
         UUID chargerId = UUID.randomUUID();
         Charger mockCharger = new Charger();
+        Charger.ChargerStatus status = Charger.ChargerStatus.AVAILABLE;
         
         when(chargerRepository.findById(chargerId)).thenReturn(Optional.of(mockCharger));
         
         Charger charger = chargerService.getChargerById(chargerId);
         
         assertEquals(mockCharger, charger);
+        assertEquals(status, charger.getStatus());
     }
 
     @Test
