@@ -1,4 +1,5 @@
 import React from 'react'
+import Footer from '../components/Footer'
 
 type Props = {
     children: React.ReactNode,
@@ -10,7 +11,7 @@ export default function Main({ children, title }: Props) {
         <>
             <div className="navbar bg-base-100 shadow-sm">
                 <div className="flex-1">
-                    <a className="btn btn-ghost text-xl">{title}</a>
+                    <a href="/" className="btn btn-ghost text-xl">{title}</a>
                 </div>
                 <div className="flex-none">
                     <ul className="menu menu-horizontal px-1">
@@ -26,6 +27,7 @@ export default function Main({ children, title }: Props) {
             {
                 children
             }
+            <Footer />
         </>
     )
 }
