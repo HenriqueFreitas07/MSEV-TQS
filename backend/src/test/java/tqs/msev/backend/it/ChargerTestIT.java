@@ -1,5 +1,6 @@
 package tqs.msev.backend.it;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import tqs.msev.backend.entity.Charger;
@@ -74,6 +75,7 @@ class ChargerTestIT {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenStationExists_thenReturnChargers() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -110,7 +112,8 @@ class ChargerTestIT {
                 .andExpect(jsonPath("$[1].connectorType").value("CCS"));
     }
 
-    @Test 
+    @Test
+    @Requirement("MSEV-18")
     void whenChargerExists_thenReturnCharger() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -139,6 +142,7 @@ class ChargerTestIT {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenChargerDoesNotExist_thenReturnNotFound() throws Exception {
         UUID chargerId = UUID.randomUUID();
         mockMvc.perform(get("/api/v1/chargers/{chargerId}", chargerId))
@@ -146,6 +150,7 @@ class ChargerTestIT {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenStationDoesNotExist_thenReturnEmptyList() throws Exception {
         UUID stationId = UUID.randomUUID();
         mockMvc.perform(get("/api/v1/chargers/station/{stationId}", stationId))

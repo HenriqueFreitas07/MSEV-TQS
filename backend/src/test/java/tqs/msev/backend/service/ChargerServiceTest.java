@@ -1,5 +1,6 @@
 package tqs.msev.backend.service;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,6 +25,7 @@ class ChargerServiceTest {
     private ChargerService chargerService;
 
     @Test
+    @Requirement("MSEV-18")
     void whenChargerExists_thenReturnCharger() {
         UUID chargerId = UUID.randomUUID();
         Charger mockCharger = new Charger();
@@ -38,6 +40,7 @@ class ChargerServiceTest {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenChargerDoesNotExist_thenThrowException() {
         UUID chargerId = UUID.randomUUID();
         
@@ -51,6 +54,7 @@ class ChargerServiceTest {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenStationExists_thenReturnChargers() {
         UUID stationId = UUID.randomUUID();
         List<Charger> mockChargers = List.of(new Charger(), new Charger());
@@ -63,6 +67,7 @@ class ChargerServiceTest {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenStationDoesNotExist_thenReturnEmptyList() {
         UUID stationId = UUID.randomUUID();
         

@@ -1,5 +1,6 @@
 package tqs.msev.backend.it;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class StationIT {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenGetStations_thenReturnStations() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -79,6 +81,7 @@ public class StationIT {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenGetStationByValidId_thenReturnStation() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -98,6 +101,7 @@ public class StationIT {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenGetStationByInvalidId_thenReturnNotFound() {
         given()
                 .when()
@@ -108,6 +112,7 @@ public class StationIT {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenSearchStationByValidName_thenReturnStations() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -135,6 +140,7 @@ public class StationIT {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenSearchStationByAddress_thenReturnStations() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -163,6 +169,7 @@ public class StationIT {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenSearchStationByInvalidAddress_thenReturnEmptyList() {
         Station station1 = new Station();
         station1.setLatitude(40);

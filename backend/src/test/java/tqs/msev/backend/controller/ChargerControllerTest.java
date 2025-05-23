@@ -4,6 +4,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -43,6 +44,7 @@ class ChargerControllerTest {
 
 
     @Test
+    @Requirement("MSEV-18")
     void whenStationExists_thenReturnChargers() throws Exception {
 
         UUID stationId = UUID.randomUUID();
@@ -60,6 +62,7 @@ class ChargerControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenChargerExists_thenReturnCharger()  throws Exception {
         UUID chargerId = UUID.randomUUID();
         Charger mockCharger = new Charger();
@@ -77,6 +80,7 @@ class ChargerControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-18")
     void whenChargerDoesNotExist_thenThrowException() throws Exception {
         UUID chargerId = UUID.randomUUID();
         
