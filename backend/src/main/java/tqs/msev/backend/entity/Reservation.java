@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.UUID;
 
-import org.testcontainers.shaded.org.checkerframework.checker.units.qual.C;
 
 import java.util.Date;
 
