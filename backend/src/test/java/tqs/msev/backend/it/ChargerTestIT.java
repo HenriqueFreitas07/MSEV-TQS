@@ -1,7 +1,6 @@
 package tqs.msev.backend.it;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
@@ -9,7 +8,6 @@ import tqs.msev.backend.repository.StationRepository;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -17,9 +15,7 @@ import org.testcontainers.junit.jupiter.Container;
 
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Testcontainers
 @AutoConfigureMockMvc
-public class ChargerTestIT {
+class ChargerTestIT {
     
     @Autowired
     private ChargerRepository chargerRepository;
@@ -58,17 +54,18 @@ public class ChargerTestIT {
     }
     
     @AfterEach
-    public void resetDb() {
+    void resetDb() {
         chargerRepository.deleteAll();
         stationRepository.deleteAll();
     }
 
     @Test
-    public void whenStationExists_thenReturnChargers() throws Exception {
+    void whenStationExists_thenReturnChargers() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
         station.setLongitude(-74.0060);
         station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
         station.setStatus(Station.StationStatus.ENABLED);
 
         station = stationRepository.save(station);
@@ -100,11 +97,12 @@ public class ChargerTestIT {
     }
 
     @Test 
-    public void whenChargerExists_thenReturnCharger() throws Exception {
+    void whenChargerExists_thenReturnCharger() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
         station.setLongitude(-74.0060);
         station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
         station.setStatus(Station.StationStatus.ENABLED);
 
         station = stationRepository.save(station);
@@ -127,19 +125,17 @@ public class ChargerTestIT {
     }
 
     @Test
-    public void whenChargerDoesNotExist_thenReturnNotFound() throws Exception {
+    void whenChargerDoesNotExist_thenReturnNotFound() throws Exception {
         UUID chargerId = UUID.randomUUID();
         mockMvc.perform(get("/api/v1/chargers/{chargerId}", chargerId))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void whenStationDoesNotExist_thenReturnEmptyList() throws Exception {
+    void whenStationDoesNotExist_thenReturnEmptyList() throws Exception {
         UUID stationId = UUID.randomUUID();
         mockMvc.perform(get("/api/v1/chargers/station/{stationId}", stationId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
-
-
 }
