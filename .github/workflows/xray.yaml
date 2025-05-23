@@ -53,7 +53,4 @@ jobs:
       env:
         XRAYCLOUD_CLIENT_ID: ${{ secrets.CLIENT_ID_XRAY }}
         XRAYCLOUD_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_XRAY }}
-        XRAYCLOUD_TEST_PLAN_KEY: ${{ vars.XRAYCLOUD_TEST_PLAN_KEY }}
-        REVISON: ${{ github.ref_name}}
-        TEST_ENVIRONMENT: java${{ matrix.java }}
-      run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} -Dxray.testEnvironment=${{ env.TEST_ENVIRONMENT }} -Dxray.testPlanKey=${{ env.XRAYCLOUD_TEST_PLAN_KEY }} -Dxray.revision=${{ env.REVISON }} xray:import-results  
+      run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} xray:import-results  
