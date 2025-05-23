@@ -60,7 +60,7 @@ public class ReservationService {
 
     public Reservation getReservationById(UUID reservationId){
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+                .orElseThrow(() -> new NoSuchElementException("Reservation not found"));
         return reservation;
     }
 

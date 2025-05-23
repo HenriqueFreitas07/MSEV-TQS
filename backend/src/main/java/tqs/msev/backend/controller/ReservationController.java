@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.validation.Valid;
 import tqs.msev.backend.entity.Reservation;
 import java.util.UUID;
 import tqs.msev.backend.service.ReservationService;
@@ -28,7 +30,7 @@ public class ReservationController {
     }
 
     @PostMapping("/create")
-    public Reservation createReservation(@RequestBody Reservation reservation) {
+    public Reservation createReservation(@Valid @RequestBody Reservation reservation) {
         return reservationService.createReservation(reservation);
     }
 
