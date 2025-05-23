@@ -15,8 +15,8 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
-    public Reservation createReservation(Reservation reservation) {
-        return reservationRepository.save(reservation);
+    public List<Reservation> getUserReservations(UUID userId) {
+        return reservationRepository.findByUserId(userId);
     }
 
     public List<Reservation> getFutureReservationsOnCharger(UUID chargerId) {
@@ -28,6 +28,47 @@ public class ReservationService {
                 .filter(reservation -> reservation.getStartTimestamp().before(fiveDaysFromNow))
                 .toList();
         
+    }
+
+    public Reservation createReservation(Reservation reservation) {
+
+        Date now = new Date();
+        if (reservation.getStartTimestamp().before(now) || reservation.getEndTimestamp().before(now)) {
+            throw new IllegalArgumentException("Reservation cannot be in the past");
+        }
+        if (reservation.getStartTimestamp().after(reservation.getEndTimestamp())) {
+            throw new IllegalArgumentException("Start timestamp must be before end timestamp");
+        }
+        List<Reservation> existingReservations = reservationRepository.findByChargerId(reservation.getCharger().getId());
+        for (Reservation existingReservation : existingReservations) {
+            if (reservation.getStartTimestamp().before(existingReservation.getEndTimestamp()) &&
+                reservation.getEndTimestamp().after(existingReservation.getStartTimestamp())) {
+                throw new IllegalArgumentException("Reservation overlaps with an existing reservation");
+            }
+        }
+        return reservationRepository.save(reservation);
+    }
+
+    public Reservation cancelReservation(UUID reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        reservationRepository.delete(reservation);
+        reservationRepository.flush();
+        return reservation;
+    }
+
+    public Reservation getReservationById(UUID reservationId){
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        return reservation;
+    }
+
+    public Reservation markReservationAsUsed(UUID reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        reservation.setUsed(true);
+
+        return reservationRepository.save(reservation);
     }
     
 }
