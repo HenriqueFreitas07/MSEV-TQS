@@ -12,7 +12,6 @@ import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import java.util.UUID;
-import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;

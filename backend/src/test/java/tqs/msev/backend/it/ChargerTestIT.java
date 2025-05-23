@@ -27,7 +27,6 @@ import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
-import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 
 
 
