@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
@@ -127,4 +128,100 @@ class ReservationTestIT {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationExists_thenReturnReservation() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        User user = User.builder()
+                .email("test@gmail.com")
+                .password("password")
+                .name("test")
+                .isOperator(false)
+                .build();
+        userRepository.save(user);
+        userRepository.flush();
+        Date now = new Date();
+        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
+        Reservation reservation = Reservation.builder()
+                .charger(charger)
+                .user(user)
+                .startTimestamp(nowPlusOneHour)
+                .endTimestamp(nowPlusOneHour)
+                .build();
+        reservationRepository.save(reservation);
+        reservationRepository.flush();
+        mockMvc.perform(get("/api/v1/reservations/" + reservation.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(reservation.getId().toString()))
+                .andExpect(jsonPath("$.user.id").value(user.getId().toString()))
+                .andExpect(jsonPath("$.charger.id").value(charger.getId().toString()));
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenReservationValidAndUnused_thenMarkAsUsed() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        User user = User.builder()
+                .email("test@gmail.com")
+                .password("password")
+                .name("test")
+                .isOperator(false)
+                .build();
+        userRepository.save(user);
+        userRepository.flush();
+        Date now = new Date();
+        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
+        Reservation reservation = Reservation.builder()
+                .charger(charger)
+                .user(user)
+                .startTimestamp(nowPlusOneHour)
+                .endTimestamp(nowPlusOneHour)
+                .build();
+        reservationRepository.save(reservation);
+        reservationRepository.flush();
+        mockMvc.perform(put("/api/v1/reservations/" + reservation.getId() + "/used"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(reservation.getId().toString()))
+                .andExpect(jsonPath("$.user.id").value(user.getId().toString()))
+                .andExpect(jsonPath("$.charger.id").value(charger.getId().toString()))
+                .andExpect(jsonPath("$.used").value(true));
+    }
 }

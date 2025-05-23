@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,9 +30,6 @@ class ReservationControllerTest {
     
     @Autowired
     MockMvc mockMvc;
-
-    @MockitoBean
-    ChargerService chargerService;
 
     @MockitoBean
     ReservationService reservationService;
@@ -150,7 +148,7 @@ class ReservationControllerTest {
         when(reservationService.markReservationAsUsed(reservationId)).thenReturn(mockReservation);
         
         mockMvc.perform(
-            get("/api/v1/reservations/{reservationId}/used", reservationId)
+            put("/api/v1/reservations/{reservationId}/used", reservationId)
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isNotEmpty());
