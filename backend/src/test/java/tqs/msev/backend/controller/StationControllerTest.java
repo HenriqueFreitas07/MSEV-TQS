@@ -29,7 +29,7 @@ class StationControllerTest {
     private StationService service;
 
     @Test
-    @XrayTest(key = "MSEV-56")
+    @Requirement("MSEV-16")
     void givenManyStations_whenGetStations_thenReturnStations() throws Exception {
         Station station1 = new Station();
         station1.setName("Station 1");
@@ -46,7 +46,6 @@ class StationControllerTest {
     }
 
     @Test
-    @XrayTest(key = "MSEV-57")
     @Requirement("MSEV-16")
     void givenOneStation_whenGetStation_thenReturnStation() throws Exception {
         UUID id = UUID.randomUUID();

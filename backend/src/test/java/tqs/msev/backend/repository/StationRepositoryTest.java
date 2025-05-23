@@ -1,5 +1,6 @@
 package tqs.msev.backend.repository;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -20,6 +21,7 @@ class StationRepositoryTest {
     private StationRepository stationRepository;
 
     @Test
+    @Requirement("MSEV-16")
     void whenValidId_thenReturnStation() {
         Station station1 = new Station();
         station1.setLatitude(40);
@@ -35,6 +37,7 @@ class StationRepositoryTest {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void whenInvalidId_thenReturnNull() {
         Station station = stationRepository.findById(UUID.randomUUID()).orElse(null);
 
@@ -42,6 +45,7 @@ class StationRepositoryTest {
     }
 
     @Test
+    @Requirement("MSEV-16")
     void givenSetOfStations_whenFindAll_thenReturnAllStations() {
         Station station1 = new Station();
         station1.setLatitude(40);
