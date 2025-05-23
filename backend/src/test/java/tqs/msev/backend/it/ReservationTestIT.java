@@ -116,7 +116,7 @@ class ReservationTestIT {
                 .build();
         reservationRepository.save(reservation);
         reservationRepository.flush();
-        mockMvc.perform(get("/api/reservations/user/" + user.getId()))
+        mockMvc.perform(get("/api/v1/reservations/user/" + user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(reservation.getId().toString()))
                 .andExpect(jsonPath("$[0].user.id").value(user.getId().toString()))
@@ -163,7 +163,7 @@ class ReservationTestIT {
                 .startTimestamp(nowPlusOneHour)
                 .endTimestamp(nowPlusOneHour)
                 .build();
-        mockMvc.perform(post("/api/reservations/create")
+        mockMvc.perform(post("/api/v1/reservations/create")
                 .contentType("application/json")
                 .content("{\"chargerId\":\"" + reservation.getCharger().getId() + "\", \"userId\":\"" + reservation.getUser().getId() + "\", \"startTimestamp\":\"" + nowPlusOneHour.toString() + "\", \"endTimestamp\":\"" + nowPlusOneHour.toString() + "\"}"))
                 .andExpect(status().isCreated())
@@ -178,7 +178,7 @@ class ReservationTestIT {
     @Requirement("MSEV-19")
     void whenReservationUnexistent_thenReturnNotFound() throws Exception {
         UUID reservationId = UUID.randomUUID();
-        mockMvc.perform(get("/api/reservations/" + reservationId))
+        mockMvc.perform(get("/api/v1/reservations/" + reservationId))
                 .andExpect(status().isNotFound());
     }
 
