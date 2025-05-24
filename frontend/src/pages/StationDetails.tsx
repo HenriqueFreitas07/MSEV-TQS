@@ -53,10 +53,10 @@ function StationDetails() {
         return (
             <div className="items-center justify-center">
                 <NavLayout title="Station" >
-                    <p className={`text-4xl p-4 text-center ${getColorStation(station.status)}`}>Station {station.name}</p>
+                    <p data-test-id="station" className={`text-4xl p-4 text-center ${getColorStation(station.status)}`}>Station {station.name}</p>
 
                     <p className="text-4xl p-4 text-center">Chargers</p>
-                    <div className="flex grid grid-cols-2 ">
+                    <div className="flex grid grid-cols-2" data-test-id="chargers">
                         {chargers.map(
                             (charger) =>
                                 <div className="card p-3 m-4 card-side card-sm bg-base-100 shadow-sm" key={charger.id}>
@@ -67,8 +67,8 @@ function StationDetails() {
                                         />
                                     </figure>
                                     <div className="card-body">
-                                        <h2 className="card-title">{charger.connectorType}</h2>
-                                        <p className="font-bold">Price: </p><p> {charger.price}</p>
+                                        <h2 className="card-title" data-test-id="type">{charger.connectorType}</h2>
+                                        <p className="font-bold" data-test-id="price">Price: </p><p> {charger.price}</p>
                                         <p className="font-bold">Connector Type: </p><p> {charger.connectorType}</p>
                                         <p className="font-bold">Charging Speed: </p><p> {charger.chargingSpeed}</p>
                                         <p className="font-bold">Status: </p><p className={`${getColorChargers(charger.status)}`}> {charger.status}</p>
