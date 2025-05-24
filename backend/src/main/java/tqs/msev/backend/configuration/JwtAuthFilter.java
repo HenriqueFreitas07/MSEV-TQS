@@ -51,7 +51,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         try {
-            final String jwt =cookie.getValue();
+            final String jwt = cookie.getValue();
             final String username = jwtService.extractUsername(jwt);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
