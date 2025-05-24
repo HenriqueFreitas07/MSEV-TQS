@@ -268,7 +268,8 @@ class ReservationTestIT {
         mockMvc.perform(post("/api/v1/reservations/create")
                 .contentType("application/json")
                 .content(new ObjectMapper().writeValueAsString(reservation)))
-                .andExpect(status().isCreated());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(reservation.getId().toString()));
 
     }
 
