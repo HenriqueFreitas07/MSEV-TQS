@@ -7,7 +7,7 @@ type Props = {
 }
 
 export default function Main({ children, title }: Props) {
-  const { isLogged, user } = useAuth();
+  const { isLogged, logout } = useAuth();
 
   return (
     <>
@@ -25,8 +25,8 @@ export default function Main({ children, title }: Props) {
                 <NavLink to="/login">Login</NavLink>
               </li>
             ) : (
-              <li className="justify-center">
-                Hi, {user!.name}
+              <li className="justify-center cursor-pointer" onClick={logout}>
+                <NavLink to="/" onClick={logout}>Logout</NavLink>
               </li>
             )}
           </ul>
