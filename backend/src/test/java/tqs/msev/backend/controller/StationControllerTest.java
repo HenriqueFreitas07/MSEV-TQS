@@ -1,13 +1,13 @@
 package tqs.msev.backend.controller;
 
-import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
-import app.getxray.xray.junit.customjunitxml.annotations.XrayTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tqs.msev.backend.entity.Station;
+import tqs.msev.backend.service.JwtService;
 import tqs.msev.backend.service.StationService;
 
 import java.util.List;
@@ -28,8 +28,11 @@ class StationControllerTest {
     @MockitoBean
     private StationService service;
 
+    @MockitoBean
+    private JwtService jwtService;
+
     @Test
-    @Requirement("MSEV-16")
+    @WithMockUser(username = "test")
     void givenManyStations_whenGetStations_thenReturnStations() throws Exception {
         Station station1 = new Station();
         station1.setName("Station 1");
@@ -46,7 +49,7 @@ class StationControllerTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
+    @WithMockUser(username = "test")
     void givenOneStation_whenGetStation_thenReturnStation() throws Exception {
         UUID id = UUID.randomUUID();
         Station station1 = new Station();
@@ -61,7 +64,7 @@ class StationControllerTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
+    @WithMockUser(username = "test")
     void whenGetInvalidStation_thenReturnNotFound() throws Exception {
         UUID id = UUID.randomUUID();
 
@@ -72,7 +75,7 @@ class StationControllerTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
+    @WithMockUser(username = "test")
     void givenManyStations_whenSearchStationsByName_thenReturnStations() throws Exception {
         Station station1 = new Station();
         station1.setName("Station 1");
@@ -85,7 +88,7 @@ class StationControllerTest {
     }
 
     @Test
-    @Requirement("MSEV-16")
+    @WithMockUser(username = "test")
     void givenManyStations_whenSearchStationsByAddress_thenReturnStations() throws Exception {
         Station station1 = new Station();
         station1.setName("Station 1");
