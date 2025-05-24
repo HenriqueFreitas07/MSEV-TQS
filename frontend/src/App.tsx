@@ -5,7 +5,10 @@ import {
 import Home from "./pages/Home";
 import "./index.css"
 import NotFound from "./pages/NotFound";
-import  Stations from "./pages/StationDiscovery";
+import Stations from "./pages/StationDiscovery";
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/auth";
+import Signup from "./pages/Signup";
 
 const router = createBrowserRouter([
   {
@@ -17,13 +20,25 @@ const router = createBrowserRouter([
     element: <Stations />
   },
   {
-    path:"/*",
+    path: "/login",
+    element: <Login />
+  },
+  {
+    path: "/signup",
+    element: <Signup />
+  },
+  {
+    path: "/*",
     element: <NotFound />
-  } ,
+  },
 ]);
 
 function App() {
-  return   <RouterProvider router={router} />
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  )
 }
 
 export default App
