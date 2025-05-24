@@ -14,9 +14,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.UUID;
 
-public class CucumberSteps {
-    private WebDriver driver = new ChromeDriver();
-    private Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+// public class CucumberSteps {
+//     private WebDriver driver = new ChromeDriver();
+//     private Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(2));
 
     // private UUID stationId;
 
@@ -45,4 +45,4 @@ public class CucumberSteps {
     // wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-test-id='price']")));
     // }
 
-}
+// }
