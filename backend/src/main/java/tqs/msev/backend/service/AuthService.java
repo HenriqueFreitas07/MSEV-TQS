@@ -23,7 +23,7 @@ public class AuthService {
 
     public void createUser(SignupDTO dto) {
         String email = dto.getEmail();
-        if (!userRepository.existsUserByEmail(email)) {
+        if (userRepository.existsUserByEmail(email)) {
             throw new IllegalArgumentException("A user with that email already exists!");
         }
 

@@ -34,7 +34,8 @@ public class User implements UserDetails {
     private String password;
 
     @Column(nullable = false)
-    private boolean isOperator;
+    @Builder.Default
+    private boolean isOperator = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
