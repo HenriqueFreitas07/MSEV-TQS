@@ -18,7 +18,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '16'  # Adjust the Node.js version based on your project's needs
+        node-version: '22'  # Adjust the Node.js version based on your project's needs
 
     - name: Install frontend dependencies
       working-directory: ./frontend  # Change to where your frontend code is located

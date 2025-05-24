@@ -2,8 +2,9 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router";
-import Home from "./components/Home";
+import Home from "./pages/Home";
 import "./index.css"
+import NotFound from "./pages/NotFound";
 import StationDetails from "./pages/StationDetails";
 
 const router = createBrowserRouter([
@@ -11,6 +12,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <Home />
   },
+  {
+    path:"/*",
+    element: <NotFound />
+  } ,
   {
     path: "/station/:postId",
     element: <StationDetails />
