@@ -3,7 +3,7 @@ import type { Charger } from './types/Charger';
 import type { Station } from './types/Station';
 
 const api = axios.create({
-  baseURL: 'http://backend:8080/api', // might change
+  baseURL: 'http://localhost:8080/api/v1', // might change
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export const ChargerService = {
       throw error;
     }
   },
-  getChargerById: async (id:string) => {
+  getChargerById: async (id: string) => {
     try {
       const response = await api.get(`/chargers/${id}`);
       return response.data as Charger;

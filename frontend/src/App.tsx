@@ -12,7 +12,7 @@ const router = createBrowserRouter([
     element: <Home />
   },
   {
-    path: "/station",
+    path: "/station/:postId",
     element: <StationDetails />
   },
 ]);

@@ -17,8 +17,8 @@ function StationDetails() {
     useEffect(() => {
         const fetchData = async () => {
             if (params.postId) {
-                setChargers(await ChargerService.getChargerByStation(params.postId));
                 setStation(await StationService.getStationById(params.postId));
+                setChargers(await ChargerService.getChargerByStation(params.postId));
             }
         }
         fetchData();
@@ -49,7 +49,7 @@ function StationDetails() {
         }
         return color_station;
     }
-    if (station)
+    if (params.postId && station)
         return (
             <div className="items-center justify-center">
                 <NavLayout title="Station" >
@@ -59,7 +59,7 @@ function StationDetails() {
                     <div className="flex grid grid-cols-2 ">
                         {chargers.map(
                             (charger) =>
-                                <div className="card p-3 m-4 card-side card-sm bg-base-100 shadow-sm" >
+                                <div className="card p-3 m-4 card-side card-sm bg-base-100 shadow-sm" key={charger.id}>
                                     <figure className="w-2/3">
                                         <img
                                             src="https://www.ayvens.com/-/media/leaseplan-digital/pt/blog/closeupofachargingelectriccarjpgs1024x1024wisk20ckeuxnuhyqyacvxmhzorzeru0rnlkt8gmrr91setym.jpg?rev=5b11d8a3cb184493bb742f8ae7e1a41f"
