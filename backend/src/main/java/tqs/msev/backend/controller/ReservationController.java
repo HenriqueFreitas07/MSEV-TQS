@@ -49,4 +49,9 @@ public class ReservationController {
         return reservationService.markReservationAsUsed(reservationId);
     }
 
+    @GetMapping("/charger/{chargerId}")
+    public List<Reservation> getChargerReservations(@PathVariable("chargerId") UUID chargerId) {
+        return reservationService.getChargerReservations(chargerId);
+    }
+
 }

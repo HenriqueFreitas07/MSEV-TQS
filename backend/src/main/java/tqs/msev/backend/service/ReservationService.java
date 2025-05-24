@@ -81,5 +81,9 @@ public class ReservationService {
         reservationRepository.flush();
         return reservation;
     }
+
+    public List<Reservation> getChargerReservations(UUID chargerId) {
+        return reservationRepository.findByChargerId(chargerId);
+    }
     
 }
