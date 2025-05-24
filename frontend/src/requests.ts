@@ -1,5 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import type { LoginDTO, SignupDTO, User } from './types/user';
+import type { Station } from './types/Station';
+import type { Charger } from './types/Charger';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -26,6 +28,29 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+//
+// How to declare the requests to the backend endpoints 
+// export const ServiceName = {
+//   method: async () => {
+//     try {
+//       const response = await api.get('/restaurants');
+//       return response.data;
+//     } catch (error) {
+//       console.error('Error fetching restaurants:', error);
+//       throw error;
+//     }
+//   },
+
+//   otherMethod: async (id) => {
+//     try {
+//       const response = await api.get(`/restaurants/${id}`);
+//       return response.data;
+//     } catch (error) {
+//       console.error(`Error fetching restaurant with id ${id}:`, error);
+//       throw error;
+//     }
+//   }
+// };
 
 export const AuthService = {
   signup: async (dto: SignupDTO) => {
@@ -69,25 +94,62 @@ export const UserService = {
 }
 
 
-// How to declare the requests to the backend endpoints 
-// export const ServiceName = {
-//   method: async () => {
-//     try {
-//       const response = await api.get('/restaurants');
-//       return response.data;
-//     } catch (error) {
-//       console.error('Error fetching restaurants:', error);
-//       throw error;
-//     }
-//   },
+export const StationService = {
+  getAllStations: async () => {
+    try {
+      const response = await api.get("/stations/");
+      return response.data as Station[];
+    } catch (error) {
+      console.error('Error fetching stations:', error);
+      throw error;
+    }
+  },
+  getStationById: async (id: string) => {
+    try {
+      const response = await api.get(`/stations/${id}`);
+      return response.data as Station;
+    } catch (error) {
+      console.error('Error fetching station:', error);
+      throw error;
+    }
+  },
+  searchStationByName: async (name: string) => {
+    try {
+      const response = await api.get("/stations/search-by-name", { params: { name } });
+      return response.data as Station[];
+    } catch (error) {
+      console.error('Error fetching station:', error);
+      throw error;
+    }
+  },
+  searchStationByADdress: async (address: string) => {
+    try {
+      const response = await api.get("/stations/search-by-address", { params: { address } });
+      return response.data as Station[];
+    } catch (error) {
+      console.error('Error fetching station:', error);
+      throw error;
+    }
+  }
+}
 
-//   otherMethod: async (id) => {
-//     try {
-//       const response = await api.get(`/restaurants/${id}`);
-//       return response.data;
-//     } catch (error) {
-//       console.error(`Error fetching restaurant with id ${id}:`, error);
-//       throw error;
-//     }
-//   }
-// };
+export const ChargerService = {
+  getChargerByStation: async (id: string) => {
+    try {
+      const response = await api.get(`/chargers/station/${id}`);
+      return response.data as Charger[];
+    } catch (error) {
+      console.error('Error fetching chargers:', error);
+      throw error;
+    }
+  },
+  getChargerById: async (id: string) => {
+    try {
+      const response = await api.get(`/chargers/${id}`);
+      return response.data as Charger;
+    } catch (error) {
+      console.error('Error fetching charger:', error);
+      throw error;
+    }
+  }
+}

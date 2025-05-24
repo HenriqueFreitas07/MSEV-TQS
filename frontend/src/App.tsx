@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/auth";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import StationDetails from "./pages/StationDetails";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,13 @@ const router = createBrowserRouter([
   {
     path: "/*",
     element: <NotFound />
+  },
+  {
+    path: "/station/:postId",
+    element: <ProtectedRoute />,
+    children: [
+      { element: <StationDetails /> }
+    ]
   },
 ]);
 
