@@ -13,6 +13,7 @@ import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import tqs.msev.backend.service.ReservationService;
 import tqs.msev.backend.entity.Reservation;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -46,7 +47,8 @@ class ReservationControllerTest {
         when(reservationService.getUserReservations(userId)).thenReturn(mockReservations);
         
         mockMvc.perform(
-            get("/api/v1/reservations/user/{userId}", userId)
+            get("/api/v1/reservations")
+                .param("userId", userId.toString())
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
@@ -120,7 +122,7 @@ class ReservationControllerTest {
         when(reservationService.cancelReservation(reservationId)).thenReturn(mockReservation);
         
         mockMvc.perform(
-            get("/api/v1/reservations/{reservationId}/cancel", reservationId)
+            delete("/api/v1/reservations/{reservationId}", reservationId)
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isNotEmpty());
@@ -134,7 +136,7 @@ class ReservationControllerTest {
         when(reservationService.cancelReservation(reservationId)).thenThrow(new NoSuchElementException("Reservation not found"));
         
         mockMvc.perform(
-            get("/api/v1/reservations/{reservationId}/cancel", reservationId)
+            delete("/api/v1/reservations/{reservationId}", reservationId)
         )
         .andExpect(status().isNotFound());
     }

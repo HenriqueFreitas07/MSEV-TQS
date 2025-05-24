@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -114,7 +115,7 @@ class ReservationTestIT {
                 .build();
         reservationRepository.save(reservation);
         reservationRepository.flush();
-        mockMvc.perform(get("/api/v1/reservations/user/" + user.getId()))
+        mockMvc.perform(get("/api/v1/reservations" + "?userId=" + user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(reservation.getId().toString()))
                 .andExpect(jsonPath("$[0].user.id").value(user.getId().toString()))
@@ -125,7 +126,7 @@ class ReservationTestIT {
     @Requirement("MSEV-19")
     void whenReservationUnexistent_thenReturnNotFound() throws Exception {
         UUID reservationId = UUID.randomUUID();
-        mockMvc.perform(post("/api/v1/reservations/" + reservationId+"/cancel"))
+        mockMvc.perform(delete("/api/v1/reservations/" + reservationId))
                 .andExpect(status().isNotFound());
     }
 
@@ -265,7 +266,7 @@ class ReservationTestIT {
                 .startTimestamp(inThirtyMinutes)
                 .endTimestamp(nowPlusOneHour)
                 .build();
-        mockMvc.perform(post("/api/v1/reservations/create")
+        mockMvc.perform(post("/api/v1/reservations")
                 .contentType("application/json")
                 .content(new ObjectMapper().writeValueAsString(reservation)))
                 .andExpect(status().isOk())
@@ -314,7 +315,7 @@ class ReservationTestIT {
                 .build();
         reservationRepository.save(reservation);
         reservationRepository.flush();
-        mockMvc.perform(get("/api/v1/reservations/charger/" + charger.getId()))
+        mockMvc.perform(get("/api/v1/reservations" + "?chargerId=" + charger.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(reservation.getId().toString()))
                 .andExpect(jsonPath("$[0].user.id").value(user.getId().toString()))
