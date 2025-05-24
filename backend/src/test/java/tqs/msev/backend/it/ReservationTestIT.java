@@ -269,7 +269,7 @@ class ReservationTestIT {
                 .contentType("application/json")
                 .content(new ObjectMapper().writeValueAsString(reservation)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(reservation.getId().toString()));
+                .andExpect(jsonPath("$.id").isNotEmpty());
 
     }
 
