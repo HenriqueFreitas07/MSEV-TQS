@@ -257,12 +257,12 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date now = new Date();
-        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
+        Date inThirtyMinutes = new Date(System.currentTimeMillis() + 1800000);
+        Date nowPlusOneHour = new Date(inThirtyMinutes.getTime() + 3600000);
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
-                .startTimestamp(now)
+                .startTimestamp(inThirtyMinutes)
                 .endTimestamp(nowPlusOneHour)
                 .build();
         mockMvc.perform(post("/api/v1/reservations/create")
