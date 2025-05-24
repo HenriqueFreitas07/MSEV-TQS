@@ -9,6 +9,7 @@ import Stations from "./pages/StationDiscovery";
 import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/auth";
 import Signup from "./pages/Signup";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -17,7 +18,10 @@ const router = createBrowserRouter([
   },
   {
     path: "/stations",
-    element: <Stations />
+    element: <ProtectedRoute />,
+    children: [
+      { element: <Stations /> }
+    ]
   },
   {
     path: "/login",
