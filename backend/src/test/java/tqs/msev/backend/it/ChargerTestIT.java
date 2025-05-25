@@ -208,4 +208,32 @@ class ChargerTestIT {
         mockMvc.perform(get("/api/v1/chargers/{chargerId}/reservations", charger.getId()))
                 .andExpect(jsonPath("$").isArray());
     }
+
+    @Test
+    @Requirement("MSEV-17")
+    @WithMockUser(username = "test")
+    void whenThereAreNoCloseReservations__thenReturnEmptyList() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setStatus(Station.StationStatus.ENABLED);
+        station.setAddress("Idk St.");
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        mockMvc.perform(get("/api/v1/chargers/{chargerId}/reservations", charger.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
 }
