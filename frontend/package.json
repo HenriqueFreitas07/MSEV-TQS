@@ -15,6 +15,7 @@
     "@vis.gl/react-google-maps": "^1.5.2",
     "axios": "^1.9.0",
     "daisyui": "^5.0.35",
+    "date-fns": "^4.1.0",
     "js-cookie": "^3.0.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

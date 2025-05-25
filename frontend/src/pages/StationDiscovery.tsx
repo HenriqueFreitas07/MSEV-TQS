@@ -15,7 +15,7 @@ export default function StationsDiscovery() {
   const [nameSearch, setNameSearch] = useState<number>(0);
   const [currentText, setCurrentText] = useState("");
   const [loading, setLoading] = useState(false);
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const [selectedMarker, setSelectedMarker] = useState<markerProps>();
   const [markers, setMarkers] = useState<markerProps[]>([]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -79,7 +79,7 @@ export default function StationsDiscovery() {
           });
 
       } else if (nameSearch === 1) {
-        StationService.searchStationByADdress(value)
+        StationService.searchStationByAddress(value)
           .then((data) => {
             setAutocompleteList(
               data.map((item) => ({
