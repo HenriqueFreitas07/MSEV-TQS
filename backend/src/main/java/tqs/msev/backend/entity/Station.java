@@ -1,5 +1,6 @@
 package tqs.msev.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -38,6 +40,10 @@ public class Station {
 
     @Column(nullable = false)
     private StationStatus status = StationStatus.ENABLED;
+
+    @OneToMany(mappedBy = "station", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Charger> chargers;
 
     public enum StationStatus {
         ENABLED, DISABLED
