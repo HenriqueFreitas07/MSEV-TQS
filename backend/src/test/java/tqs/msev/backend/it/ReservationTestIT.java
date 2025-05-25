@@ -2,6 +2,8 @@ package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
+
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
@@ -76,6 +78,7 @@ class ReservationTestIT {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenUserExists_thenReturnReservations() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -124,6 +127,7 @@ class ReservationTestIT {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationUnexistent_thenReturnNotFound() throws Exception {
         UUID reservationId = UUID.randomUUID();
         mockMvc.perform(delete("/api/v1/reservations/" + reservationId))
@@ -132,6 +136,7 @@ class ReservationTestIT {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationExists_thenReturnReservation() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -180,6 +185,7 @@ class ReservationTestIT {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationValidAndUnused_thenMarkAsUsed() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -229,6 +235,7 @@ class ReservationTestIT {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationIsValid_thenCreateReservation() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -276,6 +283,7 @@ class ReservationTestIT {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenChargerEXists_thenReturnReservations() throws Exception{
         Station station = new Station();
         station.setName("Test Station");

@@ -7,6 +7,7 @@ import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
@@ -39,6 +40,7 @@ class ReservationControllerTest {
     ReservationController reservationController;
 
     @Test
+    @WithMockUser(username = "test")
     @Requirement("MSEV-19")
     void whenGetUserReservations_thenReturnReservations() throws Exception {
         UUID userId = UUID.randomUUID();
@@ -57,6 +59,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "test")
     @Requirement("MSEV-19")
     void whenReservationValid__thenReturnReservation() throws Exception {
         UUID reservationId = UUID.randomUUID();
@@ -73,6 +76,7 @@ class ReservationControllerTest {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationValid_thenCreateReservation() throws Exception {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
@@ -88,6 +92,7 @@ class ReservationControllerTest {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationNonExistent_thenThrowException() throws Exception {
         UUID reservationId = UUID.randomUUID();
         
@@ -101,6 +106,7 @@ class ReservationControllerTest {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationInPast_thenThrowException() throws Exception {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
@@ -115,6 +121,7 @@ class ReservationControllerTest {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationExistsAndValid_thenCancelReservation() throws Exception {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
@@ -130,6 +137,7 @@ class ReservationControllerTest {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationNonExistent_thenThrowExceptionOnCancel() throws Exception {
         UUID reservationId = UUID.randomUUID();
         
@@ -143,6 +151,7 @@ class ReservationControllerTest {
 
     @Test
     @Requirement("MSEV-19")
+    @WithMockUser(username = "test")
     void whenReservationExistsAndValid_thenMarkAsUsed() throws Exception {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
