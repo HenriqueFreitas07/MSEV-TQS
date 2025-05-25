@@ -7,125 +7,30 @@ import { MdPersonSearch } from "react-icons/md";
 import type { markerProps } from "../types/MapTypes";
 import { GoogleService, StationService } from "../requests";
 import type { autoComplete } from "../types/PlacesTypes";
+import type { Station } from "../types/Station";
+import { showAlert } from "../alerts";
+import { useNavigate } from "react-router";
+import { BiLogoAirbnb } from "react-icons/bi";
 
 export default function StationsDiscovery() {
-  const [nameSearch, setNameSearch] = useState(true);
+  const [nameSearch, setNameSearch] = useState<number>(0);
   const [currentText, setCurrentText] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  let navigate = useNavigate();
   const [selectedMarker, setSelectedMarker] = useState<markerProps>();
   const [markers, setMarkers] = useState<markerProps[]>([]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [autocompleteList, setAutocompleteList] = useState<autoComplete[]>([]);
-  const [stations, setStations] = useState([
-    {
-      id: 1,
-      name: "Station 1",
-      address: "123 Main St, Cityville",
-      latitude: 40.7128,
-      longitude: -8.506,
-      status: "ENABLED",
-    },
-    {
-      id: 2,
-      name: "Station 2",
-      address: "Aveiro",
-      latitude: 40.7128,
-      longitude: -8.64554,
-      status: "DISABLED",
-    },
-  ]);
+  const [stations, setStations] = useState<Station[]>([]);
   const handlerRadio = (
     e: React.ChangeEvent<HTMLInputElement>,
-    value: boolean
+    value: 0 | 1 | 2
   ) => {
     setNameSearch(value);
   };
-  const handlerAutocomplete = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setCurrentText(value);
-    if (value.length < 3) {
-      setStations([]);
-      return;
-    }
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = setTimeout(() => {
-      if (nameSearch) {
-        StationService.searchByName(value)
-          .then((data) => {
-            console.log(data);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      // if search is by name then i show up the google places api autocomplete 
-      GoogleService.autocompletePlaces(value)
-        .then((data) => {
-          type SuggestionItem = {
-            text: string;
-            placePrediction: { text: { text: string }; placeId: string };
-          };
-          const suggestions = data.suggestions.map((item: SuggestionItem) => ({
-            text: item.placePrediction.text.text,
-            place_id: item.placePrediction.placeId,
-          }));
-          setAutocompleteList(suggestions);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      } else {
-        StationService.searchByAddress(value)
-          .then((data) => {
-            console.log(data);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      }
-    }, 1000);
-  };
-  const handleSelectSugg = (index: number) => {
-    const selectedSuggestion = autocompleteList[index];
-    setCurrentText(selectedSuggestion.text);
-    setAutocompleteList([]);
-    setStations([]);
-    GoogleService.getPlace(selectedSuggestion.place_id)
-      .then((data) => {
-        setSelectedMarker({
-          markerOptions: {
-            position: {
-              lat: data.location.latitude,
-              lng: data.location.longitude,
-            },
-            title: data.displayName.text,
-          },
-          icon: <MdPersonSearch className="text-green-500" size={40} />,
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-      // get all the stations and set for all of them that are in a radius of 5km
-      StationService.getAllStations().then((data)=>{
-        setStations((prevStations) =>
-          prevStations.filter(
-            (station) =>
-              station.latitude <= data.location.latitude + 0.05 &&
-              station.latitude >= data.location.latitude - 0.05 &&
-              station.longitude <= data.location.longitude + 0.05 &&
-              station.longitude >= data.location.longitude - 0.05
-          )
-        );
-      })
-
-
-  };
 
   const UpdateStationMarkers = () => {
+    //get all the stations and set markers for them
     setMarkers(
       stations.map((station) => ({
         markerOptions: {
@@ -137,6 +42,10 @@ export default function StationsDiscovery() {
           title: station.name,
           description: station.address,
         },
+        callback: () => {
+          console.log("Marker clicked:", station.id);
+          navigate(`/stations/${station.id}`);
+        },
         icon:
           station.status === "ENABLED" ? (
             <TbGasStation className="text-green-500" size={40} />
@@ -146,6 +55,133 @@ export default function StationsDiscovery() {
       }))
     );
   };
+  const handlerAutocomplete = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLoading(true);
+    setCurrentText(value);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
+      if (nameSearch == 0) {
+        StationService.searchStationByName(value)
+          .then((data) => {
+            setAutocompleteList(
+              data.map((item) => ({
+                text: item.name,
+                place_id: item.id,
+              }))
+            );
+            setStations(data);
+            UpdateStationMarkers();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+
+      } else if (nameSearch === 1) {
+        StationService.searchStationByADdress(value)
+          .then((data) => {
+            setAutocompleteList(
+              data.map((item) => ({
+                text: item.name,
+                place_id: item.id,
+              }))
+            );
+            setStations(data);
+            UpdateStationMarkers();
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      else if (nameSearch === 2) {
+        GoogleService.autocompletePlaces(value)
+          .then((data) => {
+            type SuggestionItem = {
+              text: string;
+              placePrediction: { text: { text: string }; placeId: string };
+            };
+            const suggestions = data.suggestions.map((item: SuggestionItem) => ({
+              text: item.placePrediction.text.text,
+              place_id: item.placePrediction.placeId,
+            }));
+            setAutocompleteList(suggestions);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      setLoading(false);
+    }, 1000);
+  };
+  const handleSelectSugg = (index: number) => {
+    if (index < 0 || index >= autocompleteList.length) {
+      showAlert("Error", "Invalid selection", "error");
+      return;
+    }
+
+    const selectedSuggestion = autocompleteList[index];
+    setMarkers([]);
+    setAutocompleteList([]);
+    if (nameSearch === 2) {
+      GoogleService.getPlace(selectedSuggestion.place_id)
+        .then((data) => {
+          setSelectedMarker({
+            markerOptions: {
+              position: {
+                lat: data.location.latitude,
+                lng: data.location.longitude,
+              },
+              title: data.displayName.text,
+            },
+            icon: <MdPersonSearch className="text-green-500" size={40} />,
+          });
+          // set the station markers within 5km of the selected place
+          const nearbyStations = stations.filter((station) => {
+            const distance = Math.sqrt(
+              Math.pow(station.latitude - data.location.latitude, 2) +
+              Math.pow(station.longitude - data.location.longitude, 2)
+            );
+            return distance <= 0.05; // Assuming 0.05 degrees is roughly 5km
+          });
+          console.log("Nearby Stations:", nearbyStations);
+          setStations(nearbyStations);
+          UpdateStationMarkers();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      setCurrentText(selectedSuggestion.text);
+      setAutocompleteList([]);
+      return;
+    }
+    setCurrentText(selectedSuggestion.text);
+    const selectedStation: Station | undefined = stations.find(
+      (station) => station.id === selectedSuggestion.place_id
+    );
+    if (!selectedStation) {
+      showAlert("Error", "Station not found", "error");
+      return;
+    }
+    setStations([selectedStation]);
+    UpdateStationMarkers();
+  };
+
+
+
+
+  useEffect(() => {
+    const response = StationService.getAllStations()
+    response.then((data) => {
+      setStations(data);
+    }).catch((err) => {
+      console.error("Error fetching stations:", err);
+      showAlert("Error", "Failed to fetch stations", "error");
+    });
+  }, []);
+
   useEffect(() => {
     UpdateStationMarkers();
   }, [stations]);
@@ -161,7 +197,7 @@ export default function StationsDiscovery() {
               <input
                 type="radio"
                 name="radio-1"
-                onChange={(e) => handlerRadio(e, true)}
+                onChange={(e) => handlerRadio(e, 0)}
                 className="radio"
                 defaultChecked
               />
@@ -171,10 +207,19 @@ export default function StationsDiscovery() {
               <input
                 type="radio"
                 name="radio-1"
-                onChange={(e) => handlerRadio(e, false)}
+                onChange={(e) => handlerRadio(e, 1)}
                 className="radio"
               />
               By Address
+            </div>
+            <div className="flex p-3 gap-2">
+              <input
+                type="radio"
+                name="radio-1"
+                onChange={(e) => handlerRadio(e, 2)}
+                className="radio"
+              />
+              By Google Places
             </div>
           </div>
           <label className="input w-4/5 mx-auto">
@@ -204,7 +249,17 @@ export default function StationsDiscovery() {
           </label>
           <div className="w-4/5 mx-auto mt-3 absolute left-[50%] translate-x-[-50%] bottom-0 translate-y-[100%] z-10">
             <ul className="list bg-base-100 rounded-box shadow-sm shadow-neutral-500">
-              {autocompleteList.map((item, index) => (
+              {loading &&
+                <li>
+                  <span className="loading loading-dots loading-xl"></span>
+                </li>
+              }
+              {currentText !== "" && autocompleteList.length === 0 && !loading && (
+                <li className="list-row p-3 text-center">
+                  No suggestions found
+                </li>
+              )}
+              {!loading && autocompleteList.map((item, index) => (
                 <li
                   onClick={() => handleSelectSugg(index)}
                   key={index}

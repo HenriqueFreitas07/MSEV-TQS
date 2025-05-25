@@ -2,6 +2,7 @@ import axios ,{AxiosError}from "axios";
 import type { LoginDTO, SignupDTO, User } from './types/user';
 import type { Station } from './types/Station';
 import type { Charger } from './types/Charger';
+import { showToast } from "./alerts";
 
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -33,12 +34,15 @@ api.interceptors.response.use(
         error.response.status,
         error.response.data
       );
+      showToast(`Error (${error.response.status}): ${error.response.data}`,"error","top-end")
     } else if (error.request) {
       // Request made but no response
       console.error("Request error - no response received:", error.request);
+      showToast(`Error: ${error.request}`,"error","top-end")
     } else {
       // Request setup error
       console.error("Error setting up request:", error.message);
+      showToast(`Error: ${error.message}`,"error","top-end")
     }
     return Promise.reject(error);
   }
@@ -89,7 +93,7 @@ export const UserService = {
 export const StationService = {
   getAllStations: async () => {
     try {
-      const response = await api.get("/stations/");
+      const response = await api.get("/stations");
       return response.data as Station[];
     } catch (error) {
       console.error('Error fetching stations:', error);
