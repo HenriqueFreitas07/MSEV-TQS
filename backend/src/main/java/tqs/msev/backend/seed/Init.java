@@ -1,4 +1,4 @@
-package tqs.msev.backend.db;
+package tqs.msev.backend.seed;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -6,8 +6,6 @@ import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
-
-import java.util.UUID;
 
 import static tqs.msev.backend.entity.Station.StationStatus;
 
