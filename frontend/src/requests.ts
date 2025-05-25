@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import type { LoginDTO, SignupDTO, User } from './types/user';
 import type { Station } from './types/Station';
 import type { Charger } from './types/Charger';
+import type { Reservation } from './types/reservation';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -122,7 +123,7 @@ export const StationService = {
       throw error;
     }
   },
-  searchStationByADdress: async (address: string) => {
+  searchStationByAddress: async (address: string) => {
     try {
       const response = await api.get("/stations/search-by-address", { params: { address } });
       return response.data as Station[];
@@ -143,6 +144,7 @@ export const ChargerService = {
       throw error;
     }
   },
+
   getChargerById: async (id: string) => {
     try {
       const response = await api.get(`/chargers/${id}`);
@@ -151,5 +153,11 @@ export const ChargerService = {
       console.error('Error fetching charger:', error);
       throw error;
     }
+  },
+
+  getChargerReservationsForNextDays: async (id: string): Promise<Reservation[]> => {
+    const { data } = await api.get(`/chargers/${id}/reservations`)
+
+    return data;
   }
 }
