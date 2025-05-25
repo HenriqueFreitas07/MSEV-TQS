@@ -3,7 +3,6 @@ package tqs.msev.backend.controller;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;

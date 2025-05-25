@@ -66,6 +66,8 @@ class ReservationTestIT {
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", ()->"create-drop");
+        registry.add("security.jwt.secret-key", () -> "f9924db12318f6a0f1bcfa6e5d0342b65a51022a48a8246cdaa3b1a45493b6b4");
+        registry.add("security.jwt.expiration-time", () -> "360000");
     }
     
     @AfterEach
