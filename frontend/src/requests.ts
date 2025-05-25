@@ -1,4 +1,4 @@
-import axios ,{AxiosError}from "axios";
+import axios, { AxiosError } from "axios";
 import type { LoginDTO, SignupDTO, User } from './types/user';
 import type { Station } from './types/Station';
 import type { Charger } from './types/Charger';
@@ -19,6 +19,7 @@ const googlePlace = axios.create({
 const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL, // might change
   timeout: 10000,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -34,15 +35,15 @@ api.interceptors.response.use(
         error.response.status,
         error.response.data
       );
-      showToast(`Error (${error.response.status}): ${error.response.data}`,"error","top-end")
+      showToast(`Error (${error.response.status}): ${error.response.data}`, "error", "top-end")
     } else if (error.request) {
       // Request made but no response
       console.error("Request error - no response received:", error.request);
-      showToast(`Error: ${error.request}`,"error","top-end")
+      showToast(`Error: ${error.request}`, "error", "top-end")
     } else {
       // Request setup error
       console.error("Error setting up request:", error.message);
-      showToast(`Error: ${error.message}`,"error","top-end")
+      showToast(`Error: ${error.message}`, "error", "top-end")
     }
     return Promise.reject(error);
   }
