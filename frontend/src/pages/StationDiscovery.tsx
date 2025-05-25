@@ -10,7 +10,6 @@ import type { autoComplete } from "../types/PlacesTypes";
 import type { Station } from "../types/Station";
 import { showAlert } from "../alerts";
 import { useNavigate } from "react-router";
-import { BiLogoAirbnb } from "react-icons/bi";
 
 export default function StationsDiscovery() {
   const [nameSearch, setNameSearch] = useState<number>(0);
@@ -23,7 +22,6 @@ export default function StationsDiscovery() {
   const [autocompleteList, setAutocompleteList] = useState<autoComplete[]>([]);
   const [stations, setStations] = useState<Station[]>([]);
   const handlerRadio = (
-    e: React.ChangeEvent<HTMLInputElement>,
     value: 0 | 1 | 2
   ) => {
     setNameSearch(value);
@@ -197,7 +195,7 @@ export default function StationsDiscovery() {
               <input
                 type="radio"
                 name="radio-1"
-                onChange={(e) => handlerRadio(e, 0)}
+                onChange={() => handlerRadio(0)}
                 className="radio"
                 defaultChecked
               />
@@ -207,7 +205,7 @@ export default function StationsDiscovery() {
               <input
                 type="radio"
                 name="radio-1"
-                onChange={(e) => handlerRadio(e, 1)}
+                onChange={() => handlerRadio(1)}
                 className="radio"
               />
               By Address
@@ -216,7 +214,7 @@ export default function StationsDiscovery() {
               <input
                 type="radio"
                 name="radio-1"
-                onChange={(e) => handlerRadio(e, 2)}
+                onChange={() => handlerRadio(2)}
                 className="radio"
               />
               By Google Places
