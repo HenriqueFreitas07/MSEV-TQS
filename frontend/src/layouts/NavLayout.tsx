@@ -1,5 +1,7 @@
-import { NavLink } from "react-router";
-import { useAuth } from "../contexts/auth"
+import React from 'react'
+import Footer from '../components/Footer'
+import { NavLink } from 'react-router-dom'
+import { useAuth } from '../contexts/auth'
 
 type Props = {
   children: React.ReactNode,
@@ -35,6 +37,7 @@ export default function Main({ children, title }: Props) {
       {
         children
       }
+    <Footer />
     </>
   )
 }
