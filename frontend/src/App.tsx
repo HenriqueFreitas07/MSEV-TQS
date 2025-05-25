@@ -15,34 +15,23 @@ import StationDetails from "./pages/StationDetails";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />
-  },
-  {
-    path: "/stations",
-    element: <ProtectedRoute />,
     children: [
-      { element: <Stations /> }
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "/signup", element: <Signup /> },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "stations", element: <Stations /> },
+          { path: "stations/:postId", element: <StationDetails /> }
+        ]
+      },
+      {
+        path: "/*",
+        element: <NotFound />
+      },
     ]
-  },
-  {
-    path: "/login",
-    element: <Login />
-  },
-  {
-    path: "/signup",
-    element: <Signup />
-  },
-  {
-    path: "/*",
-    element: <NotFound />
-  },
-  {
-    path: "/station/:postId",
-    element: <ProtectedRoute />,
-    children: [
-      { element: <StationDetails /> }
-    ]
-  },
+  }
 ]);
 
 function App() {

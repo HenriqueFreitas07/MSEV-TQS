@@ -17,7 +17,7 @@ export default function Login() {
 
     try {
       await login(email, password);
-      navigate("/");
+      navigate("/stations");
     } catch (error) {
       const err = error as Error;
 

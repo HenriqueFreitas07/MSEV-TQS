@@ -16,31 +16,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    async function loadUser() {
-      if (!Cookies.get("logged")) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const user = await UserService.getSelfUser();
-        setUser(user);
-      } catch (error) {
-        console.log("Invalid access token");
-        console.log(error);
-        Cookies.remove("logged");
-      } finally {
-        setLoading(false);
-      }
+  async function loadUser() {
+    if (!Cookies.get("logged")) {
+      setLoading(false);
+      return;
     }
 
+    try {
+      const user = await UserService.getSelfUser();
+      setUser(user);
+    } catch (error) {
+      console.log("Invalid access token");
+      console.log(error);
+      Cookies.remove("logged");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
     loadUser();
   }, [])
 
   async function login(email: string, password: string) {
     await AuthService.login({ email, password });
     Cookies.set("logged", "1");
+    await loadUser();
   }
 
   async function logout() {
