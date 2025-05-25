@@ -5,9 +5,7 @@ import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.UUID;
 
@@ -15,11 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Setter
-@Getter
 @Data
 public class Charger {
-    
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -42,9 +37,7 @@ public class Charger {
     @Builder.Default
     private ChargerStatus status= ChargerStatus.AVAILABLE;
 
-
     public enum ChargerStatus {
         AVAILABLE, IN_USE, OUT_OF_ORDER, TEMPORARILY_DISABLED
     }
-
 }

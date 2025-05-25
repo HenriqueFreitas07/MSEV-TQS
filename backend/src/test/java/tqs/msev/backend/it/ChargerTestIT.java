@@ -3,6 +3,7 @@ package tqs.msev.backend.it;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import org.springframework.security.test.context.support.WithMockUser;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
@@ -63,6 +64,8 @@ class ChargerTestIT {
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", ()->"create-drop");
+        registry.add("security.jwt.secret-key", () -> "f9924db12318f6a0f1bcfa6e5d0342b65a51022a48a8246cdaa3b1a45493b6b4");
+        registry.add("security.jwt.expiration-time", () -> "360000");
     }
     
     @AfterEach
@@ -75,6 +78,7 @@ class ChargerTestIT {
 
     @Test
     @Requirement("MSEV-18")
+    @WithMockUser(username = "test")
     void whenStationExists_thenReturnChargers() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -113,6 +117,7 @@ class ChargerTestIT {
 
     @Test
     @Requirement("MSEV-18")
+    @WithMockUser(username = "test")
     void whenChargerExists_thenReturnCharger() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
@@ -142,6 +147,7 @@ class ChargerTestIT {
 
     @Test
     @Requirement("MSEV-18")
+    @WithMockUser(username = "test")
     void whenChargerDoesNotExist_thenReturnNotFound() throws Exception {
         UUID chargerId = UUID.randomUUID();
         mockMvc.perform(get("/api/v1/chargers/{chargerId}", chargerId))
@@ -150,6 +156,7 @@ class ChargerTestIT {
 
     @Test
     @Requirement("MSEV-18")
+    @WithMockUser(username = "test")
     void whenStationDoesNotExist_thenReturnEmptyList() throws Exception {
         UUID stationId = UUID.randomUUID();
         mockMvc.perform(get("/api/v1/chargers/station/{stationId}", stationId))
@@ -159,6 +166,7 @@ class ChargerTestIT {
 
     @Test
     @Requirement("MSEV-17")
+    @WithMockUser(username = "test")
     void whenThereAreCloseReservations__thenReturnList() throws Exception {
         Station station = new Station();
         station.setName("Test Station");

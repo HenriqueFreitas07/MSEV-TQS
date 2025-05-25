@@ -5,7 +5,7 @@ import {
 import Home from "./pages/Home";
 import "./index.css"
 import NotFound from "./pages/NotFound";
-import  Stations from "./pages/StationDiscovery";
+import StationDetails from "./pages/StationDetails";
 
 const router = createBrowserRouter([
   {
@@ -13,17 +13,17 @@ const router = createBrowserRouter([
     element: <Home />
   },
   {
-    path: "/stations",
-    element: <Stations />
-  },
-  {
     path:"/*",
     element: <NotFound />
   } ,
+  {
+    path: "/station/:postId",
+    element: <StationDetails />
+  },
 ]);
 
 function App() {
-  return   <RouterProvider router={router} />
+  return <RouterProvider router={router} />
 }
 
 export default App
