@@ -1,13 +1,15 @@
-import axios from 'axios';
-import type { Charger } from './types/Charger';
+import axios, { AxiosError } from 'axios';
+import type { LoginDTO, SignupDTO, User } from './types/user';
 import type { Station } from './types/Station';
+import type { Charger } from './types/Charger';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/v1', // might change
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  withCredentials: true
 });
 
 api.interceptors.response.use(
@@ -26,8 +28,7 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-
+//
 // How to declare the requests to the backend endpoints 
 // export const ServiceName = {
 //   method: async () => {
@@ -50,6 +51,48 @@ api.interceptors.response.use(
 //     }
 //   }
 // };
+
+export const AuthService = {
+  signup: async (dto: SignupDTO) => {
+    try {
+      const { data } = await api.post("/signup", dto);
+      return data;
+    } catch (error) {
+      const err = error as AxiosError;
+
+      throw err.response?.data;
+    }
+  },
+
+  login: async (dto: LoginDTO) => {
+    try {
+      const { data } = await api.post("/login", dto);
+      return data;
+    } catch (error) {
+      const err = error as AxiosError;
+
+      throw err.response?.data;
+    }
+  },
+
+  logout: async () => {
+    try {
+      const { data } = await api.post("/logout");
+      return data;
+    } catch (error) {
+      console.error("Error logging out", error);
+    }
+  }
+}
+
+export const UserService = {
+  getSelfUser: async (): Promise<User> => {
+    const { data } = await api.get("/users/self");
+
+    return data;
+  }
+}
+
 
 export const StationService = {
   getAllStations: async () => {

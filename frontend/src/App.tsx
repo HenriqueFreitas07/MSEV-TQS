@@ -5,25 +5,41 @@ import {
 import Home from "./pages/Home";
 import "./index.css"
 import NotFound from "./pages/NotFound";
+import Stations from "./pages/StationDiscovery";
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/auth";
+import Signup from "./pages/Signup";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import StationDetails from "./pages/StationDetails";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />
-  },
-  {
-    path:"/*",
-    element: <NotFound />
-  } ,
-  {
-    path: "/station/:postId",
-    element: <StationDetails />
-  },
+    children: [
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "/signup", element: <Signup /> },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "stations", element: <Stations /> },
+          { path: "stations/:postId", element: <StationDetails /> }
+        ]
+      },
+      {
+        path: "/*",
+        element: <NotFound />
+      },
+    ]
+  }
 ]);
 
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  )
 }
 
 export default App
