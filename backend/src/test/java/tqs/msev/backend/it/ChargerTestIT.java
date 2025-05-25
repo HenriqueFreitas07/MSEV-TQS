@@ -211,6 +211,7 @@ class ChargerTestIT {
 
     @Test
     @Requirement("MSEV-17")
+    @WithMockUser(username = "test")
     void whenThereAreNoCloseReservations__thenReturnEmptyList() throws Exception {
         Station station = new Station();
         station.setName("Test Station");
