@@ -1,5 +1,11 @@
-import axios from "axios";
+import axios ,{AxiosError}from "axios";
+import type { LoginDTO, SignupDTO, User } from './types/user';
+import type { Station } from './types/Station';
+import type { Charger } from './types/Charger';
+
+
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+
 const googlePlace = axios.create({
   baseURL: "https://places.googleapis.com/v1/places",
   timeout: 10000,
@@ -37,39 +43,83 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-export const StationService={
-  getAllStations:async()=>{
+
+export const AuthService = {
+  signup: async (dto: SignupDTO) => {
     try {
-      const response = await api.get("/api/v1/stations/");
-      return response.data;
+      const { data } = await api.post("/signup", dto);
+      return data;
     } catch (error) {
-      console.error("Error fetching restaurants:", error);
+      const err = error as AxiosError;
+
+      throw err.response?.data;
+    }
+  },
+
+  login: async (dto: LoginDTO) => {
+    try {
+      const { data } = await api.post("/login", dto);
+      return data;
+    } catch (error) {
+      const err = error as AxiosError;
+
+      throw err.response?.data;
+    }
+  },
+
+  logout: async () => {
+    try {
+      const { data } = await api.post("/logout");
+      return data;
+    } catch (error) {
+      console.error("Error logging out", error);
+    }
+  }
+}
+
+export const UserService = {
+  getSelfUser: async (): Promise<User> => {
+    const { data } = await api.get("/users/self");
+
+    return data;
+  }
+}
+
+
+export const StationService = {
+  getAllStations: async () => {
+    try {
+      const response = await api.get("/stations/");
+      return response.data as Station[];
+    } catch (error) {
+      console.error('Error fetching stations:', error);
       throw error;
     }
   },
-  searchByName:async(name:string)=>{
+  getStationById: async (id: string) => {
     try {
-      const response = await api.get("/api/v1/stations/search-by-name", {
-        params:{
-          "name":name
-        }
-      });
-      return response.data;
+      const response = await api.get(`/stations/${id}`);
+      return response.data as Station;
     } catch (error) {
-      console.error("Error fetching restaurants:", error);
+      console.error('Error fetching station:', error);
       throw error;
     }
   },
-  searchByAddress:async(add:string)=>{
+  searchStationByName: async (name: string) => {
     try {
-      const response = await api.get("/api/v1/stations/search-by-address", {
-        params:{
-          "address":add
-        }
-      });
-      return response.data;
+      const response = await api.get("/stations/search-by-name", { params: { name } });
+      return response.data as Station[];
     } catch (error) {
-      console.error("Error fetching restaurants:", error);
+      console.error('Error fetching station:', error);
+      throw error;
+    }
+  },
+  searchStationByADdress: async (address: string) => {
+    try {
+      const response = await api.get("/stations/search-by-address", { params: { address } });
+      return response.data as Station[];
+    } catch (error) {
+      console.error('Error fetching station:', error);
       throw error;
     }
   }
@@ -103,3 +153,24 @@ export const GoogleService = {
   },
 };
 
+
+export const ChargerService = {
+  getChargerByStation: async (id: string) => {
+    try {
+      const response = await api.get(`/chargers/station/${id}`);
+      return response.data as Charger[];
+    } catch (error) {
+      console.error('Error fetching chargers:', error);
+      throw error;
+    }
+  },
+  getChargerById: async (id: string) => {
+    try {
+      const response = await api.get(`/chargers/${id}`);
+      return response.data as Charger;
+    } catch (error) {
+      console.error('Error fetching charger:', error);
+      throw error;
+    }
+  }
+}

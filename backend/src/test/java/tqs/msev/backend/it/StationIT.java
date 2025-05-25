@@ -2,6 +2,7 @@ package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,7 +14,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import tqs.msev.backend.entity.Station;
+import tqs.msev.backend.entity.User;
 import tqs.msev.backend.repository.StationRepository;
+import tqs.msev.backend.repository.UserRepository;
+import tqs.msev.backend.service.JwtService;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,9 +39,33 @@ public class StationIT {
     @Autowired
     private StationRepository stationRepository;
 
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+
+        User user = userRepository.findUserByEmail("test@gmail.com").orElse(null);
+
+        if (user == null) {
+            user = User.builder()
+                    .email("test@gmail.com")
+                    .name("Test")
+                    .password("test")
+                    .isOperator(false)
+                    .build();
+
+            user = userRepository.save(user);
+        }
+
+        String jwtToken = jwtService.generateToken(user);
+
+        RestAssured.requestSpecification = new RequestSpecBuilder()
+                .addCookie("accessToken", jwtToken)
+                .build();
     }
 
     @AfterEach
@@ -51,6 +79,8 @@ public class StationIT {
         registry.add("spring.datasource.username", container::getUsername);
         registry.add("spring.datasource.password", container::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("security.jwt.secret-key", () -> "f9924db12318f6a0f1bcfa6e5d0342b65a51022a48a8246cdaa3b1a45493b6b4");
+        registry.add("security.jwt.expiration-time", () -> "360000");
     }
 
     @Test
