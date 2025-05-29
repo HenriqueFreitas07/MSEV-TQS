@@ -185,5 +185,23 @@ export const ChargerService = {
     const { data } = await api.get(`/chargers/${id}/reservations`)
 
     return data;
+  },
+
+  lockCharger: async (id: string) => {
+    try {
+      api.patch(`/chargers/${id}/lock`);
+    } catch (error) {
+      console.error('Error locking charger:', error);
+      throw error;
+    }
+  },
+
+  unlockCharger: async (id: string) => {
+    try {
+      api.patch(`/chargers/${id}/unlock`);
+    } catch (error) {
+      console.error('Error unlocking charger:', error);
+      throw error;
+    }
   }
 }
