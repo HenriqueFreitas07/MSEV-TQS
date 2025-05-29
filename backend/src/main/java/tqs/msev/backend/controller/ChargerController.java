@@ -1,9 +1,6 @@
 package tqs.msev.backend.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
 import java.util.UUID;
@@ -36,5 +33,16 @@ public class ChargerController {
     @GetMapping("/{chargerId}/reservations")
     public List<Reservation> getChargerAvailability(@PathVariable("chargerId") UUID chargerId) {
         return reservationService.getFutureReservationsOnCharger(chargerId);
+    }
+    @PutMapping("/{chargerId}/disable")
+    public void disableCharger(@PathVariable UUID chargerId) {
+        Charger charger = chargerService.getChargerById(chargerId);
+        chargerService.disableCharger(charger);
+    }
+
+    @PutMapping("/{chargerId}/enable")
+    public void enableCharger(@PathVariable UUID chargerId) {
+        Charger charger = chargerService.getChargerById(chargerId);
+        chargerService.enableCharger(charger);
     }
 }

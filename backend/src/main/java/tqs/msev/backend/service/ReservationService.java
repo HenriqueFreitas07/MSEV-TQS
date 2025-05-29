@@ -1,6 +1,7 @@
 package tqs.msev.backend.service;
 
 import org.springframework.stereotype.Service;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.repository.ReservationRepository;
 import java.util.List;
@@ -33,7 +34,11 @@ public class ReservationService {
     }
 
     public Reservation createReservation(Reservation reservation) {
-
+        // verify if a reservation doesn't book an out of order or disabled charger
+        Charger.ChargerStatus status = reservation.getCharger().getStatus();
+        if  (status== Charger.ChargerStatus.TEMPORARILY_DISABLED || status == Charger.ChargerStatus.OUT_OF_ORDER) {
+            throw new IllegalArgumentException("Reservation charger is temporarily disabled or out of order");
+        }
         Date now = new Date();
         if (reservation.getStartTimestamp().before(now) || reservation.getEndTimestamp().before(now)) {
             throw new IllegalArgumentException("Reservation cannot be in the past");

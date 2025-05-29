@@ -35,4 +35,9 @@ public class StationController {
     public List<Station> searchStationByAddress(@RequestParam String address) {
         return stationService.searchByAddress(address);
     }
+    @PutMapping("/{id}/disable")
+    public void disableStation(@PathVariable UUID id) {
+        Station s = stationService.getStationById(id);
+        stationService.disableStation(s);
+    }
 }
