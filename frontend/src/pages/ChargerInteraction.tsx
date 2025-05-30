@@ -89,22 +89,21 @@ function ChargerDetails() {
             <span className={`${getColor(charger.status)} font-semibold`}>{charger.status}</span>
           </p>
           <div className="flex gap-4 mt-4">
-            {charger.status === "AVAILABLE" && !charging && (
-              <button
-                className="btn btn-primary"
-                onClick={() => handleLock()}
-              >
-                Lock Charger
-              </button>
-            )}
-            {charging && (
-                <button
-                className="btn btn-primary"
-                onClick={() => handleUnlock()}
-              >
-                Unlock Charger
-              </button>
-            )}
+          {charger.status === "AVAILABLE" && !charging ? (
+            <button
+              className="btn btn-primary"
+              onClick={() => handleLock()}
+            >
+              Lock Charger
+            </button>
+          ) : (
+            <button
+              className="btn btn-primary"
+              onClick={() => handleUnlock()}
+            >
+              Unlock Charger
+            </button>
+          )}
           </div>
         </div>
       </NavLayout>
