@@ -1,56 +1,54 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 import type { LoginDTO, SignupDTO, User } from './types/user';
 import type { Station } from './types/Station';
 import type { Charger } from './types/Charger';
+import type { Reservation } from './types/reservation';
+import { showToast } from "./alerts";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL,
+
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+
+const googlePlace = axios.create({
+  baseURL: "https://places.googleapis.com/v1/places",
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
+    "X-Goog-Api-key": apiKey
   },
-  withCredentials: true
+});
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_BACKEND_URL, // might change
+  timeout: 10000,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 api.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
     if (error.response) {
       // Server responded with status outside 2xx
-      console.error('Response error:', error.response.status, error.response.data);
+      console.error(
+        "Response error:",
+        error.response.status,
+        error.response.data
+      );
+      showToast(`Error (${error.response.status}): ${error.response.data}`, "error", "top-end")
     } else if (error.request) {
       // Request made but no response
-      console.error('Request error - no response received:', error.request);
+      console.error("Request error - no response received:", error.request);
+      showToast(`Error: ${error.request}`, "error", "top-end")
     } else {
       // Request setup error
-      console.error('Error setting up request:', error.message);
+      console.error("Error setting up request:", error.message);
+      showToast(`Error: ${error.message}`, "error", "top-end")
     }
     return Promise.reject(error);
   }
 );
-//
-// How to declare the requests to the backend endpoints 
-// export const ServiceName = {
-//   method: async () => {
-//     try {
-//       const response = await api.get('/restaurants');
-//       return response.data;
-//     } catch (error) {
-//       console.error('Error fetching restaurants:', error);
-//       throw error;
-//     }
-//   },
-
-//   otherMethod: async (id) => {
-//     try {
-//       const response = await api.get(`/restaurants/${id}`);
-//       return response.data;
-//     } catch (error) {
-//       console.error(`Error fetching restaurant with id ${id}:`, error);
-//       throw error;
-//     }
-//   }
-// };
 
 export const AuthService = {
   signup: async (dto: SignupDTO) => {
@@ -97,7 +95,7 @@ export const UserService = {
 export const StationService = {
   getAllStations: async () => {
     try {
-      const response = await api.get("/stations/");
+      const response = await api.get("/stations");
       return response.data as Station[];
     } catch (error) {
       console.error('Error fetching stations:', error);
@@ -122,7 +120,7 @@ export const StationService = {
       throw error;
     }
   },
-  searchStationByADdress: async (address: string) => {
+  searchStationByAddress: async (address: string) => {
     try {
       const response = await api.get("/stations/search-by-address", { params: { address } });
       return response.data as Station[];
@@ -132,6 +130,35 @@ export const StationService = {
     }
   }
 }
+export const GoogleService = {
+  autocompletePlaces: async (text: string) => {
+    try {
+      const response = await googlePlace.post(":autocomplete/", {
+        input: text,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching restaurants:", error);
+      throw error;
+    }
+  },
+  getPlace: async (id: string) => {
+    try {
+      const response = await googlePlace.get("/" + id, {
+        params: {
+          key: apiKey,
+          fields: 'id,displayName,location,formattedAddress',
+          languageCode: 'en'
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching restaurants:", error);
+      throw error;
+    }
+  },
+};
+
 
 export const ChargerService = {
   getChargerByStation: async (id: string) => {
@@ -143,6 +170,7 @@ export const ChargerService = {
       throw error;
     }
   },
+
   getChargerById: async (id: string) => {
     try {
       const response = await api.get(`/chargers/${id}`);
@@ -151,5 +179,11 @@ export const ChargerService = {
       console.error('Error fetching charger:', error);
       throw error;
     }
+  },
+
+  getChargerReservationsForNextDays: async (id: string): Promise<Reservation[]> => {
+    const { data } = await api.get(`/chargers/${id}/reservations`)
+
+    return data;
   }
 }
