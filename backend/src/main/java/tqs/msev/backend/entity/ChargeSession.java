@@ -25,6 +25,10 @@ public class ChargeSession {
 
     private LocalDateTime endTimestamp;
 
+    private int consumption;
+
+    private int chargingSpeed;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
