@@ -29,8 +29,6 @@ import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
 
-
-
 @SpringBootTest
 @Testcontainers
 @AutoConfigureMockMvc
@@ -53,7 +51,7 @@ class ChargerTestIT {
 
     
     @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
+    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:17")
         .withDatabaseName("testdb")
         .withUsername("user")
         .withPassword("password");

@@ -85,7 +85,7 @@ public class ChargerService {
         if (session == null)
             throw new NoSuchElementException("The charger is already available");
 
-        if (session.getUser().getId() != userId)
+        if (!session.getUser().getId().equals(userId))
             throw new IllegalStateException("You cannot lock a charger that is already being used by another user");
 
         session.setEndTimestamp(LocalDateTime.now());
