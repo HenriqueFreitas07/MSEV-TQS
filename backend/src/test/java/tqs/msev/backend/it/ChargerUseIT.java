@@ -7,12 +7,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+import tqs.msev.backend.configuration.TestDatabaseConfig;
 import tqs.msev.backend.entity.*;
 import tqs.msev.backend.repository.*;
 import tqs.msev.backend.service.JwtService;
@@ -20,19 +18,14 @@ import tqs.msev.backend.service.JwtService;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.Optional;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
-@Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ChargerUseIT {
-    @Container
-    public static PostgreSQLContainer<?> container = new PostgreSQLContainer<>(DockerImageName.parse("postgres:17"))
-            .withDatabaseName("msev_test");
-
+@Import(TestDatabaseConfig.class)
+class ChargerUseIT {
     @LocalServerPort
     private int port;
 
@@ -54,18 +47,14 @@ public class ChargerUseIT {
     void setUp() {
         RestAssured.port = port;
 
-        User user = userRepository.findUserByEmail("test@gmail.com").orElse(null);
+        User user = User.builder()
+                .email("test@gmail.com")
+                .name("Test")
+                .password("test")
+                .isOperator(false)
+                .build();
 
-        if (user == null) {
-            user = User.builder()
-                    .email("test@gmail.com")
-                    .name("Test")
-                    .password("test")
-                    .isOperator(false)
-                    .build();
-
-            user = userRepository.save(user);
-        }
+        user = userRepository.saveAndFlush(user);
 
         String jwtToken = jwtService.generateToken(user);
 
@@ -79,17 +68,13 @@ public class ChargerUseIT {
         reservationRepository.deleteAll();
         chargeSessionRepository.deleteAll();
         stationRepository.deleteAll();
+        userRepository.deleteAll();
 
-        Optional<User> user = userRepository.findUserByEmail("test2@gmail.com");
-
-        user.ifPresent(user2 -> userRepository.delete(user2));
+        RestAssured.reset();
     }
 
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", container::getJdbcUrl);
-        registry.add("spring.datasource.username", container::getUsername);
-        registry.add("spring.datasource.password", container::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
         registry.add("security.jwt.secret-key", () -> "f9924db12318f6a0f1bcfa6e5d0342b65a51022a48a8246cdaa3b1a45493b6b4");
         registry.add("security.jwt.expiration-time", () -> "360000");
