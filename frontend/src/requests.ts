@@ -187,3 +187,56 @@ export const ChargerService = {
     return data;
   }
 }
+
+
+export const ReservationService = {
+  createReservation: async (reservation: Reservation): Promise<Reservation> => {
+    try {
+      const response = await api.post("/reservations", { reservation });
+      return response.data as Reservation;
+    } catch (error) {
+      console.error('Error fetching chargers:', error);
+      throw error;
+    }
+  },
+  getReservationById: async (id: string): Promise<Reservation> => {
+    try {
+      const response = await api.get(`/reservations/${id}`);
+      return response.data as Reservation;
+    } catch (error) {
+      console.error('Error fetching reservation:', error);
+      throw error;
+    }
+  },
+
+  cancelReservation: async (id: string): Promise<Reservation> => {
+    try {
+      const response = await api.delete(`/reservations/${id}`);
+      return response.data as Reservation;
+    } catch (error) {
+      console.error('Error canceling the reservation:', error);
+      throw error;
+    }
+  },
+
+  markReservationAsUsed: async (id: string): Promise<Reservation> => {
+    try {
+      const response = await api.put(`/reservations/${id}/used`);
+      return response.data as Reservation;
+    } catch (error) {
+      console.error('Error marking a reservation as used:', error);
+      throw error;
+    }
+
+  },
+
+  getReservations: async (chargerId: string, userId: string): Promise<Reservation[]> => {
+    try {
+      const response = await api.get("/reservations", { params: { chargerId, userId } });
+      return response.data as Reservation[];
+    } catch (error) {
+      console.error('Error fetching reservations:', error);
+      throw error;
+    }
+  }
+}

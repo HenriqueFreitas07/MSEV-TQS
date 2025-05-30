@@ -11,6 +11,7 @@ import { AuthProvider } from "./contexts/auth";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import StationDetails from "./pages/StationDetails";
+import Reserve from "./pages/Reserve";
 
 const router = createBrowserRouter([
   {
@@ -23,7 +24,8 @@ const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: "stations", element: <Stations /> },
-          { path: "stations/:postId", element: <StationDetails /> }
+          { path: "stations/:postId", element: <StationDetails /> },
+          { path: "reserve", element: <Reserve />}
         ]
       },
       {

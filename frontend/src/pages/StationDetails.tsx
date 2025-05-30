@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { format } from "date-fns";
 
 import NavLayout from "../layouts/NavLayout.js";
@@ -20,7 +20,7 @@ function StationDetails() {
   const [reservations, setReservations] = useState<Record<string, Reservation[]>>({});
 
   const params = useParams();
-
+  const navigate = useNavigate();
   const modalRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ function StationDetails() {
                     <p className="font-bold">Reservations for the next 5 days: </p><p>{reservations[charger.id]?.length ?? 0}</p>
                     <div className="card-actions justify-end">
                       <button className="btn btn-info" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }}>See availability</button>
-                      <button className="btn btn-primary">Reserve now</button>
+                      <button className="btn btn-primary" onClick={()=>{navigate(`/reserve`)}}>Reserve now</button>
                     </div>
                   </div>
                 </div>
