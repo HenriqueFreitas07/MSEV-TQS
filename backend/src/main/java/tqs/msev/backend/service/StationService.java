@@ -1,5 +1,6 @@
 package tqs.msev.backend.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import tqs.msev.backend.dto.Coordinates;
 import tqs.msev.backend.entity.Station;
@@ -48,5 +49,12 @@ public class StationService {
             Util.distanceBetweenCoordinates(coordinates.getLat(), coordinates.getLon(),
                     station.getLatitude(), station.getLongitude())
         )).toList();
+    }
+
+    public Station createStation(Station station) {
+        if (station.getStatus() == null) {
+            station.setStatus(Station.StationStatus.ENABLED);
+        }
+        return stationRepository.save(station);
     }
 }

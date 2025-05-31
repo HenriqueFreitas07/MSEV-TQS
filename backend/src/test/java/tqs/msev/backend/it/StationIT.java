@@ -213,4 +213,45 @@ class StationIT {
                 .statusCode(200)
                 .body("$", hasSize(0));
     }
+
+    @Test
+    @Requirement("MSEV-13")
+    void whenCreateStation_thenReturnCreatedStation() {
+        Station station = new Station();
+        station.setName("New Station");
+        station.setAddress("New Address");
+        station.setLatitude(40.7128);
+        station.setLongitude(-74.0060);
+
+        given()
+                .contentType("application/json")
+                .body(station)
+                .when()
+                .post("/api/v1/stations")
+                .then()
+                .assertThat()
+                .statusCode(201)
+                .body("name", is("New Station"))
+                .body("address", is("New Address"))
+                .body("latitude", is(40.7128f))
+                .body("longitude", is(-74.0060f));
+    }
+
+    @Test
+    @Requirement("MSEV-13")
+    void whenCreateStationWithInvalidData_thenReturnBadRequest() {
+        Station station = new Station();
+        station.setName("");
+        station.setAddress("New Address");
+        station.setLatitude(200.7128); // Invalid latitude
+        station.setLongitude(-74.0060);
+        given()
+                .contentType("application/json")
+                .body(station)
+                .when()
+                .post("/api/v1/stations")
+                .then()
+                .assertThat()
+                .statusCode(400);
+    }
 }

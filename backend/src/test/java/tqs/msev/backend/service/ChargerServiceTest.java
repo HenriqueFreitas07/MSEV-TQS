@@ -256,4 +256,37 @@ class ChargerServiceTest {
         verify(chargeSessionRepository, times(1)).save(Mockito.any());
         verify(chargerRepository, times(1)).save(Mockito.any());
     }
+
+    @Test
+    @Requirement("MSEV-13")
+    void whenCreateValidCharger_thenReturnCharger() {
+        Charger charger = Charger.builder()
+                .id(UUID.randomUUID())
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        when(chargerRepository.save(Mockito.any(Charger.class))).thenReturn(charger);
+
+        Charger createdCharger = chargerService.createCharger(charger);
+
+        assertEquals(charger, createdCharger);
+        verify(chargerRepository, times(1)).save(charger);
+    }
+
+    @Test
+    @Requirement("MSEV-13")
+    void whenCreateChargerWithNullStatus_thenSetDefaultStatus() {
+        Charger charger = Charger.builder()
+                .id(UUID.randomUUID())
+                .status(null)
+                .build();
+        Charger expectedCharger = Charger.builder()
+                .id(charger.getId())
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+        when(chargerRepository.save(Mockito.any(Charger.class))).thenReturn(expectedCharger);
+        Charger createdCharger = chargerService.createCharger(charger);
+        assertEquals(expectedCharger, createdCharger);
+        verify(chargerRepository, times(1)).save(charger);
+    }
 }

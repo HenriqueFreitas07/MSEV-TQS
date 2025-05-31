@@ -95,4 +95,11 @@ public class ChargerService {
         charger.setStatus(Charger.ChargerStatus.AVAILABLE);
         chargerRepository.save(charger);
     }
+
+    public Charger createCharger(Charger charger) {
+        if (charger.getStatus() == null) {
+            charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        }
+        return chargerRepository.save(charger);
+    }
 }

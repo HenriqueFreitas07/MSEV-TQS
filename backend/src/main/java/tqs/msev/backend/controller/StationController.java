@@ -1,8 +1,12 @@
 package tqs.msev.backend.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.service.StationService;
+import tqs.msev.backend.service.UserService;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,4 +39,13 @@ public class StationController {
     public List<Station> searchStationByAddress(@RequestParam String address) {
         return stationService.searchByAddress(address);
     }
+
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PostMapping
+    public Station createStation(@Valid @RequestBody Station station) {
+        return stationService.createStation(station);
+    }
+
+
 }

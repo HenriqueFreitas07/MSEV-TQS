@@ -3,10 +3,16 @@ package tqs.msev.backend.controller;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import tqs.msev.backend.configuration.TestSecurityConfig;
 import tqs.msev.backend.entity.Station;
+import tqs.msev.backend.exception.GlobalExceptionHandler;
 import tqs.msev.backend.service.JwtService;
 import tqs.msev.backend.service.StationService;
 
@@ -17,10 +23,12 @@ import java.util.UUID;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(StationController.class)
+@Import({GlobalExceptionHandler.class, TestSecurityConfig.class})
 class StationControllerTest {
     @Autowired
     private MockMvc mvc;
@@ -100,5 +108,56 @@ class StationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name", is(station1.getName())));
 
+    }
+
+    @Test
+    @WithUserDetails("test_operator")
+    @Requirement("MSEV-13")
+    void givenValidStation_whenCreateStation_thenReturnCreatedStation() throws Exception {
+        Station station = new Station();
+        station.setName("New Station");
+        station.setAddress("New Address");
+        station.setLatitude(40.7128);
+        station.setLongitude(-74.0060);
+
+        when(service.createStation(station)).thenReturn(station);
+
+        mvc.perform(post("/api/v1/stations")
+                .contentType("application/json")
+                .content("{\"name\":\"New Station\", \"address\":\"New Address\", \"latitude\":40.7128, \"longitude\":-74.0060}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(station.getName())))
+                .andExpect(jsonPath("$.address", is(station.getAddress())))
+                .andExpect(jsonPath("$.status", is("ENABLED")));
+    }
+
+    @Test
+    @WithUserDetails("test_operator")
+    @Requirement("MSEV-13")
+    void givenInvalidStation_whenCreateStation_thenReturnBadRequest() throws Exception {
+        Station station = new Station();
+        station.setName("");
+
+        when(service.createStation(station)).thenThrow(new IllegalArgumentException("Station name cannot be null or empty"));
+
+        mvc.perform(post("/api/v1/stations")
+                .contentType("application/json")
+                .content("{\"name\":\"\", \"address\":\"New Address\", \"latitude\":200.7128, \"longitude\":-74.0060}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "test")
+    void whenCreateStationWithoutAuthentication_thenReturnForbidden() throws Exception {
+        Station station = new Station();
+        station.setName("Unauthorized Station");
+        station.setAddress("Unauthorized Address");
+        station.setLatitude(40.7128);
+        station.setLongitude(-74.0060);
+
+        mvc.perform(post("/api/v1/stations")
+                .contentType("application/json")
+                .content("{\"name\":\"Unauthorized Station\", \"address\":\"Unauthorized Address\", \"latitude\":40.7128, \"longitude\":-74.0060}"))
+                .andExpect(status().isForbidden());
     }
 }
