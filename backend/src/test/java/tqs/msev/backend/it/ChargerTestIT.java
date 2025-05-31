@@ -8,7 +8,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import tqs.msev.backend.configuration.TestDatabaseConfig;
-import tqs.msev.backend.configuration.TestSecurityConfig;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
@@ -30,11 +29,10 @@ import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
-import tqs.msev.backend.exception.GlobalExceptionHandler;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import({GlobalExceptionHandler.class, TestSecurityConfig.class, TestDatabaseConfig.class})
+@Import(TestDatabaseConfig.class)
 class ChargerTestIT {
     @Autowired
     private ChargerRepository chargerRepository;
@@ -231,6 +229,13 @@ class ChargerTestIT {
         @Requirement("MSEV-13")
         @WithUserDetails("test_operator")
         void whenCreateCharger_thenReturnCreatedCharger() throws Exception {
+                User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+                userRepository.saveAndFlush(operator);
                 Station station = new Station();
                 station.setName("New Station");
                 station.setAddress("New Address");
@@ -262,6 +267,13 @@ class ChargerTestIT {
         @Requirement("MSEV-13")
         @WithUserDetails("test_operator")
         void whenCreateChargerWithInvalidData_thenReturnBadRequest() throws Exception {
+                User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+                userRepository.saveAndFlush(operator);
                 Station station = new Station();
                 station.setName("New Station");
                 station.setAddress("New Address");

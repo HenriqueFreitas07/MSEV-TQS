@@ -8,14 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import tqs.msev.backend.configuration.TestDatabaseConfig;
-import tqs.msev.backend.configuration.TestSecurityConfig;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.entity.User;
-import tqs.msev.backend.exception.GlobalExceptionHandler;
 import tqs.msev.backend.repository.StationRepository;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.service.JwtService;
@@ -28,7 +27,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Import({TestDatabaseConfig.class, GlobalExceptionHandler.class, TestSecurityConfig.class})
+@Import(TestDatabaseConfig.class)
 class StationIT {
     @LocalServerPort
     private int port;
@@ -221,6 +220,13 @@ class StationIT {
     @Requirement("MSEV-13")
     @WithUserDetails("test_operator")
     void whenCreateStation_thenReturnCreatedStation() {
+        User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+        userRepository.saveAndFlush(operator);
         Station station = new Station();
         station.setName("New Station");
         station.setAddress("New Address");
@@ -245,6 +251,13 @@ class StationIT {
     @Requirement("MSEV-13")
     @WithUserDetails("test_operator")
     void whenCreateStationWithInvalidData_thenReturnBadRequest() {
+        User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+        userRepository.saveAndFlush(operator);
         Station station = new Station();
         station.setName("");
         station.setAddress("New Address");
