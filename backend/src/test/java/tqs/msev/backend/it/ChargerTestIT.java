@@ -272,7 +272,7 @@ class ChargerTestIT {
                 Charger charger = Charger.builder()
                         .station(station)
                         .connectorType("") 
-                        .price(-1.0) // Invalid price
+                        .price(-1.0)
                         .chargingSpeed(22)
                         .status(Charger.ChargerStatus.AVAILABLE)
                         .build();

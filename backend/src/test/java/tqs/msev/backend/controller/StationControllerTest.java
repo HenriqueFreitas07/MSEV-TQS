@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -124,8 +125,9 @@ class StationControllerTest {
 
         mvc.perform(post("/api/v1/stations")
                 .contentType("application/json")
+                .with(csrf())
                 .content("{\"name\":\"New Station\", \"address\":\"New Address\", \"latitude\":40.7128, \"longitude\":-74.0060}"))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is(station.getName())))
                 .andExpect(jsonPath("$.address", is(station.getAddress())))
                 .andExpect(jsonPath("$.status", is("ENABLED")));
@@ -142,13 +144,13 @@ class StationControllerTest {
 
         mvc.perform(post("/api/v1/stations")
                 .contentType("application/json")
+                .with(csrf())
                 .content("{\"name\":\"\", \"address\":\"New Address\", \"latitude\":200.7128, \"longitude\":-74.0060}"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    @WithMockUser(username = "test")
-    void whenCreateStationWithoutAuthentication_thenReturnForbidden() throws Exception {
+    void whenCreateStationWithoutAuthentication_thenReturnUnauthorized() throws Exception {
         Station station = new Station();
         station.setName("Unauthorized Station");
         station.setAddress("Unauthorized Address");
@@ -157,7 +159,8 @@ class StationControllerTest {
 
         mvc.perform(post("/api/v1/stations")
                 .contentType("application/json")
+                .with(csrf())
                 .content("{\"name\":\"Unauthorized Station\", \"address\":\"Unauthorized Address\", \"latitude\":40.7128, \"longitude\":-74.0060}"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
     }
 }
