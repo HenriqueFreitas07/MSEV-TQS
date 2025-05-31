@@ -2,17 +2,16 @@ package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import tqs.msev.backend.configuration.TestDatabaseConfig;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.junit.jupiter.Container;
 import java.util.Date;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
@@ -32,10 +31,9 @@ import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
 
-
 @SpringBootTest
-@Testcontainers
 @AutoConfigureMockMvc
+@Import(TestDatabaseConfig.class)
 class ReservationTestIT {
     
     @Autowired
@@ -53,18 +51,8 @@ class ReservationTestIT {
     @Autowired
     private MockMvc mockMvc;
 
-    
-    @Container
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest")
-        .withDatabaseName("testdb")
-        .withUsername("user")
-        .withPassword("password");
-
     @DynamicPropertySource
     static void properties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", ()->"create-drop");
         registry.add("security.jwt.secret-key", () -> "f9924db12318f6a0f1bcfa6e5d0342b65a51022a48a8246cdaa3b1a45493b6b4");
         registry.add("security.jwt.expiration-time", () -> "360000");
