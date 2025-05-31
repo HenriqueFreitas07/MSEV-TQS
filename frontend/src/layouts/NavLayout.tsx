@@ -4,12 +4,13 @@ import { NavLink } from 'react-router-dom'
 import { useAuth } from '../contexts/auth'
 
 type Props = {
-  children: React.ReactNode,
-  title: string
+  children: React.ReactNode;
+  title: string;
+  footer?: boolean;
 }
 
-export default function Main({ children, title }: Props) {
-  const { isLogged, logout } = useAuth();
+export default function NavLayout({ children, title, footer = true }: Props) {
+  const { isLogged, logout, user } = useAuth();
 
   return (
     <>
@@ -22,6 +23,13 @@ export default function Main({ children, title }: Props) {
             <li>
               <NavLink to="/stations">Stations</NavLink>
             </li>
+            {
+              user?.operator && (
+                <li>
+                  <NavLink to="/dashboard">Dashboard</NavLink>
+                </li>
+              )
+            }
             {!isLogged ? (
               <li>
                 <NavLink to="/login">Login</NavLink>
@@ -37,7 +45,9 @@ export default function Main({ children, title }: Props) {
       {
         children
       }
-    <Footer />
+      {
+        footer && <Footer />
+      }
     </>
   )
 }

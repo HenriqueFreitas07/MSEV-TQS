@@ -2,7 +2,7 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  isOperator: boolean;
+  operator: boolean;
 }
 
 export type SignupDTO = {
