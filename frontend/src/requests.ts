@@ -18,7 +18,7 @@ const googlePlace = axios.create({
 });
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_URL, // might change
+  baseURL: "http://localhost:8080/api/v1",//import.meta.env.VITE_BACKEND_URL, // might change
   timeout: 10000,
   withCredentials: true,
   headers: {

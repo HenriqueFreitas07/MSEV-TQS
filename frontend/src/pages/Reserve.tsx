@@ -1,17 +1,17 @@
 import NavLayout from "../layouts/NavLayout.js";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { ReservationService } from "../requests.js";
-
+import { ChargerService, ReservationService, StationService } from "../requests.js";
 import dayjs from "dayjs";
 import type { Reservation } from "../types/reservation.js";
+import type { Charger } from "../types/Charger.js";
+import type { Station } from "../types/Station.js";
+import { TbGasStation, TbGasStationOff } from "react-icons/tb";
 
 interface TimeSlot {
   start: string;
   end: string;
 }
-
-
 
 const generateTimeSlots = (startHour: number, endHour: number): TimeSlot[] => {
   const slots: TimeSlot[] = [];
@@ -46,20 +46,24 @@ const generateDaysWithSlots = (days: number): { date: string; slots: TimeSlot[] 
 
 
 function Reserve() {
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+  // const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [charger, setCharger] = useState<Charger>();
+
   const daysWithSlots = generateDaysWithSlots(5);
 
   const params = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
-      const reservationsResponse = await ReservationService.getReservations(params.postId!, params.postId!);
+      setCharger(await ChargerService.getChargerById(params.postId!));
 
-      setReservations(reservations);
+      // const reservationsResponse = await ReservationService.getReservations(params.postId!, params.postId!);
 
-      for (const reserve of reservationsResponse) {
-        continue;
-      }
+      // setReservations(reservations);
+
+      // for (const reserve of reservationsResponse) {
+      //   continue;
+      // }
     }
     fetchData();
   }, []);
@@ -67,10 +71,44 @@ function Reserve() {
   return (
     <div className="items-center justify-center">
       <NavLayout title="Reserve">
-        <div className="flex justify-center p-6 ">
-          <div>Station: </div>
-          <div>Charger: </div>
+        <div className="flex justify-between p-6 ml-12 mr-12">
+          <div className="flex">
+            <div className="pr-6">Station:
+              {charger?.station.status === "ENABLED" ? (
+                <TbGasStation className="text-green-500" size={40} />
+              ) : (
+                <TbGasStationOff className="text-red-500" size={40} />
+              )}
 
+            </div>
+            <div>
+              <div className="flex">
+                <p className="font-bold mr-3" data-test-id="name">Name: </p>
+                <p> {charger?.station.name}</p>
+              </div>
+              <div className="flex">
+                <p className="font-bold mr-3">Address: </p>
+                <p> {charger?.station?.address}</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex">
+            <div className="pr-6">Charger:</div>
+            <div>
+              <div className="flex">
+                <p className="font-bold mr-3" data-test-id="price">Price: </p>
+                <p> {charger?.price}</p>
+              </div>
+              <div className="flex">
+                <p className="font-bold mr-3">Connector Type: </p>
+                <p> {charger?.connectorType}</p>
+              </div>
+              <div className="flex">
+                <p className="font-bold mr-3">Charging Speed: </p>
+                <p> {charger?.chargingSpeed}</p>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="flex">
           <div style={{ width: "5%" }}></div>
@@ -88,7 +126,6 @@ function Reserve() {
                           || dayjs().date() == Number(day.date.substring(day.date.length - 2)) && dayjs().hour() > Number(slot.start.substring(0, 2))
                           ?
                           <button key={idx} className="btn btn-sm w-full">
-
                           </button>
                           :
                           <button key={idx} className="btn btn-sm w-full bg-blue-400">

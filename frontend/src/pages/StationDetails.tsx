@@ -96,7 +96,7 @@ function StationDetails() {
                     <p className="font-bold">Reservations for the next 5 days: </p><p>{reservations[charger.id]?.length ?? 0}</p>
                     <div className="card-actions justify-end">
                       <button className="btn btn-info" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }}>See availability</button>
-                      <button className="btn btn-primary" onClick={()=>{navigate(`/reserve`)}}>Reserve now</button>
+                      <button className="btn btn-primary" onClick={() => { navigate(`/reserve/${charger.id}`) }}>Reserve now</button>
                     </div>
                   </div>
                 </div>

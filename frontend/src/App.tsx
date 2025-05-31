@@ -25,7 +25,7 @@ const router = createBrowserRouter([
         children: [
           { path: "stations", element: <Stations /> },
           { path: "stations/:postId", element: <StationDetails /> },
-          { path: "reserve", element: <Reserve />}
+          { path: "reserve/:postId", element: <Reserve />}
         ]
       },
       {
