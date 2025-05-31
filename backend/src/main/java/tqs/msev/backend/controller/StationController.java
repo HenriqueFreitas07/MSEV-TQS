@@ -1,5 +1,6 @@
 package tqs.msev.backend.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.service.StationService;
@@ -35,7 +36,8 @@ public class StationController {
     public List<Station> searchStationByAddress(@RequestParam String address) {
         return stationService.searchByAddress(address);
     }
-    @PutMapping("/{id}/disable")
+    @PreAuthorize("@userService.getCurrentUser(authentication).operator()")
+    @PatchMapping("/{id}/disable")
     public void disableStation(@PathVariable UUID id) {
         Station s = stationService.getStationById(id);
         stationService.disableStation(s);

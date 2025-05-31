@@ -1,5 +1,6 @@
 package tqs.msev.backend.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
@@ -34,13 +35,16 @@ public class ChargerController {
     public List<Reservation> getChargerAvailability(@PathVariable("chargerId") UUID chargerId) {
         return reservationService.getFutureReservationsOnCharger(chargerId);
     }
-    @PutMapping("/{chargerId}/disable")
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).operator()")
+    @PatchMapping("/{chargerId}/disable")
     public void disableCharger(@PathVariable UUID chargerId) {
         Charger charger = chargerService.getChargerById(chargerId);
         chargerService.disableCharger(charger);
     }
 
-    @PutMapping("/{chargerId}/enable")
+    @PreAuthorize("@userService.getCurrentUser(authentication).operator()")
+    @PatchMapping("/{chargerId}/enable")
     public void enableCharger(@PathVariable UUID chargerId) {
         Charger charger = chargerService.getChargerById(chargerId);
         chargerService.enableCharger(charger);

@@ -37,7 +37,7 @@ public class ReservationService {
         // verify if a reservation doesn't book an out of order or disabled charger
         Charger.ChargerStatus status = reservation.getCharger().getStatus();
         if  (status== Charger.ChargerStatus.TEMPORARILY_DISABLED || status == Charger.ChargerStatus.OUT_OF_ORDER) {
-            throw new IllegalArgumentException("Reservation charger is temporarily disabled or out of order");
+            throw new IllegalStateException("Reservation charger is temporarily disabled or out of order");
         }
         Date now = new Date();
         if (reservation.getStartTimestamp().before(now) || reservation.getEndTimestamp().before(now)) {
