@@ -160,4 +160,6 @@ class ChargerControllerTest {
         mockMvc.perform(patch("/api/v1/chargers/{chargerId}/lock", UUID.randomUUID()).with(csrf()))
                 .andExpect(status().isOk());
     }
+
+
 }

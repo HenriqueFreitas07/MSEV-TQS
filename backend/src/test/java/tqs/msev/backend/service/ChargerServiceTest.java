@@ -289,4 +289,19 @@ class ChargerServiceTest {
         assertEquals(expectedCharger, createdCharger);
         verify(chargerRepository, times(1)).save(charger);
     }
+
+    @Test
+    @Requirement("MSEV-13")
+    void whenCreateChargerWithNoStation_thenThrowException() {
+        Charger charger = Charger.builder()
+                .id(UUID.randomUUID())
+                .station(null)
+                .build();
+
+        assertThatThrownBy(() -> chargerService.createCharger(charger))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Charger must be associated with a valid station");
+        
+        verify(chargerRepository, never()).save(Mockito.any(Charger.class));
+    }
 }

@@ -8,6 +8,7 @@ import tqs.msev.backend.repository.ChargeSessionRepository;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.repository.UserRepository;
+import tqs.msev.backend.repository.StationRepository;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -22,12 +23,14 @@ public class ChargerService {
     private final ReservationRepository reservationRepository;
     private final ChargeSessionRepository chargeSessionRepository;
     private final UserRepository userRepository;
+    private final StationRepository stationRepository;
 
-    public ChargerService(ChargerRepository chargerRepository, ReservationRepository reservationRepository, ChargeSessionRepository chargeSessionRepository, UserRepository userRepository) {
+    public ChargerService(ChargerRepository chargerRepository, ReservationRepository reservationRepository, ChargeSessionRepository chargeSessionRepository, UserRepository userRepository, StationRepository stationRepository) {
         this.chargerRepository = chargerRepository;
         this.reservationRepository = reservationRepository;
         this.chargeSessionRepository = chargeSessionRepository;
         this.userRepository = userRepository;
+        this.stationRepository = stationRepository;
     }
 
     public List<Charger> getChargersByStation(UUID stationId) {
@@ -97,9 +100,13 @@ public class ChargerService {
     }
 
     public Charger createCharger(Charger charger) {
+        if (charger.getStation() == null || stationRepository.findById(charger.getStation().getId()).isEmpty()) {
+            throw new IllegalArgumentException("Charger must be associated with a valid station");
+        }
         if (charger.getStatus() == null) {
             charger.setStatus(Charger.ChargerStatus.AVAILABLE);
         }
+        
         return chargerRepository.save(charger);
     }
 }
