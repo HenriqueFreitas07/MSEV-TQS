@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -58,6 +59,18 @@ class ChargerTestIT {
         registry.add("security.jwt.secret-key", () -> "f9924db12318f6a0f1bcfa6e5d0342b65a51022a48a8246cdaa3b1a45493b6b4");
         registry.add("security.jwt.expiration-time", () -> "360000");
     }
+
+    @BeforeEach
+    void setUp() {
+        User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+        userRepository.saveAndFlush(operator);
+        
+    }
     
     @AfterEach
     void resetDb() {
@@ -65,6 +78,7 @@ class ChargerTestIT {
         userRepository.deleteAll();
         chargerRepository.deleteAll();
         stationRepository.deleteAll();
+        
     }
 
     @Test
@@ -232,13 +246,7 @@ class ChargerTestIT {
         @Requirement("MSEV-13")
         @WithUserDetails("test_operator")
         void whenCreateCharger_thenReturnCreatedCharger() throws Exception {
-                User operator = User.builder()
-                .email("test_operator")
-                .name("test_operator")
-                .password("test_operator")
-                .isOperator(true)
-                .build();
-                userRepository.saveAndFlush(operator);
+               
                 Station station = new Station();
                 station.setName("New Station");
                 station.setAddress("New Address");
@@ -279,13 +287,7 @@ class ChargerTestIT {
         @Requirement("MSEV-13")
         @WithUserDetails("test_operator")
         void whenCreateChargerWithInvalidData_thenReturnBadRequest() throws Exception {
-                User operator = User.builder()
-                .email("test_operator")
-                .name("test_operator")
-                .password("test_operator")
-                .isOperator(true)
-                .build();
-                userRepository.saveAndFlush(operator);
+                
                 Station station = new Station();
                 station.setName("New Station");
                 station.setAddress("New Address");

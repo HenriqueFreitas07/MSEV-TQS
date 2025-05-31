@@ -55,6 +55,15 @@ class StationIT {
 
         String jwtToken = jwtService.generateToken(user);
 
+
+        User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+        userRepository.saveAndFlush(operator);
+
         RestAssured.requestSpecification = new RequestSpecBuilder()
                 .addCookie("accessToken", jwtToken)
                 .build();
@@ -220,13 +229,7 @@ class StationIT {
     @Requirement("MSEV-13")
     @WithUserDetails("test_operator")
     void whenCreateStation_thenReturnCreatedStation() {
-        User operator = User.builder()
-                .email("test_operator")
-                .name("test_operator")
-                .password("test_operator")
-                .isOperator(true)
-                .build();
-        userRepository.saveAndFlush(operator);
+
         Station station = new Station();
         station.setName("New Station");
         station.setAddress("New Address");
@@ -251,13 +254,7 @@ class StationIT {
     @Requirement("MSEV-13")
     @WithUserDetails("test_operator")
     void whenCreateStationWithInvalidData_thenReturnBadRequest() {
-        User operator = User.builder()
-                .email("test_operator")
-                .name("test_operator")
-                .password("test_operator")
-                .isOperator(true)
-                .build();
-        userRepository.saveAndFlush(operator);
+
         Station station = new Station();
         station.setName("");
         station.setAddress("New Address");
