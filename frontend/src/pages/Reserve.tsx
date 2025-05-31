@@ -1,11 +1,10 @@
 import NavLayout from "../layouts/NavLayout.js";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
-import { ChargerService, ReservationService, StationService } from "../requests.js";
+import { ChargerService, ReservationService } from "../requests.js";
 import dayjs from "dayjs";
 import type { Reservation } from "../types/reservation.js";
 import type { Charger } from "../types/Charger.js";
-import type { Station } from "../types/Station.js";
 import { TbGasStation, TbGasStationOff } from "react-icons/tb";
 
 interface TimeSlot {
@@ -49,6 +48,9 @@ function Reserve() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [charger, setCharger] = useState<Charger>();
   const [car, setCar] = useState<{ date: string, slots: TimeSlot }[]>([]);
+  const [slots, setSlots] = useState<{ date: string, slots: TimeSlot }[]>([]);
+
+  const modalRef = useRef<HTMLDialogElement | null>(null);
 
   const daysWithSlots = generateDaysWithSlots(5);
 
@@ -60,10 +62,36 @@ function Reserve() {
       const reservationsResponse = await ReservationService.getReservationsForCharger(params.postId!);
 
       setReservations(reservationsResponse);
-      console.log(reservationsResponse);
     }
     fetchData();
   }, []);
+
+  const concat = () => {
+    let conc = true;
+    let change = [...car];
+
+    while (conc) {
+      conc = false
+      for (const reserve of change) {
+        for (const reserve2 of change) {
+          if (reserve === reserve2 || reserve.date !== reserve2.date) {
+            break;
+          }
+          else if (reserve.slots.start === reserve2.slots.end) {
+            change = change.filter((r) => r.slots.start !== reserve.slots.start && r.slots.start !== reserve2.slots.start && r.date === reserve.date && r.date === reserve2.date);
+            change.push({ date: reserve.date, slots: { start: reserve2.slots.start, end: reserve.slots.end } })
+            conc = true
+          }
+          else if (reserve2.slots.start === reserve.slots.end) {
+            change = change.filter((r) => r.slots.start !== reserve2.slots.start && r.slots.start !== reserve2.slots.start && reserve.date === r.date && r.date === reserve2.date);
+            change.push({ date: reserve.date, slots: { start: reserve.slots.start, end: reserve2.slots.end } });
+            conc = true
+          }
+        }
+      }
+    }
+    setSlots(change);
+  }
 
 
   const addToCar = (slot: TimeSlot, day: string) => {
@@ -123,7 +151,57 @@ function Reserve() {
               </div>
             </div>
           </div>
+          <div>
+            <button className="btn btn-lg w-full bg-green-600 text-white" onClick={() => { modalRef.current?.showModal(); concat(); }}>Reserve now</button>
+            {
+              slots.map((s, idx) => (
+                <div key={idx}>{s.date} - {s.slots.start} - {s.slots.end}</div>
+              )
+              )
+            }
+          </div>
         </div>
+        <dialog className="modal" ref={modalRef}>
+          <div className="modal-box">
+            <form method="dialog">
+              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <h3 className="font-bold text-lg">Slots</h3>
+            {
+              car.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="table table-zebra">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {
+                        car.map((reservation, i) => (
+                          <tr key={i}>
+                            <th>{reservation.date}</th>
+                            <td>{reservation.slots.start}</td>
+                            <td>{reservation.slots.end}</td>
+                          </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                  <div className="justify-center items-center mt-3">
+                    <button className="btn btn-md  bg-green-600 text-white">Confirm Reserve</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-4">
+                  There are no slots selected! Please select a slot before trying to create a reserve!
+                </div>
+              )
+            }
+          </div>
+        </dialog>
         <div className="flex">
           <div style={{ width: "5%" }}></div>
           <div className=" rounded-xl p-4 shadow-md bg-base-200" style={{ width: "90%" }}>
