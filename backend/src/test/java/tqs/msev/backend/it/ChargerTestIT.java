@@ -23,6 +23,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static io.restassured.RestAssured.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import tqs.msev.backend.repository.UserRepository;
@@ -253,15 +255,18 @@ class ChargerTestIT {
                         .status(Charger.ChargerStatus.AVAILABLE)
                         .build();
         
-                chargerRepository.save(charger);
-                chargerRepository.flush();
-        
-                mockMvc.perform(get("/api/v1/chargers/{chargerId}", charger.getId()))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.connectorType").value("Type 2"))
-                        .andExpect(jsonPath("$.price").value(0.5))
-                        .andExpect(jsonPath("$.chargingSpeed").value(22));
-        }
+                given()
+                        .contentType("application/json")
+                        .body(charger)
+                        .when()
+                        .post("/api/v1/chargers")
+                        .then()
+                        .assertThat()
+                        .statusCode(201)
+                        .body("connectorType", is("Type 2"))
+                        .body("price", is(0.5f))
+                        .body("chargingSpeed", is(22))
+                        .body("status", is("AVAILABLE"));
 
         @Test
         @Requirement("MSEV-13")
@@ -291,8 +296,14 @@ class ChargerTestIT {
                         .status(Charger.ChargerStatus.AVAILABLE)
                         .build();
         
-                mockMvc.perform(get("/api/v1/chargers"))
-                        .andExpect(status().isBadRequest());
+                given()
+                        .contentType("application/json")
+                        .body(charger)
+                        .when()
+                        .post("/api/v1/chargers")
+                        .then()
+                        .assertThat()
+                        .statusCode(400);
         }
                 
 }
