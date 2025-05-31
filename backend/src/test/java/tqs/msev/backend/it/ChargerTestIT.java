@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static io.restassured.RestAssured.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.is;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
@@ -266,7 +267,13 @@ class ChargerTestIT {
                         .body("connectorType", is("Type 2"))
                         .body("price", is(0.5f))
                         .body("chargingSpeed", is(22))
-                        .body("status", is("AVAILABLE"));
+                        .body("status", is("AVAILABLE"))
+                        .body("station.id", is(station.getId().toString()))
+                        .body("station.name", is("New Station"))
+                        .body("station.address", is("New Address"))
+                        .body("station.latitude", is(40.7128f))
+                        .body("station.longitude", is(-74.0060f));
+        }
 
         @Test
         @Requirement("MSEV-13")
