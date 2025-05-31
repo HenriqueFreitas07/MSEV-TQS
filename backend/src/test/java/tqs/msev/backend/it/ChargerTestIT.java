@@ -8,6 +8,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import tqs.msev.backend.configuration.TestDatabaseConfig;
+import tqs.msev.backend.configuration.TestSecurityConfig;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
@@ -29,10 +30,11 @@ import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
+import tqs.msev.backend.exception.GlobalExceptionHandler;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Import(TestDatabaseConfig.class)
+@Import({GlobalExceptionHandler.class, TestSecurityConfig.class, TestDatabaseConfig.class})
 class ChargerTestIT {
     @Autowired
     private ChargerRepository chargerRepository;

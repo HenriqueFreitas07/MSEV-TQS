@@ -13,8 +13,10 @@ import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import tqs.msev.backend.configuration.TestDatabaseConfig;
+import tqs.msev.backend.configuration.TestSecurityConfig;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.entity.User;
+import tqs.msev.backend.exception.GlobalExceptionHandler;
 import tqs.msev.backend.repository.StationRepository;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.service.JwtService;
@@ -27,7 +29,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Import(TestDatabaseConfig.class)
+@Import({GlobalExceptionHandler.class, TestSecurityConfig.class, TestDatabaseConfig.class})
 class StationIT {
     @LocalServerPort
     private int port;

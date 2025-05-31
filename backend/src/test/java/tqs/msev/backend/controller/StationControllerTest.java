@@ -150,6 +150,7 @@ class StationControllerTest {
     }
 
     @Test
+    @Requirement("MSEV-13")
     void whenCreateStationWithoutAuthentication_thenReturnUnauthorized() throws Exception {
         Station station = new Station();
         station.setName("Unauthorized Station");
