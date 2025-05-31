@@ -15,6 +15,9 @@ import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.repository.UserRepository;
+import tqs.msev.backend.repository.StationRepository;
+
+import tqs.msev.backend.entity.Station;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,6 +40,9 @@ class ChargerServiceTest {
 
     @Mock
     private ChargerRepository chargerRepository;
+
+    @Mock
+    private StationRepository stationRepository;
 
     @InjectMocks
     private ChargerService chargerService;
@@ -260,11 +266,15 @@ class ChargerServiceTest {
     @Test
     @Requirement("MSEV-13")
     void whenCreateValidCharger_thenReturnCharger() {
+        Station station = Station.builder()
+                .id(UUID.randomUUID())
+                .build();
         Charger charger = Charger.builder()
                 .id(UUID.randomUUID())
+                .station(station)
                 .status(Charger.ChargerStatus.AVAILABLE)
                 .build();
-
+        when(stationRepository.findById(station.getId())).thenReturn(Optional.of(station));
         when(chargerRepository.save(Mockito.any(Charger.class))).thenReturn(charger);
 
         Charger createdCharger = chargerService.createCharger(charger);
@@ -276,14 +286,19 @@ class ChargerServiceTest {
     @Test
     @Requirement("MSEV-13")
     void whenCreateChargerWithNullStatus_thenSetDefaultStatus() {
+        Station station = Station.builder()
+                .id(UUID.randomUUID())
+                .build();
         Charger charger = Charger.builder()
                 .id(UUID.randomUUID())
+                .station(station)
                 .status(null)
                 .build();
         Charger expectedCharger = Charger.builder()
                 .id(charger.getId())
                 .status(Charger.ChargerStatus.AVAILABLE)
                 .build();
+        when(stationRepository.findById(station.getId())).thenReturn(Optional.of(station));
         when(chargerRepository.save(Mockito.any(Charger.class))).thenReturn(expectedCharger);
         Charger createdCharger = chargerService.createCharger(charger);
         assertEquals(expectedCharger, createdCharger);

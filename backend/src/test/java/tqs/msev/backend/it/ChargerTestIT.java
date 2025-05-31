@@ -5,6 +5,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
+
 import tqs.msev.backend.configuration.TestDatabaseConfig;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
@@ -222,4 +224,61 @@ class ChargerTestIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
+
+        @Test
+        @Requirement("MSEV-13")
+        @WithUserDetails("test_operator")
+        void whenCreateCharger_thenReturnCreatedCharger() throws Exception {
+                Station station = new Station();
+                station.setName("New Station");
+                station.setAddress("New Address");
+                station.setLatitude(40.7128);
+                station.setLongitude(-74.0060);
+                station.setStatus(Station.StationStatus.ENABLED);
+                station = stationRepository.save(station);
+                stationRepository.flush();
+        
+                Charger charger = Charger.builder()
+                        .station(station)
+                        .connectorType("Type 2")
+                        .price(0.5)
+                        .chargingSpeed(22)
+                        .status(Charger.ChargerStatus.AVAILABLE)
+                        .build();
+        
+                chargerRepository.save(charger);
+                chargerRepository.flush();
+        
+                mockMvc.perform(get("/api/v1/chargers/{chargerId}", charger.getId()))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.connectorType").value("Type 2"))
+                        .andExpect(jsonPath("$.price").value(0.5))
+                        .andExpect(jsonPath("$.chargingSpeed").value(22));
+        }
+
+        @Test
+        @Requirement("MSEV-13")
+        @WithUserDetails("test_operator")
+        void whenCreateChargerWithInvalidData_thenReturnBadRequest() throws Exception {
+                Station station = new Station();
+                station.setName("New Station");
+                station.setAddress("New Address");
+                station.setLatitude(40.7128);
+                station.setLongitude(-74.0060);
+                station.setStatus(Station.StationStatus.ENABLED);
+                station = stationRepository.save(station);
+                stationRepository.flush();
+        
+                Charger charger = Charger.builder()
+                        .station(station)
+                        .connectorType("") 
+                        .price(-1.0) // Invalid price
+                        .chargingSpeed(22)
+                        .status(Charger.ChargerStatus.AVAILABLE)
+                        .build();
+        
+                mockMvc.perform(get("/api/v1/chargers"))
+                        .andExpect(status().isBadRequest());
+        }
+                
 }
