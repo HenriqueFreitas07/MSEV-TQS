@@ -19,7 +19,7 @@ export function StationCard({ station, onClick }: Props) {
       setChargers(chargersRes);
       console.log(chargersRes)
 
-      setChargersOutOfOrder(chargersRes.filter(c => c.status === "OUT_OF_ORDERr").length);
+      setChargersOutOfOrder(chargersRes.filter(c => c.status === "OUT_OF_ORDER").length);
     }
 
     loadChargers();
