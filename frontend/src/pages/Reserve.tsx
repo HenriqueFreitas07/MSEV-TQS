@@ -46,8 +46,9 @@ const generateDaysWithSlots = (days: number): { date: string; slots: TimeSlot[] 
 
 
 function Reserve() {
-  // const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [charger, setCharger] = useState<Charger>();
+  const [car, setCar] = useState<{ date: string, slots: TimeSlot }[]>([]);
 
   const daysWithSlots = generateDaysWithSlots(5);
 
@@ -56,17 +57,30 @@ function Reserve() {
   useEffect(() => {
     const fetchData = async () => {
       setCharger(await ChargerService.getChargerById(params.postId!));
+      const reservationsResponse = await ReservationService.getReservationsForCharger(params.postId!);
 
-      // const reservationsResponse = await ReservationService.getReservations(params.postId!, params.postId!);
-
-      // setReservations(reservations);
-
-      // for (const reserve of reservationsResponse) {
-      //   continue;
-      // }
+      setReservations(reservationsResponse);
+      console.log(reservationsResponse);
     }
     fetchData();
   }, []);
+
+
+  const addToCar = (slot: TimeSlot, day: string) => {
+    const exists = car.some(
+      (item) => item.date === day && item.slots.start === slot.start && item.slots.end === slot.end
+    );
+    if (exists) {
+      setCar((prev) =>
+        prev.filter(
+          (item) =>
+            !(item.date === day && item.slots.start === slot.start && item.slots.end === slot.end)
+        )
+      );
+    } else {
+      setCar((prev) => [...prev, { date: day, slots: slot }]);
+    }
+  };
 
   return (
     <div className="items-center justify-center">
@@ -128,9 +142,27 @@ function Reserve() {
                           <button key={idx} className="btn btn-sm w-full">
                           </button>
                           :
-                          <button key={idx} className="btn btn-sm w-full bg-blue-400">
-                            {slot.start} - {slot.end}
-                          </button>
+                          <>
+                            {!reservations.some(
+                              (r) =>
+                              (
+                                (
+                                  dayjs(r.startTimestamp).format("HH:mm") < slot.end &&
+                                  dayjs(r.endTimestamp).format("HH:mm") > slot.start) &&
+                                dayjs(r.startTimestamp).format("dddd, MMM D") === day.date
+                              )
+
+                            ) ?
+                              <button key={idx} className={`btn btn-sm w-full ${car.some(item => item.date === day.date && item.slots.start === slot.start && item.slots.end === slot.end) ? "bg-red-400" : "bg-blue-400"}`}
+                                onClick={() => addToCar(slot, day.date)}>
+                                {slot.start} - {slot.end}
+                              </button>
+                              :
+                              <button className="btn btn-sm w-full bg-gray-400">
+                                {slot.start} - {slot.end}
+                              </button>
+                            }
+                          </>
                         }
                       </div>
                     ))}

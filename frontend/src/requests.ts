@@ -18,7 +18,7 @@ const googlePlace = axios.create({
 });
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/api/v1",//import.meta.env.VITE_BACKEND_URL, // might change
+  baseURL: import.meta.env.VITE_BACKEND_URL, // might change
   timeout: 10000,
   withCredentials: true,
   headers: {
@@ -230,9 +230,18 @@ export const ReservationService = {
 
   },
 
-  getReservations: async (chargerId: string, userId: string): Promise<Reservation[]> => {
+  getReservationsForCharger: async (chargerId: string): Promise<Reservation[]> => {
     try {
-      const response = await api.get("/reservations", { params: { chargerId, userId } });
+      const response = await api.get("/reservations", { params: { chargerId } });
+      return response.data as Reservation[];
+    } catch (error) {
+      console.error('Error fetching reservations:', error);
+      throw error;
+    }
+  },
+  getReservationsForUSer: async (userId: string): Promise<Reservation[]> => {
+    try {
+      const response = await api.get("/reservations", { params: { userId } });
       return response.data as Reservation[];
     } catch (error) {
       console.error('Error fetching reservations:', error);
