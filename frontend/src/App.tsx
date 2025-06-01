@@ -11,7 +11,12 @@ import { AuthProvider } from "./contexts/auth";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import StationDetails from "./pages/StationDetails";
+
 import Reserve from "./pages/Reserve";
+
+import Dashboard from "./pages/dashboard/Dashboard";
+import StationDetailsDashboard from "./pages/dashboard/StationDetailsDashboard";
+
 
 const router = createBrowserRouter([
   {
@@ -19,13 +24,20 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
-      { path: "/signup", element: <Signup /> },
+      { path: "signup", element: <Signup /> },
       {
         element: <ProtectedRoute />,
         children: [
           { path: "stations", element: <Stations /> },
           { path: "stations/:postId", element: <StationDetails /> },
           { path: "reserve/:postId", element: <Reserve />}
+        ]
+      },
+      {
+        element: <ProtectedRoute operatorOnly />,
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "dashboard/stations/:stationId", element: <StationDetailsDashboard /> }
         ]
       },
       {
