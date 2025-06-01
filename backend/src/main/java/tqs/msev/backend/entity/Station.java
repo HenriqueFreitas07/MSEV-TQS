@@ -2,9 +2,9 @@ package tqs.msev.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,9 +24,11 @@ public class Station {
     private UUID id;
 
     @Column(nullable = false)
+    @NotEmpty
     private String name;
 
     @Column(nullable = false)
+    @NotEmpty
     private String address;
 
     @DecimalMax(value = "90")
@@ -40,6 +42,7 @@ public class Station {
     private double longitude;
 
     @Column(nullable = false)
+    @Builder.Default
     private StationStatus status = StationStatus.ENABLED;
 
     @OneToMany(mappedBy = "station", cascade = CascadeType.ALL, orphanRemoval = true)

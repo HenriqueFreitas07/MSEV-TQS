@@ -127,7 +127,7 @@ class StationControllerTest {
                 .contentType("application/json")
                 .with(csrf())
                 .content("{\"name\":\"New Station\", \"address\":\"New Address\", \"latitude\":40.7128, \"longitude\":-74.0060}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(station.getName())))
                 .andExpect(jsonPath("$.address", is(station.getAddress())))
                 .andExpect(jsonPath("$.status", is("ENABLED")));

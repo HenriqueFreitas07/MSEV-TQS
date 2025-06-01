@@ -3,13 +3,13 @@ package tqs.msev.backend.it;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import tqs.msev.backend.configuration.TestDatabaseConfig;
@@ -40,6 +40,10 @@ class StationIT {
     @Autowired
     private UserRepository userRepository;
 
+    private RequestSpecification defaultSpec;
+
+    private RequestSpecification operatorSpec;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -55,16 +59,21 @@ class StationIT {
 
         String jwtToken = jwtService.generateToken(user);
 
-
         User operator = User.builder()
                 .email("test_operator")
                 .name("test_operator")
                 .password("test_operator")
                 .isOperator(true)
                 .build();
-        userRepository.saveAndFlush(operator);
 
-        RestAssured.requestSpecification = new RequestSpecBuilder()
+        defaultSpec = new RequestSpecBuilder()
+                .addCookie("accessToken", jwtToken)
+                .build();
+
+        user = userRepository.saveAndFlush(operator);
+        jwtToken = jwtService.generateToken(user);
+
+        operatorSpec = new RequestSpecBuilder()
                 .addCookie("accessToken", jwtToken)
                 .build();
     }
@@ -101,6 +110,7 @@ class StationIT {
         stationRepository.saveAllAndFlush(List.of(station1, station2));
 
         given()
+                .spec(defaultSpec)
                 .when()
                 .get("/api/v1/stations")
                 .then()
@@ -122,6 +132,7 @@ class StationIT {
         station1 = stationRepository.saveAndFlush(station1);
 
         given()
+                .spec(defaultSpec)
                 .when()
                 .get("/api/v1/stations/" + station1.getId().toString())
                 .then()
@@ -134,6 +145,7 @@ class StationIT {
     @Requirement("MSEV-16")
     void whenGetStationByInvalidId_thenReturnNotFound() {
         given()
+                .spec(defaultSpec)
                 .when()
                 .get("/api/v1/stations/" + UUID.randomUUID())
                 .then()
@@ -159,6 +171,7 @@ class StationIT {
         stationRepository.saveAllAndFlush(List.of(station1, station2));
 
         given()
+                .spec(defaultSpec)
                 .queryParam("name", "Station 1")
                 .when()
                 .get("/api/v1/stations/search-by-name")
@@ -187,6 +200,7 @@ class StationIT {
         stationRepository.saveAllAndFlush(List.of(station1, station2));
 
         given()
+                .spec(defaultSpec)
                 .queryParam("address", "Aveiro")
                 .when()
                 .get("/api/v1/stations/search-by-address")
@@ -216,6 +230,7 @@ class StationIT {
         stationRepository.saveAllAndFlush(List.of(station1, station2));
 
         given()
+                .spec(defaultSpec)
                 .queryParam("address", "gdais dhasdiasd iasd sa ias")
                 .when()
                 .get("/api/v1/stations/search-by-address")
@@ -227,9 +242,7 @@ class StationIT {
 
     @Test
     @Requirement("MSEV-13")
-    @WithUserDetails("test_operator")
     void whenCreateStation_thenReturnCreatedStation() {
-
         Station station = new Station();
         station.setName("New Station");
         station.setAddress("New Address");
@@ -237,7 +250,8 @@ class StationIT {
         station.setLongitude(-74.0060);
 
         given()
-                .contentType("application/json")
+                .spec(operatorSpec)
+                .contentType(ContentType.JSON)
                 .body(station)
                 .when()
                 .post("/api/v1/stations")
@@ -252,16 +266,16 @@ class StationIT {
 
     @Test
     @Requirement("MSEV-13")
-    @WithUserDetails("test_operator")
     void whenCreateStationWithInvalidData_thenReturnBadRequest() {
-
         Station station = new Station();
         station.setName("");
         station.setAddress("New Address");
         station.setLatitude(200.7128);
         station.setLongitude(-74.0060);
+
         given()
-                .contentType("application/json")
+                .spec(operatorSpec)
+                .contentType(ContentType.JSON)
                 .body(station)
                 .when()
                 .post("/api/v1/stations")

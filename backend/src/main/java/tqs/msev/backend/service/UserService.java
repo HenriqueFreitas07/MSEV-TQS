@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 import tqs.msev.backend.entity.User;
 import tqs.msev.backend.repository.UserRepository;
 
-
-
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -17,9 +15,7 @@ public class UserService {
     public User getCurrentUser(Authentication authentication) {
         String username = authentication.getName();
 
-        User user = userRepository.findUserByEmail(username)
+        return userRepository.findUserByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        return user;
     }
 }
