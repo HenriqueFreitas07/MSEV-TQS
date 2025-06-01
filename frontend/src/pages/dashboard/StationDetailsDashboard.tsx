@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { NavLink, useParams } from "react-router";
+import { useParams } from "react-router";
 import type { Charger } from "../../types/Charger";
 import { ChargerService, StationService } from "../../requests";
 import type { Station } from "../../types/Station";
