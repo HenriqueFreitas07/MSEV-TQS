@@ -128,6 +128,15 @@ export const StationService = {
       console.error('Error fetching station:', error);
       throw error;
     }
+  },
+
+  createStation: async (name: string, address: string, latitude: number, longitude: number) => {
+    await api.post("/stations", {
+      name,
+      address,
+      latitude,
+      longitude
+    })
   }
 }
 export const GoogleService = {
@@ -185,5 +194,14 @@ export const ChargerService = {
     const { data } = await api.get(`/chargers/${id}/reservations`)
 
     return data;
+  },
+
+  createCharger: async (stationId: string, connectorType: string, price: string, chargingSpeed: string) => {
+    await api.post("/chargers", {
+      station: { id: stationId },
+      connectorType,
+      price,
+      chargingSpeed
+    });
   }
 }
