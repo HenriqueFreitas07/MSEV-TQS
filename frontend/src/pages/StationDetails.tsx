@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { format } from "date-fns";
 import dayjs from "dayjs";
 
@@ -9,7 +9,7 @@ import { ChargerService, StationService } from "../requests.ts";
 
 import type { Charger } from "../types/Charger.tsx";
 import type { Station } from "../types/Station.tsx";
-import type { Reservation } from "../types/reservation";
+import type { Reservation } from "../types/Reservation.ts";
 
 function StationDetails() {
   let color = "text-black";
@@ -21,7 +21,7 @@ function StationDetails() {
   const [reservations, setReservations] = useState<Record<string, Reservation[]>>({});
 
   const params = useParams();
-
+  const navigate = useNavigate();
   const modalRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
@@ -123,12 +123,13 @@ function StationDetails() {
                     <p className="font-bold">Charging Speed: </p><p> {charger.chargingSpeed}</p>
                     <p className="font-bold">Status: </p><p className={`${getColorChargers(charger.status)}`}> {charger.status}</p>
                     <p className="font-bold">Reservations for the next 5 days: </p><p>{reservations[charger.id]?.length ?? 0}</p>
+
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-2 w-full">
                         <button className="btn btn-info flex-1" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }}>Availability</button>
                         <button className="btn btn-primary flex-1" onClick={() => handleUnlockCharger(charger.id)} disabled={!canUnlockCharger(charger.id, charger.status)}>Unlock</button>
                       </div>
-                      <button className="btn btn-success w-full">Reserve now</button>
+                      <button className="btn btn-success w-full" onClick={() => { navigate(`/reserve/${charger.id}`) }}>Reserve now</button>
                     </div>
                   </div>
                 </div>

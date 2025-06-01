@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChargerService } from "../requests";
 
-import type { Reservation } from "../types/reservation";
+import type { Reservation } from "../types/Reservation";
 import type { Charger } from "../types/Charger"
 
 type Props = {
