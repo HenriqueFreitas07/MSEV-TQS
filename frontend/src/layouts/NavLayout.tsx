@@ -23,6 +23,9 @@ export default function NavLayout({ children, title, footer = true }: Props) {
             <li>
               <NavLink to="/stations">Stations</NavLink>
             </li>
+            <li>
+              <NavLink to="/charge-sessions">Charge Sessions</NavLink>
+            </li>
             {
               user?.operator && (
                 <li>

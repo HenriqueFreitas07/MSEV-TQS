@@ -13,6 +13,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import StationDetails from "./pages/StationDetails";
 import Dashboard from "./pages/dashboard/Dashboard";
 import StationDetailsDashboard from "./pages/dashboard/StationDetailsDashboard";
+import ChargeSessions from "./pages/ChargeSessions";
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
         children: [
           { path: "stations", element: <Stations /> },
           { path: "stations/:postId", element: <StationDetails /> },
+          { path: "charge-sessions", element: <ChargeSessions /> },
         ]
       },
       {
