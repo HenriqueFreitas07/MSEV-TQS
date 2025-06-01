@@ -12,6 +12,8 @@ import Signup from "./pages/Signup";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import StationDetails from "./pages/StationDetails";
 import ChargerInteraction from "./pages/ChargerInteraction";
+import Dashboard from "./pages/dashboard/Dashboard";
+import StationDetailsDashboard from "./pages/dashboard/StationDetailsDashboard";
 
 const router = createBrowserRouter([
   {
@@ -19,13 +21,20 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
-      { path: "/signup", element: <Signup /> },
+      { path: "signup", element: <Signup /> },
       {
         element: <ProtectedRoute />,
         children: [
           { path: "stations", element: <Stations /> },
           { path: "stations/:postId", element: <StationDetails /> },
-          { path: "/charger/:chargerId", element: <ChargerInteraction/>}
+          { path: "/charger/:chargerId", element: <ChargerInteraction /> }
+        ]
+      },
+      {
+        element: <ProtectedRoute operatorOnly />,
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "dashboard/stations/:stationId", element: <StationDetailsDashboard /> }
         ]
       },
       {

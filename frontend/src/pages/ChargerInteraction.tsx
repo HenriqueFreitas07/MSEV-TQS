@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import NavLayout from "../layouts/NavLayout";
@@ -7,7 +5,7 @@ import { ChargerService } from "../requests.ts";
 
 import type { Charger } from "../types/Charger.tsx";
 
-function ChargerDetails() {
+export default function ChargerDetails() {
   const { chargerId } = useParams();
   const [charger, setCharger] = useState<Charger | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +27,7 @@ function ChargerDetails() {
     if (!charger) return;
     try {
       await ChargerService.lockCharger(charger.id);
-      await fetchCharger(); 
+      await fetchCharger();
       setCharging(true);
     } catch (err) {
       console.error("Failed to lock charger", err);
@@ -40,7 +38,7 @@ function ChargerDetails() {
     if (!charger) return;
     try {
       await ChargerService.unlockCharger(charger.id);
-      await fetchCharger(); 
+      await fetchCharger();
       setCharging(false);
     } catch (err) {
       console.error("Failed to unlock charger", err);
@@ -89,26 +87,24 @@ function ChargerDetails() {
             <span className={`${getColor(charger.status)} font-semibold`}>{charger.status}</span>
           </p>
           <div className="flex gap-4 mt-4">
-          {charger.status === "AVAILABLE" && !charging ? (
-            <button
-              className="btn btn-primary"
-              onClick={() => handleLock()}
-            >
-              Lock Charger
-            </button>
-          ) : (
-            <button
-              className="btn btn-primary"
-              onClick={() => handleUnlock()}
-            >
-              Unlock Charger
-            </button>
-          )}
+            {charger.status === "AVAILABLE" && !charging ? (
+              <button
+                className="btn btn-warning"
+                onClick={() => handleLock()}
+              >
+                Lock Charger
+              </button>
+            ) : (
+              <button
+                className="btn btn-primary"
+                onClick={() => handleUnlock()}
+              >
+                Unlock Charger
+              </button>
+            )}
           </div>
         </div>
       </NavLayout>
     </div>
   );
 }
-
-export default ChargerDetails;
