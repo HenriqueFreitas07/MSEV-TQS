@@ -75,6 +75,15 @@ public class ChargerService {
 
         chargeSessionRepository.save(newSession);
 
+        Date now = Date.from(Instant.now());
+        Reservation reservation = reservationRepository
+                .findByUserIdAndStartTimestampBeforeAndEndTimestampAfter(userId, now, now);
+
+        if (reservation != null) {
+            reservation.setUsed(true);
+            reservationRepository.save(reservation);
+        }
+
         charger.setStatus(Charger.ChargerStatus.IN_USE);
         chargerRepository.save(charger);
     }

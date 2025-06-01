@@ -186,6 +186,36 @@ class ChargerServiceTest {
         assertThatCode(() -> chargerService.unlockCharger(charger.getId(), user.getId())).doesNotThrowAnyException();
 
         verify(chargerRepository, times(1)).findById(charger.getId());
+        verify(reservationRepository, times(1)).save(Mockito.any());
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenUnlockChargerWithReservation_thenUnlock() {
+        Charger charger = Charger.builder()
+                .id(UUID.randomUUID())
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        Reservation reservation = Reservation.builder()
+                .charger(charger)
+                .user(user)
+                .startTimestamp(Date.from(Instant.now()))
+                .build();
+
+        when(chargerRepository.findById(charger.getId())).thenReturn(Optional.of(charger));
+        when(reservationRepository
+                .findByUserIdAndStartTimestampBeforeAndEndTimestampAfter(eq(user.getId()), Mockito.any(), Mockito.any()))
+                .thenReturn(reservation);
+
+        assertThatCode(() -> chargerService.unlockCharger(charger.getId(), user.getId())).doesNotThrowAnyException();
+
+        verify(chargerRepository, times(1)).findById(charger.getId());
+        verify(reservationRepository, times(1)).save(Mockito.any());
     }
 
     @Test
