@@ -67,12 +67,13 @@ function Reserve() {
     fetchData();
   }, [setReservations]);
 
-  const handleReserve = async () => {
-    for (const reserve of slots) {
-      const startTimestamp = dayjs(reserve.date + " " + reserve.slots.start, "YYYY-MM-DD HH:mm").toISOString();
-      const endTimestamp = dayjs(reserve.date + " " + reserve.slots.end, "YYYY-MM-DD HH:mm").toISOString();
+  const handleReserve = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (auth.user && charger) {
 
-      if (auth.user != null && charger) {
+      for (const reserve of slots) {
+        const startTimestamp = dayjs(reserve.date + " " + reserve.slots.start, "YYYY-MM-DD HH:mm").toISOString();
+        const endTimestamp = dayjs(reserve.date + " " + reserve.slots.end, "YYYY-MM-DD HH:mm").toISOString();
         const reservation = {
           user: auth.user,
           startTimestamp: startTimestamp,
@@ -82,10 +83,11 @@ function Reserve() {
         const response = await ReservationService.createReservation(reservation);
 
         setReservations((prev) => [...prev, response])
-
       }
+      modalRef.current?.close();
+      setCar([]);
     }
-    setCar([]);
+
   }
 
   const concat = () => {
@@ -221,7 +223,7 @@ function Reserve() {
                   </table>
                   <div className="justify-center items-center mt-3">
                     <form>
-                      <button className="btn btn-md  bg-green-600 text-white" onClick={() => { handleReserve(); }}>Confirm Reserve</button>
+                      <button className="btn btn-md  bg-green-600 text-white" onClick={(e) => handleReserve(e)}>Confirm Reserve</button>
                     </form>
                   </div>
                 </div>
