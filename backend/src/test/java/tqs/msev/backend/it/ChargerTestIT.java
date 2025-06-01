@@ -1,10 +1,15 @@
 package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import com.google.gson.Gson;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
+
 import tqs.msev.backend.configuration.TestDatabaseConfig;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ChargerRepository;
@@ -16,11 +21,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Date;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import tqs.msev.backend.repository.UserRepository;
@@ -30,6 +36,7 @@ import tqs.msev.backend.entity.User;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(TestDatabaseConfig.class)
 class ChargerTestIT {
     @Autowired
@@ -53,11 +60,26 @@ class ChargerTestIT {
         registry.add("security.jwt.secret-key", () -> "f9924db12318f6a0f1bcfa6e5d0342b65a51022a48a8246cdaa3b1a45493b6b4");
         registry.add("security.jwt.expiration-time", () -> "360000");
     }
-    
+
+    @BeforeAll
+    void beforeAll() {
+        User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+        userRepository.saveAndFlush(operator);
+    }
+
+    @AfterAll
+    void afterAll() {
+        userRepository.deleteAll();
+    }
+
     @AfterEach
     void resetDb() {
         reservationRepository.deleteAll();
-        userRepository.deleteAll();
         chargerRepository.deleteAll();
         stationRepository.deleteAll();
     }
@@ -221,5 +243,64 @@ class ChargerTestIT {
         mockMvc.perform(get("/api/v1/chargers/{chargerId}/reservations", charger.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    @Requirement("MSEV-13")
+    @WithUserDetails("test_operator")
+    void whenCreateCharger_thenReturnCreatedCharger() throws Exception {
+        Station station = new Station();
+        station.setName("New Station");
+        station.setAddress("New Address");
+        station.setLatitude(40.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.ENABLED);
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        Gson gson = new Gson();
+
+        mockMvc.perform(post("/api/v1/chargers").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(charger)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.connectorType").value("Type 2"))
+            .andExpect(jsonPath("$.price").value(0.5))
+            .andExpect(jsonPath("$.chargingSpeed").value(22))
+            .andExpect(jsonPath("$.status").value("AVAILABLE"))
+            .andExpect(jsonPath("$.station.id").value(station.getId().toString()));
+    }
+
+    @Test
+    @Requirement("MSEV-13")
+    @WithUserDetails("test_operator")
+    void whenCreateChargerWithInvalidData_thenReturnBadRequest() throws Exception {
+        Station station = new Station();
+        station.setName("New Station");
+        station.setAddress("New Address");
+        station.setLatitude(40.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.ENABLED);
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("")
+                .price(-1.0)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        Gson gson = new Gson();
+
+        mockMvc.perform(post("/api/v1/chargers").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(charger)))
+                .andExpect(status().isBadRequest());
     }
 }
