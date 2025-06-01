@@ -1,17 +1,14 @@
 import NavLayout from "../layouts/NavLayout.js";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { ReservationService } from "../requests.js";
 import dayjs from "dayjs";
 import type { Reservation } from "../types/Reservation.js";
 import { useAuth } from "../contexts/auth.js";
-import Swal, { type SweetAlertIcon, type SweetAlertResult } from 'sweetalert2';
-
-
+import Swal from 'sweetalert2';
 
 
 function UserReserves() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
-  const modalRef = useRef<HTMLDialogElement | null>(null);
 
   const auth = useAuth();
 
