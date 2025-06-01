@@ -36,7 +36,7 @@ api.interceptors.response.use(
         error.response.status,
         error.response.data
       );
-      showToast(`Error (${error.response.status}): ${error.response.data}`, "error", "top-end")
+      showToast(`Error (${error.response.status}): ${error.response.data.message ?? "Unknown error"}`, "error", "top-end")
     } else if (error.request) {
       // Request made but no response
       console.error("Request error - no response received:", error.request);
@@ -196,7 +196,7 @@ export const ChargerService = {
     return data;
   },
 
-  createCharger: async (stationId: string, connectorType: string, price: string, chargingSpeed: string) => {
+  createCharger: async (stationId: string, connectorType: string, price: number, chargingSpeed: number) => {
     await api.post("/chargers", {
       station: { id: stationId },
       connectorType,
