@@ -115,7 +115,17 @@ public class ChargerService {
         if (charger.getStatus() == null) {
             charger.setStatus(Charger.ChargerStatus.AVAILABLE);
         }
-        
+
         return chargerRepository.save(charger);
+    }
+
+    public List<ChargeSession> getChargeSessions(UUID userId, boolean activeOnly) {
+        List<ChargeSession> sessions = chargeSessionRepository.findAllByUserId(userId);
+
+        if (activeOnly) {
+            return sessions.stream().filter(s -> s.getEndTimestamp() == null).toList();
+        }
+
+        return sessions;
     }
 }

@@ -349,4 +349,50 @@ class ChargerServiceTest {
         
         verify(chargerRepository, never()).save(Mockito.any(Charger.class));
     }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetAllChargeSessions_thenReturnChargeSessions() {
+        UUID id = UUID.randomUUID();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .build();
+
+        ChargeSession session2 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .endTimestamp((LocalDateTime.now().plusSeconds(30)))
+                .build();
+
+        when(chargeSessionRepository.findAllByUserId(id)).thenReturn(List.of(session1, session2));
+
+        List<ChargeSession> sessions = chargerService.getChargeSessions(id, false);
+
+        assertThat(sessions).hasSize(2);
+
+        verify(chargeSessionRepository, times(1)).findAllByUserId(id);
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetActiveChargeSessions_thenReturnActiveChargeSessions() {
+        UUID id = UUID.randomUUID();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .build();
+
+        ChargeSession session2 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .endTimestamp((LocalDateTime.now().plusSeconds(30)))
+                .build();
+
+        when(chargeSessionRepository.findAllByUserId(id)).thenReturn(List.of(session1, session2));
+
+        List<ChargeSession> sessions = chargerService.getChargeSessions(id, true);
+
+        assertThat(sessions).hasSize(1);
+
+        verify(chargeSessionRepository, times(1)).findAllByUserId(id);
+    }
 }
