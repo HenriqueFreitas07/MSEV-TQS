@@ -50,7 +50,6 @@ function Reserve() {
   const [charger, setCharger] = useState<Charger>();
   const [car, setCar] = useState<{ date: string, slots: TimeSlot }[]>([]);
   const [slots, setSlots] = useState<{ date: string, slots: TimeSlot }[]>([]);
-
   const modalRef = useRef<HTMLDialogElement | null>(null);
 
   const daysWithSlots = generateDaysWithSlots(5);
@@ -83,8 +82,10 @@ function Reserve() {
         const response = await ReservationService.createReservation(reservation);
 
         setReservations((prev) => [...prev, response])
+
       }
     }
+    setCar([]);
   }
 
   const concat = () => {
@@ -219,7 +220,9 @@ function Reserve() {
                     </tbody>
                   </table>
                   <div className="justify-center items-center mt-3">
-                    <button className="btn btn-md  bg-green-600 text-white" onClick={() => handleReserve()}>Confirm Reserve</button>
+                    <form>
+                      <button className="btn btn-md  bg-green-600 text-white" onClick={() => { handleReserve(); }}>Confirm Reserve</button>
+                    </form>
                   </div>
                 </div>
               ) : (
