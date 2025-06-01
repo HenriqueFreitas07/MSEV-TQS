@@ -69,6 +69,7 @@ function Reserve() {
 
   const handleReserve = async (e: React.MouseEvent) => {
     e.preventDefault();
+    modalRef.current?.close();
     if (auth.user && charger) {
 
       for (const reserve of slots) {
@@ -84,7 +85,7 @@ function Reserve() {
 
         setReservations((prev) => [...prev, response])
       }
-      modalRef.current?.close();
+      
       setCar([]);
     }
 
