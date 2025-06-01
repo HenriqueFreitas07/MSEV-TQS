@@ -20,8 +20,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -160,4 +163,26 @@ class ChargerControllerTest {
         mockMvc.perform(patch("/api/v1/chargers/{chargerId}/lock", UUID.randomUUID()).with(csrf()))
                 .andExpect(status().isOk());
     }
+
+    
+    @Test
+    @WithUserDetails("test_operator")
+    @Requirement("MSEV-13")
+    void whenCreateInvalidCharger_thenReturnBadRequest() throws Exception {
+        Charger invalidCharger = new Charger();
+        invalidCharger.setConnectorType("INVALID_TYPE");
+        invalidCharger.setPrice(-1.0);
+        invalidCharger.setChargingSpeed(-10);
+
+        mockMvc.perform(
+            post("/api/v1/chargers")
+                .contentType("application/json")
+                .content("{\"connectorType\":\"INVALID_TYPE\", \"price\":-1.0, \"chargingSpeed\":-10}")
+                .with(csrf())
+        )
+        .andExpect(status().isBadRequest());
+    }
+
+
+
 }

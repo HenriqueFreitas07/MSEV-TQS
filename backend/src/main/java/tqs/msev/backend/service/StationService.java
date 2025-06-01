@@ -49,4 +49,8 @@ public class StationService {
                     station.getLatitude(), station.getLongitude())
         )).toList();
     }
+
+    public Station createStation(Station station) {
+        return stationRepository.save(station);
+    }
 }

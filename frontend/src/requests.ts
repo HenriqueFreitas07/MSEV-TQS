@@ -3,6 +3,8 @@ import type { LoginDTO, SignupDTO, User } from './types/user';
 import type { Station } from './types/Station';
 import type { Charger } from './types/Charger';
 import type { createReservation, Reservation } from './types/Reservation';
+import type { ChargeSession } from './types/charge-session';
+
 import { showToast } from "./alerts";
 
 
@@ -185,6 +187,35 @@ export const ChargerService = {
     const { data } = await api.get(`/chargers/${id}/reservations`)
 
     return data;
+  },
+
+  lockCharger: async (id: string) => {
+    try {
+      api.patch(`/chargers/${id}/lock`);
+    } catch (error) {
+      console.error('Error locking charger:', error);
+      throw error;
+    }
+  },
+
+  unlockCharger: async (id: string) => {
+    try {
+      api.patch(`/chargers/${id}/unlock`);
+    } catch (error) {
+      console.error('Error unlocking charger:', error);
+      throw error;
+    }
+  },
+
+  getChargeSessions: async (activeOnly: boolean = false): Promise<ChargeSession[]> => {
+    try {
+      const { data } = await api.get<ChargeSession[]>("/charge-sessions", { params: { activeOnly } });
+
+      return data;
+    } catch (error) {
+      console.log("Error fetching charge sessions");
+      throw error;
+    }
   }
 }
 

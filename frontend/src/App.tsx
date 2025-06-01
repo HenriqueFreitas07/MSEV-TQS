@@ -17,6 +17,7 @@ import UserReserves from "./pages/UserReserves";
 
 import Dashboard from "./pages/dashboard/Dashboard";
 import StationDetailsDashboard from "./pages/dashboard/StationDetailsDashboard";
+import ChargeSessions from "./pages/ChargeSessions";
 
 
 const router = createBrowserRouter([
@@ -32,7 +33,8 @@ const router = createBrowserRouter([
           { path: "stations", element: <Stations /> },
           { path: "stations/:postId", element: <StationDetails /> },
           { path: "reserve/:postId", element: <Reserve />},
-          { path: "my-reserves", element: <UserReserves />}
+          { path: "my-reserves", element: <UserReserves />},
+          { path: "charge-sessions", element: <ChargeSessions /> },
         ]
       },
       {

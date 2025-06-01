@@ -1,10 +1,15 @@
 package tqs.msev.backend.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
+
 import java.util.UUID;
 
 import tqs.msev.backend.entity.User;
@@ -53,5 +58,12 @@ public class ChargerController {
         User user = (User) auth.getPrincipal();
 
         chargerService.lockCharger(chargerId, user.getId());
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Charger createCharger(@Valid @RequestBody Charger charger) {
+        return chargerService.createCharger(charger);
     }
 }
