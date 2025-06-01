@@ -8,7 +8,7 @@ import { ChargerService, StationService } from "../requests.ts";
 
 import type { Charger } from "../types/Charger.tsx";
 import type { Station } from "../types/Station.tsx";
-import type { Reservation } from "../types/reservation";
+import type { Reservation } from "../types/Reservation.ts";
 
 function StationDetails() {
   let color = "text-black";

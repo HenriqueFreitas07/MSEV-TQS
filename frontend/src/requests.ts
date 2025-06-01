@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import type { LoginDTO, SignupDTO, User } from './types/user';
 import type { Station } from './types/Station';
 import type { Charger } from './types/Charger';
-import type { Reservation } from './types/reservation';
+import type { createReservation, Reservation } from './types/Reservation';
 import { showToast } from "./alerts";
 
 
@@ -190,9 +190,9 @@ export const ChargerService = {
 
 
 export const ReservationService = {
-  createReservation: async (reservation: Reservation): Promise<Reservation> => {
+  createReservation: async (reservation: createReservation): Promise<Reservation> => {
     try {
-      const response = await api.post("/reservations", { reservation });
+      const response = await api.post("/reservations",  reservation);
       return response.data as Reservation;
     } catch (error) {
       console.error('Error fetching chargers:', error);

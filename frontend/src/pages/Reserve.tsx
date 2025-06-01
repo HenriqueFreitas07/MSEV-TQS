@@ -3,9 +3,10 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import { ChargerService, ReservationService } from "../requests.js";
 import dayjs from "dayjs";
-import type { Reservation } from "../types/reservation.js";
+import type { Reservation } from "../types/Reservation.js";
 import type { Charger } from "../types/Charger.js";
 import { TbGasStation, TbGasStationOff } from "react-icons/tb";
+import { useAuth } from "../contexts/auth.js";
 
 interface TimeSlot {
   start: string;
@@ -35,7 +36,7 @@ const generateDaysWithSlots = (days: number): { date: string; slots: TimeSlot[] 
   for (let i = 0; i < days; i++) {
     const date = dayjs().add(i, "day");
     results.push({
-      date: date.format("dddd, MMM D"),
+      date: date.format("YYYY-MM-DD"),
       slots: generateTimeSlots(9, 17), // 9 AM to 5 PM
     });
   }
@@ -55,6 +56,7 @@ function Reserve() {
   const daysWithSlots = generateDaysWithSlots(5);
 
   const params = useParams();
+  const auth = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,7 +66,26 @@ function Reserve() {
       setReservations(reservationsResponse);
     }
     fetchData();
-  }, []);
+  }, [setReservations]);
+
+  const handleReserve = async () => {
+    for (const reserve of slots) {
+      const startTimestamp = dayjs(reserve.date + " " + reserve.slots.start, "YYYY-MM-DD HH:mm").toISOString();
+      const endTimestamp = dayjs(reserve.date + " " + reserve.slots.end, "YYYY-MM-DD HH:mm").toISOString();
+
+      if (auth.user != null && charger) {
+        const reservation = {
+          user: auth.user,
+          startTimestamp: startTimestamp,
+          endTimestamp: endTimestamp,
+          charger: charger
+        };
+        const response = await ReservationService.createReservation(reservation);
+
+        setReservations((prev) => [...prev, response])
+      }
+    }
+  }
 
   const concat = () => {
     let conc = true;
@@ -78,12 +99,25 @@ function Reserve() {
             break;
           }
           else if (reserve.slots.start === reserve2.slots.end) {
-            change = change.filter((r) => r.slots.start !== reserve.slots.start && r.slots.start !== reserve2.slots.start && r.date === reserve.date && r.date === reserve2.date);
+            change = change.filter(
+              (r) =>
+                !(
+                  (r.date === reserve.date && r.slots.start === reserve.slots.start && r.slots.end === reserve.slots.end) ||
+                  (r.date === reserve2.date && r.slots.start === reserve2.slots.start && r.slots.end === reserve2.slots.end)
+                )
+            );
+
             change.push({ date: reserve.date, slots: { start: reserve2.slots.start, end: reserve.slots.end } })
             conc = true
           }
           else if (reserve2.slots.start === reserve.slots.end) {
-            change = change.filter((r) => r.slots.start !== reserve2.slots.start && r.slots.start !== reserve2.slots.start && reserve.date === r.date && r.date === reserve2.date);
+            change = change.filter(
+              (r) =>
+                !(
+                  (r.date === reserve.date && r.slots.start === reserve.slots.start && r.slots.end === reserve.slots.end) ||
+                  (r.date === reserve2.date && r.slots.start === reserve2.slots.start && r.slots.end === reserve2.slots.end)
+                )
+            );
             change.push({ date: reserve.date, slots: { start: reserve.slots.start, end: reserve2.slots.end } });
             conc = true
           }
@@ -153,12 +187,6 @@ function Reserve() {
           </div>
           <div>
             <button className="btn btn-lg w-full bg-green-600 text-white" onClick={() => { modalRef.current?.showModal(); concat(); }}>Reserve now</button>
-            {
-              slots.map((s, idx) => (
-                <div key={idx}>{s.date} - {s.slots.start} - {s.slots.end}</div>
-              )
-              )
-            }
           </div>
         </div>
         <dialog className="modal" ref={modalRef}>
@@ -180,7 +208,7 @@ function Reserve() {
                     </thead>
                     <tbody>
                       {
-                        car.map((reservation, i) => (
+                        slots.map((reservation, i) => (
                           <tr key={i}>
                             <th>{reservation.date}</th>
                             <td>{reservation.slots.start}</td>
@@ -191,7 +219,7 @@ function Reserve() {
                     </tbody>
                   </table>
                   <div className="justify-center items-center mt-3">
-                    <button className="btn btn-md  bg-green-600 text-white">Confirm Reserve</button>
+                    <button className="btn btn-md  bg-green-600 text-white" onClick={() => handleReserve()}>Confirm Reserve</button>
                   </div>
                 </div>
               ) : (
@@ -227,7 +255,7 @@ function Reserve() {
                                 (
                                   dayjs(r.startTimestamp).format("HH:mm") < slot.end &&
                                   dayjs(r.endTimestamp).format("HH:mm") > slot.start) &&
-                                dayjs(r.startTimestamp).format("dddd, MMM D") === day.date
+                                dayjs(r.startTimestamp).format("YYYY-MM-DD") === day.date
                               )
 
                             ) ?
