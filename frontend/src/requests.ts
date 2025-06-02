@@ -38,7 +38,7 @@ api.interceptors.response.use(
         error.response.status,
         error.response.data
       );
-      showToast(`Error (${error.response.status}): ${error.response.data}`, "error", "top-end")
+      showToast(`Error (${error.response.status}): ${error.response.data.message ?? "Unknown error"}`, "error", "top-end")
     } else if (error.request) {
       // Request made but no response
       console.error("Request error - no response received:", error.request);
@@ -130,6 +130,17 @@ export const StationService = {
       console.error('Error fetching station:', error);
       throw error;
     }
+  },
+
+  createStation: async (name: string, address: string, latitude: number, longitude: number): Promise<Station> => {
+    const { data } = await api.post<Station>("/stations", {
+      name,
+      address,
+      latitude,
+      longitude
+    });
+
+    return data;
   }
 }
 export const GoogleService = {
@@ -189,6 +200,17 @@ export const ChargerService = {
     return data;
   },
 
+  createCharger: async (stationId: string, connectorType: string, price: number, chargingSpeed: number): Promise<Charger> => {
+    const { data } = await api.post<Charger>("/chargers", {
+      station: { id: stationId },
+      connectorType,
+      price,
+      chargingSpeed
+    });
+
+    return data;
+  },
+
   lockCharger: async (id: string) => {
     try {
       api.patch(`/chargers/${id}/lock`);
@@ -223,7 +245,7 @@ export const ChargerService = {
 export const ReservationService = {
   createReservation: async (reservation: createReservation): Promise<Reservation> => {
     try {
-      const response = await api.post("/reservations",  reservation);
+      const response = await api.post("/reservations", reservation);
       return response.data as Reservation;
     } catch (error) {
       console.error('Error fetching chargers:', error);
