@@ -192,6 +192,36 @@ class ChargerServiceTest {
         assertThatCode(() -> chargerService.unlockCharger(charger.getId(), user.getId())).doesNotThrowAnyException();
 
         verify(chargerRepository, times(1)).findById(charger.getId());
+        verify(reservationRepository, times(1)).save(Mockito.any());
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenUnlockChargerWithReservation_thenUnlock() {
+        Charger charger = Charger.builder()
+                .id(UUID.randomUUID())
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        User user = User.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        Reservation reservation = Reservation.builder()
+                .charger(charger)
+                .user(user)
+                .startTimestamp(Date.from(Instant.now()))
+                .build();
+
+        when(chargerRepository.findById(charger.getId())).thenReturn(Optional.of(charger));
+        when(reservationRepository
+                .findByUserIdAndStartTimestampBeforeAndEndTimestampAfter(eq(user.getId()), Mockito.any(), Mockito.any()))
+                .thenReturn(reservation);
+
+        assertThatCode(() -> chargerService.unlockCharger(charger.getId(), user.getId())).doesNotThrowAnyException();
+
+        verify(chargerRepository, times(1)).findById(charger.getId());
+        verify(reservationRepository, times(1)).save(Mockito.any());
     }
 
     @Test
@@ -318,5 +348,51 @@ class ChargerServiceTest {
                 .hasMessageContaining("Charger must be associated with a valid station");
         
         verify(chargerRepository, never()).save(Mockito.any(Charger.class));
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetAllChargeSessions_thenReturnChargeSessions() {
+        UUID id = UUID.randomUUID();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .build();
+
+        ChargeSession session2 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .endTimestamp((LocalDateTime.now().plusSeconds(30)))
+                .build();
+
+        when(chargeSessionRepository.findAllByUserId(id)).thenReturn(List.of(session1, session2));
+
+        List<ChargeSession> sessions = chargerService.getChargeSessions(id, false);
+
+        assertThat(sessions).hasSize(2);
+
+        verify(chargeSessionRepository, times(1)).findAllByUserId(id);
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetActiveChargeSessions_thenReturnActiveChargeSessions() {
+        UUID id = UUID.randomUUID();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .build();
+
+        ChargeSession session2 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .endTimestamp((LocalDateTime.now().plusSeconds(30)))
+                .build();
+
+        when(chargeSessionRepository.findAllByUserId(id)).thenReturn(List.of(session1, session2));
+
+        List<ChargeSession> sessions = chargerService.getChargeSessions(id, true);
+
+        assertThat(sessions).hasSize(1);
+
+        verify(chargeSessionRepository, times(1)).findAllByUserId(id);
     }
 }

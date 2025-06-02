@@ -23,6 +23,9 @@ export default function NavLayout({ children, title, footer = true }: Props) {
             <li>
               <NavLink to="/stations">Stations</NavLink>
             </li>
+            <li>
+              <NavLink to="/charge-sessions">Charge Sessions</NavLink>
+            </li>
             {
               user?.operator && (
                 <li>
@@ -35,9 +38,14 @@ export default function NavLayout({ children, title, footer = true }: Props) {
                 <NavLink to="/login">Login</NavLink>
               </li>
             ) : (
-              <li className="justify-center cursor-pointer" onClick={logout}>
-                <NavLink to="/" onClick={logout}>Logout</NavLink>
-              </li>
+              <>
+                <li>
+                  <NavLink to="/my-reserves">My Reserves</NavLink>
+                </li>
+                <li className="justify-center cursor-pointer" onClick={logout}>
+                  <NavLink to="/" onClick={logout}>Logout</NavLink>
+                </li>
+              </>
             )}
           </ul>
         </div>

@@ -9,3 +9,10 @@ export type Reservation = {
   endTimestamp: string;
   used: boolean;
 }
+
+export type createReservation = {
+  user: User;
+  charger: Charger;
+  startTimestamp: string;
+  endTimestamp: string;
+}
