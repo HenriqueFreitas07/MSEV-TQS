@@ -132,13 +132,15 @@ export const StationService = {
     }
   },
 
-  createStation: async (name: string, address: string, latitude: number, longitude: number) => {
-    await api.post("/stations", {
+  createStation: async (name: string, address: string, latitude: number, longitude: number): Promise<Station> => {
+    const { data } = await api.post<Station>("/stations", {
       name,
       address,
       latitude,
       longitude
-    })
+    });
+
+    return data;
   }
 }
 export const GoogleService = {

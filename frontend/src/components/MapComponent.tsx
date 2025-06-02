@@ -3,7 +3,8 @@ import {
   APIProvider,
   Map,
   AdvancedMarker,
-  useMap
+  useMap,
+  type MapMouseEvent
 } from '@vis.gl/react-google-maps';
 import { useEffect } from 'react';
 import { type markerProps } from '../types/MapTypes';
@@ -12,9 +13,11 @@ type Props = {
   markers?: markerProps[];
   center?: google.maps.LatLngLiteral;
   zoom?: number;
+  onClick?: (event: MapMouseEvent) => void;
+  fitBounds?: boolean;
 };
 
-function MapContent({ markers }: { markers?: markerProps[] }) {
+function MapContent({ markers, fitBounds }: { markers?: markerProps[], fitBounds: boolean }) {
   const map = useMap(); // access the map instance
 
   useEffect(() => {
@@ -22,22 +25,22 @@ function MapContent({ markers }: { markers?: markerProps[] }) {
 
     const bounds = new google.maps.LatLngBounds();
     markers.forEach((m) => {
-      if(m.markerOptions.position !=null )
-      {
+      if (m.markerOptions.position != null) {
         bounds.extend(m.markerOptions.position);
       }
     });
 
-    map.fitBounds(bounds);
-  }, [map, markers]);
+    if (fitBounds)
+      map.fitBounds(bounds);
+  }, [map, markers, fitBounds]);
 
   return (
     <>
       {markers?.map((markerProps, index) => (
-        <AdvancedMarker 
-        onClick={markerProps.callback} // for redirecting to the station page
-        key={index} 
-        {...markerProps.markerOptions}>
+        <AdvancedMarker
+          onClick={markerProps.callback} // for redirecting to the station page
+          key={index}
+          {...markerProps.markerOptions}>
           {markerProps.icon !== null ? (
             markerProps.icon
           ) : (
@@ -56,7 +59,9 @@ function MapContent({ markers }: { markers?: markerProps[] }) {
 export default function MapComponent({
   markers,
   zoom = 6,
-  center = { lat: 50.8503, lng: 4.3517 }
+  center = { lat: 50.8503, lng: 4.3517 },
+  onClick = () => { },
+  fitBounds = true,
 }: Props) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
@@ -69,8 +74,9 @@ export default function MapComponent({
         colorScheme="DARK"
         gestureHandling="greedy"
         style={{ width: '100%', height: '100%' }}
+        onClick={onClick}
       >
-        <MapContent markers={markers} />
+        <MapContent markers={markers} fitBounds={fitBounds} />
       </Map>
     </APIProvider>
   );

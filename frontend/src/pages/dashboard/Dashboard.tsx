@@ -1,13 +1,24 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import NavLayout from "../../layouts/NavLayout";
 import type { Station } from "../../types/Station";
 import { StationService } from "../../requests";
 import { StationCard } from "../../components/StationCard";
-import { NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
+import MapComponent from "../../components/MapComponent";
+import type { MapMouseEvent } from "@vis.gl/react-google-maps";
+import { showAlert } from "../../alerts";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 export default function Dashboard() {
   const [stations, setStations] = useState<Station[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+
+  const modalRef = useRef<HTMLDialogElement | null>(null);
 
   const navigate = useNavigate();
 
@@ -21,6 +32,36 @@ export default function Dashboard() {
 
   function handleStationClick(stationId: string) {
     navigate(`/dashboard/stations/${stationId}`)
+  }
+
+  async function handleCreateStation(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (latitude === null || longitude === null) {
+      showAlert("Error", "Please select a point in the map", "error");
+      modalRef.current?.close();
+      return;
+    }
+
+    const newStation = await StationService.createStation(name, address, latitude, longitude);
+
+    setStations(prev => [...prev, newStation]);
+
+    setName("");
+    setAddress("");
+    setLatitude(null);
+    setLongitude(null);
+
+    modalRef.current?.close();
+
+    showAlert("Success", "Station created!", "success");
+  }
+
+  function handleMapClick(event: MapMouseEvent) {
+    const { lat, lng } = event.detail.latLng!;
+
+    setLatitude(lat);
+    setLongitude(lng);
   }
 
   return (
@@ -45,9 +86,9 @@ export default function Dashboard() {
               </svg>
               <input type="search" value={searchQuery} onChange={e => setSearchQuery(e.target.value.toLowerCase())} placeholder="Search" />
             </label>
-            <NavLink to="/" className="btn btn-primary">
+            <button className="btn btn-primary" onClick={() => modalRef.current?.showModal()}>
               Add Station
-            </NavLink>
+            </button>
           </div>
         </div>
         <hr />
@@ -59,6 +100,44 @@ export default function Dashboard() {
           }
         </div>
       </div>
+      <dialog className="modal" ref={modalRef}>
+        <div className="modal-box max-w-5xl">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+          </form>
+          <h3 className="font-bold text-xl">New Station</h3>
+          <form onSubmit={handleCreateStation} className="flex flex-col mt-4">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Name</legend>
+              <input type="text" className="input w-full" placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
+            </fieldset>
+
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Address</legend>
+              <input type="text" className="input w-full" placeholder="Address" value={address} onChange={e => setAddress(e.target.value)} required />
+            </fieldset>
+
+            <div className="h-96 w-full mt-4">
+              <MapComponent
+                onClick={handleMapClick}
+                center={{ lat: 40.6408505, lng: -8.6332439 }}
+                zoom={10}
+                markers={(latitude !== null && longitude !== null) ? [{
+                  markerOptions: {
+                    position: { lat: latitude, lng: longitude }
+                  },
+                  icon: <FaMapMarkerAlt className="text-green-500" size={40} />
+                }] : []}
+                fitBounds={false}
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary mt-4">
+              Create
+            </button>
+          </form>
+        </div>
+      </dialog>
     </NavLayout>
   )
 }
