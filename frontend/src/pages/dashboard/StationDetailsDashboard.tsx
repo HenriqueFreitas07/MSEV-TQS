@@ -32,10 +32,6 @@ export default function StationDetailsDashboard() {
     loadData();
   }, [stationId]);
 
-  async function loadChargers() {
-    setChargers(await ChargerService.getChargerByStation(stationId!));
-  }
-
   async function handleCreateCharger(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -45,7 +41,9 @@ export default function StationDetailsDashboard() {
       return;
     }
 
-    await ChargerService.createCharger(stationId!, connectorType, price, chargingSpeed);
+    const newCharger = await ChargerService.createCharger(stationId!, connectorType, price, chargingSpeed);
+
+    setChargers(prev => [...prev, newCharger]);
 
     showAlert("Success", "Charger created!", "success");
     modalRef.current?.close();
@@ -53,7 +51,6 @@ export default function StationDetailsDashboard() {
     setConnectorType("");
     setPrice(0);
     setChargingSpeed(0);
-    loadChargers();
   }
 
   if (!station) return <div />;

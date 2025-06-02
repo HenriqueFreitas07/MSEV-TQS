@@ -200,13 +200,15 @@ export const ChargerService = {
     return data;
   },
 
-  createCharger: async (stationId: string, connectorType: string, price: number, chargingSpeed: number) => {
-    await api.post("/chargers", {
+  createCharger: async (stationId: string, connectorType: string, price: number, chargingSpeed: number): Promise<Charger> => {
+    const { data } = await api.post<Charger>("/chargers", {
       station: { id: stationId },
       connectorType,
       price,
       chargingSpeed
     });
+
+    return data;
   },
 
   lockCharger: async (id: string) => {
