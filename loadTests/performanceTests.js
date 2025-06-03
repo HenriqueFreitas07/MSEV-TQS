@@ -62,7 +62,7 @@ function getStationsByAddress(location) {
     console.log(`Stations found for address "${location}": ${res.json().length}`);
     console.log(`Response status: ${res.status} ${res.status_text}`);
     check(res, {
-        'status is not error': (r) => r.status !== 500 || r.status === 200,
+        'status is 200': (r) =>  r.status === 200,
     });
 
 }
@@ -82,8 +82,7 @@ export default function () {
     // Search for stations by a random real address
     const addresses = [
         "1600 Amphitheatre Parkway, Mountain View, CA",
-        "1 Infinite Loop, Cupertino, CA",
-        "350 Fifth Avenue, New York, NY",
+        "Rua da Universidade de Aveiro",
         "221B Baker Street, London, UK",
     ]
     const randomAddress = addresses[Math.floor(Math.random() * addresses.length)];
