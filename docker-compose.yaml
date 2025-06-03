@@ -6,9 +6,12 @@ services:
       - database
     env_file:
       - ./backend/.env
+    ports:
+      - "8000:8000"
     networks:
       - msev
   
+
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -20,9 +23,7 @@ services:
 
     volumes:
     - ./config/prometheus.yaml:/etc/prometheus/prometheus.yaml
-    networks:
-      - msev
-    
+
   grafana:
     image: grafana/grafana:latest
     restart: always
@@ -34,9 +35,7 @@ services:
       - GF_AUTH_BASIC_ENABLED=false
     volumes:
       - ./config/grafana:/etc/grafana/provisioning/
-    
-    networks:
-      - msev
+
 
   database:
     container_name: database

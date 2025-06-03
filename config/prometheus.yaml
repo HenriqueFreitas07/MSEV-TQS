@@ -3,4 +3,4 @@ scrape_configs:
   scrape_interval: 15s
   static_configs:
   - targets:
-    - localhost:8000
+    - backend:8000

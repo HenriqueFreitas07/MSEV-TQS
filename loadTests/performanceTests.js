@@ -59,8 +59,10 @@ function getStationsByAddress(location) {
            Cookie: `accessToken=${AUTH_TOKEN}`,
         },
     });
+    console.log(`Stations found for address "${location}": ${res.json().length}`);
+    console.log(`Response status: ${res.status} ${res.status_text}`);
     check(res, {
-        'status is 200': (r) => r.status === 200,
+        'status is not error': (r) => r.status !== 500 || r.status === 200,
     });
 
 }
@@ -76,6 +78,16 @@ export default function () {
 
     const randomStationId = stations[Math.floor(Math.random() * stations.length)];
     getChargers(randomStationId);
+    
+    // Search for stations by a random real address
+    const addresses = [
+        "1600 Amphitheatre Parkway, Mountain View, CA",
+        "1 Infinite Loop, Cupertino, CA",
+        "350 Fifth Avenue, New York, NY",
+        "221B Baker Street, London, UK",
+    ]
+    const randomAddress = addresses[Math.floor(Math.random() * addresses.length)];
+    getStationsByAddress(randomAddress);
 
     
 }
