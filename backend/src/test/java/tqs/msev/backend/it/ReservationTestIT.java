@@ -1,6 +1,7 @@
 package tqs.msev.backend.it;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import org.json.JSONObject;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -12,7 +13,8 @@ import tqs.msev.backend.repository.StationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
 import org.junit.jupiter.api.AfterEach;
@@ -26,7 +28,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import tqs.msev.backend.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
@@ -98,8 +99,7 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date now = new Date();
-        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
+        LocalDateTime nowPlusOneHour = LocalDateTime.now().plusHours(1);
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
@@ -156,8 +156,7 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date now = new Date();
-        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
+        LocalDateTime nowPlusOneHour = LocalDateTime.now().plusHours(1);
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
@@ -205,8 +204,8 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date now = new Date();
-        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nowPlusOneHour = LocalDateTime.now().plusHours(1);
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
@@ -255,8 +254,8 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date inThirtyMinutes = new Date(System.currentTimeMillis() + 1800000);
-        Date nowPlusOneHour = new Date(inThirtyMinutes.getTime() + 3600000);
+        LocalDateTime inThirtyMinutes = LocalDateTime.now().plusMinutes(30);
+        LocalDateTime nowPlusOneHour = LocalDateTime.now().plusHours(1);
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
@@ -265,7 +264,7 @@ class ReservationTestIT {
                 .build();
         mockMvc.perform(post("/api/v1/reservations")
                 .contentType("application/json")
-                .content(new ObjectMapper().writeValueAsString(reservation)))
+                .content(new JSONObject(reservation).toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNotEmpty());
 
@@ -303,8 +302,8 @@ class ReservationTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date inThirtyMinutes = new Date(System.currentTimeMillis() + 1800000);
-        Date nowPlusOneHour = new Date(inThirtyMinutes.getTime() + 3600000);
+        LocalDateTime inThirtyMinutes = LocalDateTime.now().plusMinutes(30);
+        LocalDateTime nowPlusOneHour = LocalDateTime.now().plusHours(1);
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)

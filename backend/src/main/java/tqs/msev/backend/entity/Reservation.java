@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.UUID;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -29,10 +29,10 @@ public class Reservation {
     private Charger charger;
 
     @Column(nullable = false)
-    private Date startTimestamp;
+    private LocalDateTime startTimestamp;
 
     @Column(nullable = false)
-    private Date endTimestamp;
+    private LocalDateTime endTimestamp;
 
     @Column(nullable = false)
     @Builder.Default

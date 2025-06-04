@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -174,7 +173,7 @@ class ChargerServiceTest {
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
-                .startTimestamp(Date.from(Instant.now()))
+                .startTimestamp(LocalDateTime.now())
                 .build();
 
         ChargeSession oldSession = ChargeSession.builder()
@@ -210,7 +209,7 @@ class ChargerServiceTest {
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
-                .startTimestamp(Date.from(Instant.now()))
+                .startTimestamp(LocalDateTime.now())
                 .build();
 
         when(chargerRepository.findById(charger.getId())).thenReturn(Optional.of(charger));
