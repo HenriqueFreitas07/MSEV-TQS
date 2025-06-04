@@ -47,8 +47,8 @@ class ChargerUseIT {
     @BeforeAll
     void beforeAll() {
         User operator = User.builder()
-                .email("test_operator")
-                .name("test_operator")
+                .email("test_operator2")
+                .name("test_operator2")
                 .password("test_operator")
                 .isOperator(true)
                 .build();
@@ -355,7 +355,7 @@ class ChargerUseIT {
 
     @Test
     @Requirement("MSEV-25")
-    @WithUserDetails("test_operator")
+    @WithUserDetails("test_operator2")
     void whenGetChargerStats_thenReturnChargeSessions() {
         Station station1 = new Station();
         station1.setLatitude(40);

@@ -63,8 +63,8 @@ class StationIT {
     @BeforeAll
     void beforeAll() {
         User operator = User.builder()
-                .email("test_operator")
-                .name("test_operator")
+                .email("test_operator2")
+                .name("test_operator2")
                 .password("test_operator")
                 .isOperator(true)
                 .build();
@@ -72,7 +72,7 @@ class StationIT {
 
         User user = User.builder()
                 .email("test")
-                .name("test")
+                .name("test2")
                 .password("test_user")
                 .isOperator(false)
                 .build();
@@ -452,7 +452,7 @@ class StationIT {
 
     @Test
     @Requirement("MSEV-25")
-    @WithUserDetails("test_operator")
+    @WithUserDetails("test_operator2")
     void whenGetStationStats_thenReturnStats() {
         Station station = new Station();
         station.setName("Test Station");
