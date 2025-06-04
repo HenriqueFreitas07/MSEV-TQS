@@ -61,6 +61,16 @@ public class StationService {
         station.setStatus(Station.StationStatus.DISABLED);
         stationRepository.save(station);
     }
+
+    public void enableStation(Station station) {
+        // put all chargers of the station out of order
+        List<Charger> chargers = station.getChargers();
+        for (Charger charger : chargers) {
+            chargerService.enableCharger(charger);
+        }
+        station.setStatus(Station.StationStatus.ENABLED);
+        stationRepository.save(station);
+    }
     public Station createStation(Station station) {
         return stationRepository.save(station);
     }

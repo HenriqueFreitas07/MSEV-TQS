@@ -47,6 +47,12 @@ public class StationController {
     }
 
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{id}/enable")
+    public void enableStation(@PathVariable UUID id) {
+        Station s = stationService.getStationById(id);
+        stationService.enableStation(s);
+    }
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Station createStation(@Valid @RequestBody Station station) {
