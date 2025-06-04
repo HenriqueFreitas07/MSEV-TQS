@@ -74,7 +74,7 @@ class ChargerUseIT {
         RestAssured.port = port;
 
         User user = User.builder()
-                .email("test@gmail.com")
+                .email("test2@gmail.com")
                 .name("Test")
                 .password("test")
                 .isOperator(false)
@@ -130,7 +130,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test2@gmail.com")
+                .email("test2123@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -185,7 +185,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test2@gmail.com")
+                .email("test22@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -230,7 +230,7 @@ class ChargerUseIT {
 
         charger = chargerRepository.saveAndFlush(charger);
 
-        User user = userRepository.findUserByEmail("test@gmail.com").get();
+        User user = userRepository.findUserByEmail("test6@gmail.com").get();
 
         ChargeSession session = ChargeSession.builder()
                 .charger(charger)

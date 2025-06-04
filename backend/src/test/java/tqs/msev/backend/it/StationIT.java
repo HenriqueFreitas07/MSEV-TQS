@@ -484,7 +484,7 @@ class StationIT {
         stationRepository.saveAndFlush(station);
 
         User user = new User();
-        user.setEmail("teststats");
+        user.setEmail("teststats@gmail.com");
         user.setName("Test Stats");
         user.setPassword("teststats");
         user.setOperator(false);
