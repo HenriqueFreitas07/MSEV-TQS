@@ -33,19 +33,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image (Backend)
-        id: push
+        id: push_back
         uses: docker/build-push-action@v5
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: HenriqueFreitas07/MSEV_TQS-${{ BACKEND_IMAGE }}:latest
+          tags: HenriqueFreitas07/MSEV_TQS-${{ env.BACKEND_IMAGE }}:latest
 
       - name: Build and push Docker image (Frontend)
-        id: push
+        id: push_front
         uses: docker/build-push-action@v5
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: HenriqueFreitas07/MSEV_TQS-${{ FRONTEND_IMAGE }}:latest
+          tags: HenriqueFreitas07/MSEV_TQS-${{ env.FRONTEND_IMAGE }}:latest
