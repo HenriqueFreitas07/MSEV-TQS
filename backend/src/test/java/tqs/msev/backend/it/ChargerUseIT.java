@@ -17,7 +17,6 @@ import tqs.msev.backend.service.JwtService;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -122,8 +121,8 @@ class ChargerUseIT {
         Reservation reservation = Reservation.builder()
                 .user(userRepository.findUserByEmail("test@gmail.com").get())
                 .charger(charger)
-                .startTimestamp(new Date())
-                .endTimestamp(new Date(new Date().getTime() + 3600000))
+                .startTimestamp(LocalDateTime.now())
+                .endTimestamp(LocalDateTime.now().plusHours(1))
                 .build();
 
         reservationRepository.saveAndFlush(reservation);

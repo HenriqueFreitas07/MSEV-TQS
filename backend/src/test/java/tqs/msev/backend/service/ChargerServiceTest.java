@@ -10,12 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import tqs.msev.backend.entity.ChargeSession;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
-import tqs.msev.backend.repository.ChargeSessionRepository;
-import tqs.msev.backend.repository.ChargerRepository;
+import tqs.msev.backend.repository.*;
 import tqs.msev.backend.entity.Charger;
-import tqs.msev.backend.repository.ReservationRepository;
-import tqs.msev.backend.repository.UserRepository;
-import tqs.msev.backend.repository.StationRepository;
 
 import tqs.msev.backend.entity.Station;
 
@@ -23,17 +19,17 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChargerServiceTest {
-    @Mock
-    private ReservationRepository reservationRepository;
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ReservationRepository reservationRepository;
 
     @Mock
     private ChargeSessionRepository chargeSessionRepository;
@@ -174,7 +170,7 @@ class ChargerServiceTest {
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
-                .startTimestamp(Date.from(Instant.now()))
+                .startTimestamp(LocalDateTime.now())
                 .build();
 
         ChargeSession oldSession = ChargeSession.builder()
@@ -210,7 +206,7 @@ class ChargerServiceTest {
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
-                .startTimestamp(Date.from(Instant.now()))
+                .startTimestamp(LocalDateTime.now())
                 .build();
 
         when(chargerRepository.findById(charger.getId())).thenReturn(Optional.of(charger));
@@ -291,6 +287,7 @@ class ChargerServiceTest {
 
         verify(chargeSessionRepository, times(1)).save(Mockito.any());
         verify(chargerRepository, times(1)).save(Mockito.any());
+
     }
 
     @Test

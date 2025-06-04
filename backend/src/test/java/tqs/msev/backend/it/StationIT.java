@@ -13,8 +13,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import tqs.msev.backend.configuration.TestDatabaseConfig;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.entity.User;
+import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.service.JwtService;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,6 +46,8 @@ class StationIT {
     private RequestSpecification defaultSpec;
 
     private RequestSpecification operatorSpec;
+    @Autowired
+    private ChargerRepository chargerRepository;
 
     @BeforeEach
     void setUp() {
@@ -50,7 +55,7 @@ class StationIT {
 
         User user = User.builder()
                 .email("test@gmail.com")
-                .name("Test")
+                .name("test")
                 .password("test")
                 .isOperator(false)
                 .build();
@@ -60,7 +65,7 @@ class StationIT {
         String jwtToken = jwtService.generateToken(user);
 
         User operator = User.builder()
-                .email("test_operator")
+                .email("test_operator@gmail.com")
                 .name("test_operator")
                 .password("test_operator")
                 .isOperator(true)
@@ -282,5 +287,130 @@ class StationIT {
                 .then()
                 .assertThat()
                 .statusCode(400);
+    }
+    @Test
+    @Requirement("MSEV-19")
+    void whenOperatorDisabled_thenReturnOk() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+
+        Charger charger = new Charger();
+        charger.setStation(station);
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        station.setChargers(List.of(charger));
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(operatorSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
+        assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.DISABLED);
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenUserTriesDisabledStation_thenReturnForbidden() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.ENABLED);
+        Charger charger = new Charger();
+
+        charger.setStation(station);
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        station.setChargers(List.of(charger));
+
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(defaultSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(403);
+
+    Station newS=stationRepository.findById(s.getId()).orElseThrow();
+    assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.ENABLED);
+
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenOperatorEnable_thenReturnOk() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        Charger charger = new Charger();
+        charger.setStation(station);
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
+        station.setChargers(List.of(charger));
+        station.setStatus(Station.StationStatus.DISABLED);
+
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(operatorSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/enable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
+        assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.ENABLED);
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenUserTriesEnableStation_thenReturnForbidden() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.DISABLED);
+        Charger charger = new Charger();
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
+        charger.setStation(station);
+        station.setChargers(List.of(charger));
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(defaultSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(403);
+
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
+        assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.DISABLED);
     }
 }

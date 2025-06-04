@@ -1,8 +1,13 @@
 package tqs.msev.backend.controller;
 
-import org.junit.Test;
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tqs.msev.backend.configuration.TestSecurityConfig;
+import tqs.msev.backend.entity.Charger;
+import tqs.msev.backend.entity.User;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -10,33 +15,32 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
+import tqs.msev.backend.service.JwtService;
 import tqs.msev.backend.service.ReservationService;
 import tqs.msev.backend.entity.Reservation;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-
-
 @WebMvcTest(ReservationController.class)
-@Import(GlobalExceptionHandler.class) 
+@Import({GlobalExceptionHandler.class, TestSecurityConfig.class})
 class ReservationControllerTest {
-    
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @MockitoBean
-    ReservationService reservationService;
+    private ReservationService reservationService;
 
-    @Autowired
-    ReservationController reservationController;
+    @MockitoBean
+    private JwtService jwtService;
 
     @Test
     @WithMockUser(username = "test")
@@ -55,6 +59,8 @@ class ReservationControllerTest {
         .andExpect(jsonPath("$").isArray())
         .andExpect(jsonPath("$[0]").isNotEmpty())
         .andExpect(jsonPath("$[1]").isNotEmpty());
+
+        verify(reservationService, times(1)).getUserReservations(userId);
     }
 
     @Test
@@ -77,13 +83,25 @@ class ReservationControllerTest {
     @Requirement("MSEV-19")
     @WithMockUser(username = "test")
     void whenReservationValid_thenCreateReservation() throws Exception {
-        UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
-        
+        Charger charger = new Charger();
+        charger.setId(UUID.randomUUID());
+        User user = new User();
+        user.setId(UUID.randomUUID());
+        mockReservation.setCharger(charger);
+        mockReservation.setUser(user);
+        mockReservation.setStartTimestamp(LocalDateTime.now());
+        mockReservation.setEndTimestamp(LocalDateTime.now().plusHours(5));
+
+        JSONObject json = new JSONObject(mockReservation);
+
         when(reservationService.createReservation(mockReservation)).thenReturn(mockReservation);
         
         mockMvc.perform(
-            get("/api/v1/reservations", reservationId)
+            post("/api/v1/reservations")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(json.toString())
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isNotEmpty());
@@ -99,8 +117,9 @@ class ReservationControllerTest {
         
         mockMvc.perform(
             get("/api/v1/reservations/{reservationId}", reservationId)
-        )
-        .andExpect(status().isNotFound());
+        ).andExpect(status().isNotFound());
+
+        verify(reservationService, times(1)).getReservationById(reservationId);
     }
 
     @Test
@@ -128,7 +147,7 @@ class ReservationControllerTest {
         when(reservationService.cancelReservation(reservationId)).thenReturn(mockReservation);
         
         mockMvc.perform(
-            delete("/api/v1/reservations/{reservationId}", reservationId)
+            delete("/api/v1/reservations/{reservationId}", reservationId).with(csrf())
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isNotEmpty());
@@ -143,7 +162,7 @@ class ReservationControllerTest {
         when(reservationService.cancelReservation(reservationId)).thenThrow(new NoSuchElementException("Reservation not found"));
         
         mockMvc.perform(
-            delete("/api/v1/reservations/{reservationId}", reservationId)
+            delete("/api/v1/reservations/{reservationId}", reservationId).with(csrf())
         )
         .andExpect(status().isNotFound());
     }
@@ -158,13 +177,9 @@ class ReservationControllerTest {
         when(reservationService.markReservationAsUsed(reservationId)).thenReturn(mockReservation);
         
         mockMvc.perform(
-            put("/api/v1/reservations/{reservationId}/used", reservationId)
+            put("/api/v1/reservations/{reservationId}/used", reservationId).with(csrf())
         )
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isNotEmpty());
     }
-
-
-   
- 
 }

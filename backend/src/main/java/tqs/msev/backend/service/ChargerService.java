@@ -10,8 +10,8 @@ import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.StationRepository;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
+
 import java.util.*;
 
 @Service
@@ -40,6 +40,20 @@ public class ChargerService {
         return chargerRepository.findById(chargerId)
                 .orElseThrow(() -> new NoSuchElementException("Charger not found"));
     }
+    public void disableCharger(Charger charger) {
+        charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
+        chargerRepository.save(charger);
+    }
+
+    public void outOfOrderCharger(Charger charger) {
+        charger.setStatus(Charger.ChargerStatus.OUT_OF_ORDER);
+        chargerRepository.save(charger);
+    }
+
+    public void enableCharger(Charger charger) {
+        charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        chargerRepository.save(charger);
+    }
 
     public void unlockCharger(UUID chargerId, UUID userId) {
         Charger charger = chargerRepository.findById(chargerId)
@@ -55,7 +69,7 @@ public class ChargerService {
 
         if (charger.getStatus() == Charger.ChargerStatus.IN_USE) {
             // If the charger is in use, let's check if the user has a valid reservation for this charger...
-            Date now = Date.from(Instant.now());
+            LocalDateTime now = LocalDateTime.now();
             Reservation reservation = reservationRepository
                     .findByUserIdAndStartTimestampBeforeAndEndTimestampAfter(userId, now, now);
 
@@ -77,7 +91,7 @@ public class ChargerService {
 
         chargeSessionRepository.save(newSession);
 
-        Date now = Date.from(Instant.now());
+        LocalDateTime now = LocalDateTime.now();
         Reservation reservation = reservationRepository
                 .findByUserIdAndStartTimestampBeforeAndEndTimestampAfter(userId, now, now);
 
@@ -106,7 +120,6 @@ public class ChargerService {
         charger.setStatus(Charger.ChargerStatus.AVAILABLE);
         chargerRepository.save(charger);
     }
-
     public Charger createCharger(Charger charger) {
         if (charger.getStation() == null || stationRepository.findById(charger.getStation().getId()).isEmpty()) {
             throw new IllegalArgumentException("Charger must be associated with a valid station");
@@ -142,3 +155,4 @@ public class ChargerService {
         return null;
     }
 }
+
