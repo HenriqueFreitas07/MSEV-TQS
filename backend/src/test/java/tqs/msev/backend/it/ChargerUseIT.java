@@ -3,6 +3,8 @@ package tqs.msev.backend.it;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
+
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +35,10 @@ class ChargerUseIT {
     @Autowired
     private StationRepository stationRepository;
 
+    private RequestSpecification defaultSpec;
+
+    private RequestSpecification operatorSpec;
+
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -46,6 +52,7 @@ class ChargerUseIT {
 
     @BeforeAll
     void beforeAll() {
+        
         User operator = User.builder()
                 .email("test_operator")
                 .name("test_operator")
@@ -74,9 +81,16 @@ class ChargerUseIT {
         user = userRepository.saveAndFlush(user);
         
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateToken(operator);
 
-        RestAssured.requestSpecification = new RequestSpecBuilder()
+        defaultSpec = new RequestSpecBuilder()
+                .addCookie("accessToken", jwtToken)
+                .build();
+
+        user = userRepository.saveAndFlush(operator);
+        jwtToken = jwtService.generateToken(user);
+
+        operatorSpec = new RequestSpecBuilder()
                 .addCookie("accessToken", jwtToken)
                 .build();
     }
@@ -388,6 +402,7 @@ class ChargerUseIT {
                 .build();
         chargeSessionRepository.saveAndFlush(session);
         given()
+                .spec(operatorSpec)
                 .when()
                 .get("/api/v1/charge-sessions/stats/{chargerId}", charger.getId())
                 .then()
