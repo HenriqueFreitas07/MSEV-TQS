@@ -61,16 +61,25 @@ class ChargerUseIT {
                 .isOperator(false)
                 .build();
         userRepository.saveAndFlush(user);
+    }
+
+    @AfterAll
+    void afterAll() {
+        userRepository.deleteAll();
+    }
+
+    @BeforeEach
+    void setUp() {
         RestAssured.port = port;
 
-        User user2 = User.builder()
+        User user = User.builder()
                 .email("test@gmail.com")
                 .name("Test")
                 .password("test")
                 .isOperator(false)
                 .build();
 
-        user = userRepository.saveAndFlush(user2);
+        user = userRepository.saveAndFlush(user);
         
 
         String jwtToken = jwtService.generateToken(user);
@@ -80,19 +89,13 @@ class ChargerUseIT {
                 .build();
     }
 
-    @AfterAll
-    void afterAll() {
-        userRepository.deleteAll();
-    }
-
-
-
     @AfterEach
     void resetDb() {
         reservationRepository.deleteAll();
         chargeSessionRepository.deleteAll();
+        chargerRepository.deleteAll();
         stationRepository.deleteAll();
-
+        RestAssured.reset();
     }
 
     @DynamicPropertySource
@@ -181,7 +184,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test132@gmail.com")
+                .email("test2@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -326,7 +329,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test222@gmail.com")
+                .email("test2@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -373,7 +376,7 @@ class ChargerUseIT {
         charger = chargerRepository.saveAndFlush(charger);
          User user2 = User.builder()
                 .name("Teste")
-                .email("test3432@gmail.com")
+                .email("test2@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();

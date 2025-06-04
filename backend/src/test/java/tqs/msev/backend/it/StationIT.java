@@ -63,8 +63,8 @@ class StationIT {
     @BeforeAll
     void beforeAll() {
         User operator = User.builder()
-                .email("test_operator2")
-                .name("test_operator2")
+                .email("test_operator")
+                .name("test_operator")
                 .password("test_operator")
                 .isOperator(true)
                 .build();
@@ -72,25 +72,34 @@ class StationIT {
 
         User user = User.builder()
                 .email("test")
-                .name("test2")
+                .name("test")
                 .password("test_user")
                 .isOperator(false)
                 .build();
         userRepository.saveAndFlush(user);
+    }
+
+    @AfterAll
+    void afterAll() {
+        userRepository.deleteAll();
+    }
+
+    @BeforeEach
+    void setUp() {
         RestAssured.port = port;
 
-        User user2 = User.builder()
+        User user = User.builder()
                 .email("test@gmail.com")
                 .name("test")
                 .password("test")
                 .isOperator(false)
                 .build();
 
-        user2 = userRepository.saveAndFlush(user2);
+        user = userRepository.saveAndFlush(user);
 
-        String jwtToken = jwtService.generateToken(user2);
+        String jwtToken = jwtService.generateToken(user);
 
-        User operator1 = User.builder()
+        User operator = User.builder()
                 .email("test_operator@gmail.com")
                 .name("test_operator")
                 .password("test_operator")
@@ -101,19 +110,13 @@ class StationIT {
                 .addCookie("accessToken", jwtToken)
                 .build();
 
-        user = userRepository.saveAndFlush(operator1);
+        user = userRepository.saveAndFlush(operator);
         jwtToken = jwtService.generateToken(user);
 
         operatorSpec = new RequestSpecBuilder()
                 .addCookie("accessToken", jwtToken)
                 .build();
     }
-
-    @AfterAll
-    void afterAll() {
-        userRepository.deleteAll();
-    }
-
 
     @AfterEach
     void resetDb() {
@@ -449,7 +452,7 @@ class StationIT {
 
     @Test
     @Requirement("MSEV-25")
-    @WithUserDetails("test_operator2")
+    @WithUserDetails("test_operator")
     void whenGetStationStats_thenReturnStats() {
         Station station = new Station();
         station.setName("Test Station");
@@ -474,7 +477,7 @@ class StationIT {
 
 
 
-        chargerRepository.saveAndFlush(charger2);
+        chargerRepository.saveAndFlush(charger1);
 
         station.setChargers(List.of(charger1, charger2));
 
