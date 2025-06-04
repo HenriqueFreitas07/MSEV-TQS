@@ -43,7 +43,8 @@ jobs:
         id: push_front
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          context: .
+          file: ./Dockerfile
           push: true
           tags: ghcr.io/henriquefreitas07/msev-tqs_staging_frontend:staging
+
