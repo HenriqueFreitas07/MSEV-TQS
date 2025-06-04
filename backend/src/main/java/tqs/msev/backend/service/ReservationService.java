@@ -1,6 +1,7 @@
 package tqs.msev.backend.service;
 
 import org.springframework.stereotype.Service;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.repository.ReservationRepository;
 
@@ -34,6 +35,7 @@ public class ReservationService {
     }
 
     public Reservation createReservation(Reservation reservation) {
+
         LocalDateTime now = LocalDateTime.now();
 
         if (reservation.getStartTimestamp().isBefore(now) || reservation.getEndTimestamp().isBefore(now)) {

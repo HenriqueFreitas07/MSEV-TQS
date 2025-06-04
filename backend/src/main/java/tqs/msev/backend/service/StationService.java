@@ -2,6 +2,7 @@ package tqs.msev.backend.service;
 
 import org.springframework.stereotype.Service;
 import tqs.msev.backend.dto.Coordinates;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.StationRepository;
 import tqs.msev.backend.util.Util;
@@ -15,10 +16,12 @@ import java.util.UUID;
 public class StationService {
     private final StationRepository stationRepository;
     private final GeocodingService geocodingService;
+    private final ChargerService chargerService;
 
-    public StationService(StationRepository stationRepository, GeocodingService geocodingService) {
+    public StationService(StationRepository stationRepository, GeocodingService geocodingService, ChargerService chargerService) {
         this.stationRepository = stationRepository;
         this.geocodingService = geocodingService;
+        this.chargerService = chargerService;
     }
 
     public List<Station> getAllStations() {
@@ -49,7 +52,25 @@ public class StationService {
                     station.getLatitude(), station.getLongitude())
         )).toList();
     }
+    public void disableStation(Station station) {
+        // put all chargers of the station out of order
+        List<Charger> chargers = station.getChargers();
+        for (Charger charger : chargers) {
+            chargerService.outOfOrderCharger(charger);
+        }
+        station.setStatus(Station.StationStatus.DISABLED);
+        stationRepository.save(station);
+    }
 
+    public void enableStation(Station station) {
+        // put all chargers of the station out of order
+        List<Charger> chargers = station.getChargers();
+        for (Charger charger : chargers) {
+            chargerService.enableCharger(charger);
+        }
+        station.setStatus(Station.StationStatus.ENABLED);
+        stationRepository.save(station);
+    }
     public Station createStation(Station station) {
         return stationRepository.save(station);
     }
