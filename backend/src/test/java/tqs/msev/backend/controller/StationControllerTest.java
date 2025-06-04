@@ -1,5 +1,6 @@
 package tqs.msev.backend.controller;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -11,11 +12,15 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import tqs.msev.backend.configuration.TestSecurityConfig;
+import tqs.msev.backend.entity.ChargeSession;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
+import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.service.JwtService;
 import tqs.msev.backend.service.StationService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -36,6 +41,9 @@ class StationControllerTest {
 
     @MockitoBean
     private StationService service;
+
+    @MockitoBean
+    private ChargerService chargerService;
 
     @MockitoBean
     private JwtService jwtService;
@@ -164,4 +172,40 @@ class StationControllerTest {
                 .content("{\"name\":\"Unauthorized Station\", \"address\":\"Unauthorized Address\", \"latitude\":40.7128, \"longitude\":-74.0060}"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @WithUserDetails("test_operator")
+    @Requirement("MSEV-25")
+    void givenValidStation_whenGetStationStats_thenReturnStats() throws Exception {
+        UUID stationId = UUID.randomUUID();
+        Station station = new Station();
+        station.setId(stationId);
+        station.setName("Test Station");
+        ChargeSession session1 = new ChargeSession();
+        session1.setId(UUID.randomUUID());
+        session1.setCharger(new Charger());
+        session1.setStartTimestamp(LocalDateTime.now().minusHours(1));
+        session1.setEndTimestamp(LocalDateTime.now());
+
+
+        when(service.getStationById(stationId)).thenReturn(station);
+        when(chargerService.getStationStats(stationId)).thenReturn(List.of(session1));
+        mvc.perform(get("/api/v1/stations/stats/" + stationId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(session1.getId().toString()))
+                .andExpect(jsonPath("$[0].startTimestamp").exists())
+                .andExpect(jsonPath("$[0].endTimestamp").exists());
+        
+    }
+
+    @Test
+    @WithUserDetails("test_operator")
+    @Requirement("MSEV-25")
+    void givenNoChargers_whenGetStationStats_thenReturnNotFound() throws Exception {
+        UUID stationId = UUID.randomUUID();
+        when(service.getStationById(stationId)).thenThrow(new NoSuchElementException("No chargers found for this station"));
+        mvc.perform(get("/api/v1/stations/stats/" + stationId))
+                .andExpect(status().isNotFound());
+    }
+
 }
