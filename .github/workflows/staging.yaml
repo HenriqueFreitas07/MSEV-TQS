@@ -4,10 +4,13 @@ on:
   push:
     branches: ['dev']
 
+  pull_request:
+    branches: ['dev']
+
 env:
   REGISTRY: ghcr.io
-  FRONTEND_IMAGE: ${{ github.repository }}_frontend
-  BACKEND_IMAGE: ${{ github.repository }}_backend
+  FRONTEND_IMAGE: ${{ github.repository }}_staging_frontend
+  BACKEND_IMAGE: ${{ github.repository }}_staging_backend
 
 jobs:
   build-and-push-image:
