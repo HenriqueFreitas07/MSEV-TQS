@@ -39,7 +39,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: HenriqueFreitas07/MSEV_TQS-${{ env.BACKEND_IMAGE }}:latest
+          tags: ${{ env.BACKEND_IMAGE }}:latest
 
       - name: Build and push Docker image (Frontend)
         id: push_front
@@ -48,4 +48,4 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: HenriqueFreitas07/MSEV_TQS-${{ env.FRONTEND_IMAGE }}:latest
+          tags: ${{ env.FRONTEND_IMAGE }}:latest
