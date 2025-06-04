@@ -24,7 +24,6 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(TestDatabaseConfig.class)
 class ChargerUseIT {
@@ -74,7 +73,7 @@ class ChargerUseIT {
         RestAssured.port = port;
 
         User user = User.builder()
-                .email("test2@gmail.com")
+                .email("test@gmail.com")
                 .name("Test")
                 .password("test")
                 .isOperator(false)
@@ -130,7 +129,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test2123@gmail.com")
+                .email("test2@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -185,7 +184,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test22@gmail.com")
+                .email("test2@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -230,7 +229,7 @@ class ChargerUseIT {
 
         charger = chargerRepository.saveAndFlush(charger);
 
-        User user = userRepository.findUserByEmail("test6@gmail.com").get();
+        User user = userRepository.findUserByEmail("test@gmail.com").get();
 
         ChargeSession session = ChargeSession.builder()
                 .charger(charger)
@@ -330,7 +329,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test4@gmail.com")
+                .email("test2@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -377,7 +376,7 @@ class ChargerUseIT {
         charger = chargerRepository.saveAndFlush(charger);
          User user2 = User.builder()
                 .name("Teste")
-                .email("test3@gmail.com")
+                .email("test2@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
