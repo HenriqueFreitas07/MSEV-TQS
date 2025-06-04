@@ -70,10 +70,10 @@ class ChargerUseIT {
                 .isOperator(false)
                 .build();
 
-        user2 = userRepository.saveAndFlush(user2);
+        user = userRepository.saveAndFlush(user2);
         
 
-        String jwtToken = jwtService.generateToken(user2);
+        String jwtToken = jwtService.generateToken(user);
 
         RestAssured.requestSpecification = new RequestSpecBuilder()
                 .addCookie("accessToken", jwtToken)
@@ -93,7 +93,6 @@ class ChargerUseIT {
         chargeSessionRepository.deleteAll();
         stationRepository.deleteAll();
 
-        RestAssured.reset();
     }
 
     @DynamicPropertySource
