@@ -8,6 +8,7 @@ datasources:
     access: proxy
     orgId: 1
     url: http://prometheus:9090
+    uid: DS_PROMETHEUS
     basicAuth: false
     isDefault: true
     jsonData:
