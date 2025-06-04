@@ -18,7 +18,8 @@ import tqs.msev.backend.repository.StationRepository;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 import tqs.msev.backend.entity.Station;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -275,8 +276,7 @@ class ChargerTestIT {
                 .build();
         userRepository.save(user);
         userRepository.flush();
-        Date now = new Date();
-        Date nowPlusOneHour = new Date(now.getTime() + 3600000);
+        LocalDateTime nowPlusOneHour = LocalDateTime.now().plusHours(1);
         Reservation reservation = Reservation.builder()
                 .charger(charger)
                 .user(user)
