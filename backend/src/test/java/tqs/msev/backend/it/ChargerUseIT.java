@@ -24,6 +24,8 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(TestDatabaseConfig.class)
 class ChargerUseIT {
     @LocalServerPort
