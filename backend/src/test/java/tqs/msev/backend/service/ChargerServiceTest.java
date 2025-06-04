@@ -395,4 +395,43 @@ class ChargerServiceTest {
 
         verify(chargeSessionRepository, times(1)).findAllByUserId(id);
     }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetChargeSessionByChargerId_thenReturnChargeSession() {
+        UUID id = UUID.randomUUID();
+
+        Charger charger = Charger.builder()
+                .chargingSpeed(3.0)
+                .build();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .chargingSpeed(7.0)
+                .consumption(3.0)
+                .charger(charger)
+                .build();
+
+        when(chargeSessionRepository.findByChargerIdAndEndTimestamp(id, null)).thenReturn(session1);
+
+        ChargeSession session = chargerService.getChargeSessionByChargerId(id);
+
+        assertThat(session).isEqualTo(session1);
+
+        verify(chargeSessionRepository, times(1)).findByChargerIdAndEndTimestamp(id, null);
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetChargeSessionByChargerId_WithNoChargerSession_thenReturnChargeSession() {
+        UUID id = UUID.randomUUID();
+
+        when(chargeSessionRepository.findByChargerIdAndEndTimestamp(id, null)).thenReturn(null);
+
+        ChargeSession session = chargerService.getChargeSessionByChargerId(id);
+
+        assertThat(session).isNull();
+
+        verify(chargeSessionRepository, times(1)).findByChargerIdAndEndTimestamp(id, null);
+    }
 }

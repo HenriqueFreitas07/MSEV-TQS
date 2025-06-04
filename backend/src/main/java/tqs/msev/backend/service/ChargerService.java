@@ -130,12 +130,15 @@ public class ChargerService {
 
     public ChargeSession getChargeSessionByChargerId(UUID chargerId) {
         ChargeSession chargeSession =  chargeSessionRepository.findByChargerIdAndEndTimestamp(chargerId, null);
-        double randomDouble = random.nextDouble();
-        chargeSession.setConsumption(randomDouble * chargeSession.getConsumption() + chargeSession.getConsumption());
-        chargeSession.setChargingSpeed(randomDouble + chargeSession.getCharger().getChargingSpeed() -0.5);
+        if (chargeSession != null && chargeSession.getCharger() != null ) {
+            double randomDouble = random.nextDouble();
+            chargeSession.setConsumption(randomDouble * chargeSession.getConsumption() + chargeSession.getConsumption());
+            chargeSession.setChargingSpeed(randomDouble + chargeSession.getCharger().getChargingSpeed() -0.5);
 
+            chargeSessionRepository.saveAndFlush(chargeSession);
+            return chargeSession;
+        }
 
-        chargeSessionRepository.saveAndFlush(chargeSession);
-        return chargeSession;
+        return null;
     }
 }
