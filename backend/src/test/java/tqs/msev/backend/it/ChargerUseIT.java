@@ -61,6 +61,23 @@ class ChargerUseIT {
                 .isOperator(false)
                 .build();
         userRepository.saveAndFlush(user);
+        RestAssured.port = port;
+
+        User user2 = User.builder()
+                .email("test@gmail.com")
+                .name("Test")
+                .password("test")
+                .isOperator(false)
+                .build();
+
+        user2 = userRepository.saveAndFlush(user2);
+        
+
+        String jwtToken = jwtService.generateToken(user2);
+
+        RestAssured.requestSpecification = new RequestSpecBuilder()
+                .addCookie("accessToken", jwtToken)
+                .build();
     }
 
     @AfterAll
@@ -68,26 +85,7 @@ class ChargerUseIT {
         userRepository.deleteAll();
     }
 
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
 
-        User user = User.builder()
-                .email("test@gmail.com")
-                .name("Test")
-                .password("test")
-                .isOperator(false)
-                .build();
-
-        user = userRepository.saveAndFlush(user);
-        
-
-        String jwtToken = jwtService.generateToken(user);
-
-        RestAssured.requestSpecification = new RequestSpecBuilder()
-                .addCookie("accessToken", jwtToken)
-                .build();
-    }
 
     @AfterEach
     void resetDb() {
