@@ -6,8 +6,6 @@ services:
       - database
     env_file:
       - ./backend/.env
-    ports:
-      - "8000:8000"
     networks:
       - msev
   
