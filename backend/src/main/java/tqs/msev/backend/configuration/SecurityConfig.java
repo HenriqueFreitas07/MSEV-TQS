@@ -35,6 +35,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/prometheus").permitAll()
                         .requestMatchers("/api/v1/login", "/api/v1/signup").permitAll()
                         .requestMatchers( "/api/v1/docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
