@@ -5,7 +5,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.hibernate.validator.constraints.pl.REGON;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import tqs.msev.backend.entity.ChargeSession;
@@ -461,8 +460,8 @@ class ChargerServiceTest {
                 .build();
         when(chargeSessionRepository.findAllByChargerId(chargerId)).thenReturn(List.of(session1, session2));
         List<ChargeSession> sessions = chargerService.getChargeSessionsByCharger(chargerId);
-        assertThat(sessions).hasSize(1);
-        assertThat(sessions).contains(session1);
+        assertThat(sessions).hasSize(1)
+                .contains(session1);
         verify(chargeSessionRepository, times(1)).findAllByChargerId(chargerId);
     }
 
@@ -482,8 +481,8 @@ class ChargerServiceTest {
         
         List<ChargeSession> stats = chargerService.getStationStats(stationId);
         
-        assertThat(stats).hasSize(2);
-        assertThat(stats).contains(session1, session2);
+        assertThat(stats).hasSize(2)
+                .contains(session1, session2);
     }
 
     @Test
