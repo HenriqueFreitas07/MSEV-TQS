@@ -182,7 +182,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test2@gmail.com")
+                .email("test1@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -327,7 +327,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test2@gmail.com")
+                .email("test3@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -374,7 +374,7 @@ class ChargerUseIT {
         charger = chargerRepository.saveAndFlush(charger);
          User user2 = User.builder()
                 .name("Teste")
-                .email("test2@gmail.com")
+                .email("test7@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();

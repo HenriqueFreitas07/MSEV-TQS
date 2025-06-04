@@ -476,7 +476,7 @@ class StationIT {
 
 
 
-        chargerRepository.saveAndFlush(charger1);
+        chargerRepository.saveAndFlush(charger2);
 
         station.setChargers(List.of(charger1, charger2));
 
