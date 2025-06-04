@@ -1,5 +1,6 @@
 package tqs.msev.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -30,21 +31,25 @@ public class ChargerController {
     }
 
     @GetMapping("/station/{stationId}")
+    @Operation(summary = "Get all the chargers of a station")
     public List<Charger> getChargersByStation(@PathVariable("stationId") UUID stationId) {
         return chargerService.getChargersByStation(stationId);
     }
 
     @GetMapping("/{chargerId}")
+    @Operation(summary = "Get a charger details, by id")
     public Charger getChargerById(@PathVariable("chargerId") UUID chargerId) {
         return chargerService.getChargerById(chargerId);
     }
 
     @GetMapping("/{chargerId}/reservations")
+    @Operation(summary = "Get all reservations for the specified charger")
     public List<Reservation> getChargerAvailability(@PathVariable("chargerId") UUID chargerId) {
         return reservationService.getFutureReservationsOnCharger(chargerId);
     }
 
     @PatchMapping("/{chargerId}/unlock")
+    @Operation(summary = "Unlocks a charger")
     public void unlockCharger(@PathVariable UUID chargerId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -53,6 +58,7 @@ public class ChargerController {
     }
 
     @PatchMapping("/{chargerId}/lock")
+    @Operation(summary = "Locks a charger")
     public void lockCharger(@PathVariable UUID chargerId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -63,6 +69,7 @@ public class ChargerController {
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Creates a charger")
     public Charger createCharger(@Valid @RequestBody Charger charger) {
         return chargerService.createCharger(charger);
     }

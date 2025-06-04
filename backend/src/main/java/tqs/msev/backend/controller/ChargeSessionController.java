@@ -1,5 +1,7 @@
 package tqs.msev.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +24,9 @@ public class ChargeSessionController {
     }
 
     @GetMapping
-    public List<ChargeSession> getSelfChargeSessions(@RequestParam(required = false, defaultValue = "false") boolean activeOnly) {
+    @Operation(summary = "Get the charge sessions of the current authenticated user")
+    public List<ChargeSession> getSelfChargeSessions(
+            @Parameter(description = "Whether to filter for active sessions or not") @RequestParam(required = false, defaultValue = "false") boolean activeOnly) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
 

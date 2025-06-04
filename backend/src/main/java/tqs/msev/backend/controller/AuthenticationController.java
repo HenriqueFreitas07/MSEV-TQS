@@ -1,5 +1,6 @@
 package tqs.msev.backend.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +26,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Authenticate an user")
     public void login(@Valid @RequestBody LoginDTO dto, HttpServletResponse response) {
         User user = authService.authenticate(dto);
         String jwtToken = jwtService.generateToken(user);
@@ -42,12 +44,14 @@ public class AuthenticationController {
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Sign up in the application")
     public void signup(@Valid @RequestBody SignupDTO dto) {
         authService.createUser(dto);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Logs out, removing the token cookie")
     public void logout(HttpServletResponse response) {
         ResponseCookie expiredCookie = ResponseCookie.from("accessToken", "")
                 .httpOnly(true)
