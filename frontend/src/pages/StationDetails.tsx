@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { format } from "date-fns";
+import dayjs from "dayjs";
 
 import NavLayout from "../layouts/NavLayout.js";
 
@@ -8,7 +9,7 @@ import { ChargerService, StationService } from "../requests.ts";
 
 import type { Charger } from "../types/Charger.tsx";
 import type { Station } from "../types/Station.tsx";
-import type { Reservation } from "../types/reservation";
+import type { Reservation } from "../types/Reservation.ts";
 
 function StationDetails() {
   let color = "text-black";
@@ -20,7 +21,7 @@ function StationDetails() {
   const [reservations, setReservations] = useState<Record<string, Reservation[]>>({});
 
   const params = useParams();
-
+  const navigate = useNavigate();
   const modalRef = useRef<HTMLDialogElement | null>(null);
 
   useEffect(() => {
@@ -44,6 +45,34 @@ function StationDetails() {
     }
     fetchData();
   }, [params.postId]);
+
+  async function handleUnlockCharger(chargerId: string) {
+    await ChargerService.unlockCharger(chargerId);
+
+    setChargers(prev => {
+      const charger = prev.find(c => c.id === chargerId)!;
+      charger.status = "IN_USE";
+
+      return [
+        ...prev.filter(c => c.id !== chargerId),
+        charger
+      ]
+    })
+  }
+
+  function canUnlockCharger(chargerId: string, status: string): boolean {
+    if (status === "OUT_OF_ORDER" || status === "TEMPORARILY_DISABLED") return false;
+
+    if (status === "IN_USE") {
+      const reservationsOfCharger = reservations[chargerId];
+
+      if (!reservationsOfCharger) return false;
+
+      return reservationsOfCharger.some(r => dayjs().isAfter(r.startTimestamp) && dayjs().isBefore(r.endTimestamp));
+    }
+
+    return true;
+  }
 
   const getColorChargers = (status: string) => {
     if (status === "AVAILABLE") {
@@ -73,7 +102,7 @@ function StationDetails() {
   if (params.postId && station)
     return (
       <div className="items-center justify-center bg-base-200">
-        <NavLayout title="Station">
+        <NavLayout title="Station" footer={false}>
           <p data-test-id="station" className={`text-4xl p-4 text-center ${getColorStation(station.status)}`}>Station {station.name}</p>
 
           <p className="text-4xl p-4 text-center">Chargers</p>
@@ -94,9 +123,13 @@ function StationDetails() {
                     <p className="font-bold">Charging Speed: </p><p> {charger.chargingSpeed}</p>
                     <p className="font-bold">Status: </p><p className={`${getColorChargers(charger.status)}`}> {charger.status}</p>
                     <p className="font-bold">Reservations for the next 5 days: </p><p>{reservations[charger.id]?.length ?? 0}</p>
-                    <div className="card-actions justify-end">
-                      <button className="btn btn-info" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }}>See availability</button>
-                      <button className="btn btn-primary">Reserve now</button>
+
+                    <div className="flex flex-col gap-2">
+                      <div className="flex gap-2 w-full">
+                        <button className="btn btn-info flex-1" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }}>Availability</button>
+                        <button className="btn btn-primary flex-1" onClick={() => handleUnlockCharger(charger.id)} disabled={!canUnlockCharger(charger.id, charger.status)}>Unlock</button>
+                      </div>
+                      <button className="btn btn-success w-full" onClick={() => { navigate(`/reserve/${charger.id}`) }}>Reserve now</button>
                     </div>
                   </div>
                 </div>

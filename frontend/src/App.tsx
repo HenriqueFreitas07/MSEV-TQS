@@ -12,18 +12,36 @@ import Signup from "./pages/Signup";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import StationDetails from "./pages/StationDetails";
 
+import Reserve from "./pages/Reserve";
+import UserReserves from "./pages/UserReserves";
+
+import Dashboard from "./pages/dashboard/Dashboard";
+import StationDetailsDashboard from "./pages/dashboard/StationDetailsDashboard";
+import ChargeSessions from "./pages/ChargeSessions";
+
+
 const router = createBrowserRouter([
   {
     path: "/",
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
-      { path: "/signup", element: <Signup /> },
+      { path: "signup", element: <Signup /> },
       {
         element: <ProtectedRoute />,
         children: [
           { path: "stations", element: <Stations /> },
-          { path: "stations/:postId", element: <StationDetails /> }
+          { path: "stations/:postId", element: <StationDetails /> },
+          { path: "reserve/:postId", element: <Reserve />},
+          { path: "my-reserves", element: <UserReserves />},
+          { path: "charge-sessions", element: <ChargeSessions /> },
+        ]
+      },
+      {
+        element: <ProtectedRoute operatorOnly />,
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "dashboard/stations/:stationId", element: <StationDetailsDashboard /> }
         ]
       },
       {

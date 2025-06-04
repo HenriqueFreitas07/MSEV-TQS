@@ -53,12 +53,15 @@ public class StationService {
         )).toList();
     }
     public void disableStation(Station station) {
-       // put all chargers of the station out of order
-        List<Charger>  chargers = station.getChargers();
+        // put all chargers of the station out of order
+        List<Charger> chargers = station.getChargers();
         for (Charger charger : chargers) {
             chargerService.outOfOrderCharger(charger);
         }
         station.setStatus(Station.StationStatus.DISABLED);
         stationRepository.save(station);
+    }
+    public Station createStation(Station station) {
+        return stationRepository.save(station);
     }
 }

@@ -1,10 +1,18 @@
 package tqs.msev.backend.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
+
 import java.util.UUID;
+
+import tqs.msev.backend.entity.User;
 import tqs.msev.backend.service.ChargerService;
 import tqs.msev.backend.service.ReservationService;
 
@@ -48,5 +56,27 @@ public class ChargerController {
     public void enableCharger(@PathVariable UUID chargerId) {
         Charger charger = chargerService.getChargerById(chargerId);
         chargerService.enableCharger(charger);
+    }
+    @PatchMapping("/{chargerId}/unlock")
+    public void unlockCharger(@PathVariable UUID chargerId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        chargerService.unlockCharger(chargerId, user.getId());
+    }
+
+    @PatchMapping("/{chargerId}/lock")
+    public void lockCharger(@PathVariable UUID chargerId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        chargerService.lockCharger(chargerId, user.getId());
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Charger createCharger(@Valid @RequestBody Charger charger) {
+        return chargerService.createCharger(charger);
     }
 }

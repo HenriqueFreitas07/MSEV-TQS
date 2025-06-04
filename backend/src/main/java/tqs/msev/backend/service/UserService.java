@@ -10,13 +10,12 @@ import tqs.msev.backend.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    public UserService(UserRepository userRepository) {this.userRepository = userRepository;}
 
     public User getCurrentUser(Authentication authentication) {
-        String email = authentication.getName();
-        return userRepository.findUserByEmail(email)
+        String username = authentication.getName();
+
+        return userRepository.findUserByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

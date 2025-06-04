@@ -115,4 +115,25 @@ class StationServiceTest {
         verify(repository, times(1)).findAll();
         verify(geocodingService, times(1)).getCoordinatesForAddress(Mockito.anyString());
     }
+
+    @Test
+    @Requirement("MSEV-13")
+    void whenCreateStation_thenReturnStation() {
+        Station station = new Station();
+        station.setName("New Station");
+        station.setAddress("New Address");
+        station.setLatitude(40.0);
+        station.setLongitude(-8.0);
+
+        when(repository.save(station)).thenReturn(station);
+
+        Station createdStation = service.createStation(station);
+
+        assertThat(createdStation.getName()).isEqualTo("New Station");
+        assertThat(createdStation.getAddress()).isEqualTo("New Address");
+        verify(repository, times(1)).save(station);
+    }
+
+
+    
 }
