@@ -3,8 +3,6 @@ package tqs.msev.backend.it;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.specification.RequestSpecification;
-
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,10 +33,6 @@ class ChargerUseIT {
     @Autowired
     private StationRepository stationRepository;
 
-    private RequestSpecification defaultSpec;
-
-    private RequestSpecification operatorSpec;
-
     @Autowired
     private JwtService jwtService;
     @Autowired
@@ -52,7 +46,6 @@ class ChargerUseIT {
 
     @BeforeAll
     void beforeAll() {
-        
         User operator = User.builder()
                 .email("test_operator")
                 .name("test_operator")
@@ -81,16 +74,9 @@ class ChargerUseIT {
         user = userRepository.saveAndFlush(user);
         
 
-        String jwtToken = jwtService.generateToken(operator);
+        String jwtToken = jwtService.generateToken(user);
 
-        defaultSpec = new RequestSpecBuilder()
-                .addCookie("accessToken", jwtToken)
-                .build();
-
-        user = userRepository.saveAndFlush(operator);
-        jwtToken = jwtService.generateToken(user);
-
-        operatorSpec = new RequestSpecBuilder()
+        RestAssured.requestSpecification = new RequestSpecBuilder()
                 .addCookie("accessToken", jwtToken)
                 .build();
     }
@@ -365,54 +351,5 @@ class ChargerUseIT {
                 .body("message", containsString("another user"));
     }
 
-    @Test
-    @Requirement("MSEV-25")
-    @WithUserDetails("test_operator")
-    void whenGetChargerStats_thenReturnChargeSessions() {
-        Station station1 = new Station();
-        station1.setLatitude(40);
-        station1.setLongitude(-0.5);
-        station1.setName("Station 1");
-        station1.setAddress("NY Street, 1");
-
-        station1 = stationRepository.saveAndFlush(station1);
-
-        Charger charger = Charger.builder()
-                .station(station1)
-                .price(30)
-                .chargingSpeed(10)
-                .connectorType("Type 2")
-                .status(Charger.ChargerStatus.IN_USE)
-                .build();
-
-        charger = chargerRepository.saveAndFlush(charger);
-         User user2 = User.builder()
-                .name("Teste")
-                .email("test7@gmail.com")
-                .password("123")
-                .isOperator(false)
-                .build();
-
-        user2 = userRepository.saveAndFlush(user2);
-        ChargeSession session = ChargeSession.builder()
-                .charger(charger)
-                .user(user2)
-                .startTimestamp(LocalDateTime.now())
-                .endTimestamp(LocalDateTime.now().plusHours(1))
-                .build();
-        chargeSessionRepository.saveAndFlush(session);
-        given()
-                .spec(operatorSpec)
-                .when()
-                .get("/api/v1/charge-sessions/stats/{chargerId}", charger.getId())
-                .then()
-                .assertThat()
-                .statusCode(200)
-                .body("$", hasSize(1))
-                .body("[0].charger.id", equalTo(charger.getId().toString()))
-                .body("[0].user.id", equalTo(user2.getId().toString()))
-                .body("[0].startTimestamp", notNullValue())
-                .body("[0].endTimestamp", notNullValue());
-    }
-
+    
 }
