@@ -16,6 +16,7 @@ import tqs.msev.backend.configuration.TestDatabaseConfig;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.entity.User;
+import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.service.JwtService;
@@ -45,6 +46,8 @@ class StationIT {
     private RequestSpecification defaultSpec;
 
     private RequestSpecification operatorSpec;
+    @Autowired
+    private ChargerRepository chargerRepository;
 
     @BeforeEach
     void setUp() {
@@ -293,8 +296,9 @@ class StationIT {
         station.setAddress("New Address");
         station.setLatitude(20.7128);
         station.setLongitude(-74.0060);
+
         Charger charger = new Charger();
-        charger.setId(UUID.randomUUID());
+        charger.setStation(station);
         charger.setConnectorType("Type 2");
         charger.setStatus(Charger.ChargerStatus.AVAILABLE);
         station.setChargers(List.of(charger));
@@ -326,11 +330,13 @@ class StationIT {
         station.setLongitude(-74.0060);
         station.setStatus(Station.StationStatus.ENABLED);
         Charger charger = new Charger();
-        charger.setId(UUID.randomUUID());
+
+        charger.setStation(station);
         charger.setConnectorType("Type 2");
         charger.setStatus(Charger.ChargerStatus.AVAILABLE);
         station.setChargers(List.of(charger));
-        Station s =stationRepository.save(station);
+
+        Station s =stationRepository.saveAndFlush(station);
 
         given()
                 .spec(defaultSpec)
@@ -356,7 +362,7 @@ class StationIT {
         station.setLatitude(20.7128);
         station.setLongitude(-74.0060);
         Charger charger = new Charger();
-        charger.setId(UUID.randomUUID());
+        charger.setStation(station);
         charger.setConnectorType("Type 2");
         charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
         station.setChargers(List.of(charger));
@@ -388,11 +394,11 @@ class StationIT {
         station.setLongitude(-74.0060);
         station.setStatus(Station.StationStatus.DISABLED);
         Charger charger = new Charger();
-        charger.setId(UUID.randomUUID());
         charger.setConnectorType("Type 2");
         charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
+        charger.setStation(station);
         station.setChargers(List.of(charger));
-        Station s =stationRepository.save(station);
+        Station s =stationRepository.saveAndFlush(station);
 
         given()
                 .spec(defaultSpec)
