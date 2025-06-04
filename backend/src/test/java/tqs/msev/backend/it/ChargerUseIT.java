@@ -54,22 +54,14 @@ class ChargerUseIT {
                 .build();
         userRepository.saveAndFlush(operator);
 
-        User user = User.builder()
+        User user2= User.builder()
                 .email("test")
                 .name("test")
                 .password("test_user")
                 .isOperator(false)
                 .build();
-        userRepository.saveAndFlush(user);
-    }
+        userRepository.saveAndFlush(user2);
 
-    @AfterAll
-    void afterAll() {
-        userRepository.deleteAll();
-    }
-
-    @BeforeEach
-    void setUp() {
         RestAssured.port = port;
 
         User user = User.builder()
@@ -89,13 +81,19 @@ class ChargerUseIT {
                 .build();
     }
 
+    @AfterAll
+    void afterAll() {
+        userRepository.deleteAll();
+    }
+
+
     @AfterEach
     void resetDb() {
         reservationRepository.deleteAll();
         chargeSessionRepository.deleteAll();
         chargerRepository.deleteAll();
         stationRepository.deleteAll();
-        RestAssured.reset();
+        
     }
 
     @DynamicPropertySource

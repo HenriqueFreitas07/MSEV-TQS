@@ -62,30 +62,22 @@ class StationIT {
 
     @BeforeAll
     void beforeAll() {
-        User operator = User.builder()
+        User operator1 = User.builder()
                 .email("test_operator")
                 .name("test_operator")
                 .password("test_operator")
                 .isOperator(true)
                 .build();
-        userRepository.saveAndFlush(operator);
+        userRepository.saveAndFlush(operator1);
 
-        User user = User.builder()
+        User user1 = User.builder()
                 .email("test")
                 .name("test")
                 .password("test_user")
                 .isOperator(false)
                 .build();
-        userRepository.saveAndFlush(user);
-    }
-
-    @AfterAll
-    void afterAll() {
-        userRepository.deleteAll();
-    }
-
-    @BeforeEach
-    void setUp() {
+        userRepository.saveAndFlush(user1);
+        
         RestAssured.port = port;
 
         User user = User.builder()
@@ -117,6 +109,13 @@ class StationIT {
                 .addCookie("accessToken", jwtToken)
                 .build();
     }
+
+    @AfterAll
+    void afterAll() {
+        userRepository.deleteAll();
+    }
+
+
 
     @AfterEach
     void resetDb() {
