@@ -50,7 +50,7 @@ class StationIT {
 
         User user = User.builder()
                 .email("test@gmail.com")
-                .name("Test")
+                .name("test")
                 .password("test")
                 .isOperator(false)
                 .build();
@@ -60,7 +60,7 @@ class StationIT {
         String jwtToken = jwtService.generateToken(user);
 
         User operator = User.builder()
-                .email("test_operator")
+                .email("test_operator@gmail.com")
                 .name("test_operator")
                 .password("test_operator")
                 .isOperator(true)
@@ -282,5 +282,51 @@ class StationIT {
                 .then()
                 .assertThat()
                 .statusCode(400);
+    }
+    @Test
+    @Requirement("MSEV-19")
+    void whenOperatorDisabled_thenReturnOk() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(operatorSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+    }
+    @Test
+    @Requirement("MSEV-19")
+    void whenUserTriesDisabledStation_thenReturnForbidden() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        Station s =stationRepository.save(station);
+
+        given()
+                .spec(defaultSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(403);
+
     }
 }

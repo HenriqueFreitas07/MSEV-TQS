@@ -39,7 +39,7 @@ public class StationController {
     public List<Station> searchStationByAddress(@RequestParam String address) {
         return stationService.searchByAddress(address);
     }
-    @PreAuthorize("@userService.getCurrentUser(authentication).operator()")
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PatchMapping("/{id}/disable")
     public void disableStation(@PathVariable UUID id) {
         Station s = stationService.getStationById(id);
