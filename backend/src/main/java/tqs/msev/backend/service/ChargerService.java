@@ -139,4 +139,13 @@ public class ChargerService {
 
         return sessions;
     }
+
+    public Charger updateChargerPrice(UUID chargerId, double price) {
+        Charger existingCharger = getChargerById(chargerId);
+        if (price < 0) {
+            throw new IllegalArgumentException("Price must be non-negative");
+        }
+        existingCharger.setPrice(price);
+        return chargerRepository.save(existingCharger);
+    }
 }

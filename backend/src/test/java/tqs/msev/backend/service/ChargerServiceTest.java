@@ -392,4 +392,54 @@ class ChargerServiceTest {
 
         verify(chargeSessionRepository, times(1)).findAllByUserId(id);
     }
+
+    @Test
+    @Requirement("MSEV-25")
+    void whenUpdateChargerPrice_thenReturnUpdatedCharger() {
+        UUID chargerId = UUID.randomUUID();
+        double newPrice = 0.7;
+
+        Charger mockCharger = new Charger();
+        mockCharger.setId(chargerId);
+        mockCharger.setPrice(newPrice);
+
+        when(chargerRepository.findById(chargerId)).thenReturn(Optional.of(mockCharger));
+        when(chargerRepository.save(Mockito.any(Charger.class))).thenReturn(mockCharger);
+
+        Charger updatedCharger = chargerService.updateChargerPrice(chargerId, newPrice);
+
+        assertEquals(mockCharger, updatedCharger);
+        assertEquals(newPrice, updatedCharger.getPrice());
+    }
+    
+    @Test
+    @Requirement("MSEV-25")
+    void whenUpdateChargerWithInvalidPrice_thenThrowException() {
+        UUID chargerId = UUID.randomUUID();
+        double invalidPrice = -1.0;
+
+        Charger mockCharger = new Charger();
+        mockCharger.setId(chargerId);
+        
+        when(chargerRepository.findById(chargerId)).thenReturn(Optional.of(mockCharger));
+
+        assertThatThrownBy(() -> chargerService.updateChargerPrice(chargerId, invalidPrice))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Price must be non-negative");
+
+        verify(chargerRepository, never()).save(Mockito.any(Charger.class));
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    void whenUpdateChargerThatDoesNotExist_thenThrowException() {
+        UUID chargerId = UUID.randomUUID();
+        double newPrice = 0.7;
+        when(chargerRepository.findById(chargerId)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> chargerService.updateChargerPrice(chargerId, newPrice))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessageContaining("Charger not found");
+        verify(chargerRepository, never()).save(Mockito.any(Charger.class));
+
+    }
 }
