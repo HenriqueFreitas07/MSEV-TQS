@@ -14,7 +14,6 @@ import tqs.msev.backend.repository.ChargeSessionRepository;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.repository.ReservationRepository;
-import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.StationRepository;
 
 import tqs.msev.backend.entity.Station;
@@ -30,9 +29,6 @@ import java.util.*;
 class ChargerServiceTest {
     @Mock
     private ReservationRepository reservationRepository;
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private ChargeSessionRepository chargeSessionRepository;
@@ -290,6 +286,7 @@ class ChargerServiceTest {
 
         verify(chargeSessionRepository, times(1)).save(Mockito.any());
         verify(chargerRepository, times(1)).save(Mockito.any());
+
     }
 
     @Test

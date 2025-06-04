@@ -116,6 +116,8 @@ public class ChargerService {
         chargeSessionRepository.save(session);
 
         Charger charger = session.getCharger();
+        charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        chargerRepository.save(charger);
     }
     public Charger createCharger(Charger charger) {
         if (charger.getStation() == null || stationRepository.findById(charger.getStation().getId()).isEmpty()) {
