@@ -44,14 +44,14 @@ public class ChargerController {
         return reservationService.getFutureReservationsOnCharger(chargerId);
     }
 
-    @PreAuthorize("@userService.getCurrentUser(authentication).operator()")
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PatchMapping("/{chargerId}/disable")
     public void disableCharger(@PathVariable UUID chargerId) {
         Charger charger = chargerService.getChargerById(chargerId);
         chargerService.disableCharger(charger);
     }
 
-    @PreAuthorize("@userService.getCurrentUser(authentication).operator()")
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PatchMapping("/{chargerId}/enable")
     public void enableCharger(@PathVariable UUID chargerId) {
         Charger charger = chargerService.getChargerById(chargerId);
