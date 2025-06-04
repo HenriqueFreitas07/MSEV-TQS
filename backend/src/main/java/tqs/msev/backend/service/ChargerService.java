@@ -10,9 +10,7 @@ import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.StationRepository;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -56,7 +54,7 @@ public class ChargerService {
 
         if (charger.getStatus() == Charger.ChargerStatus.IN_USE) {
             // If the charger is in use, let's check if the user has a valid reservation for this charger...
-            Date now = Date.from(Instant.now());
+            LocalDateTime now = LocalDateTime.now();
             Reservation reservation = reservationRepository
                     .findByUserIdAndStartTimestampBeforeAndEndTimestampAfter(userId, now, now);
 
@@ -78,7 +76,7 @@ public class ChargerService {
 
         chargeSessionRepository.save(newSession);
 
-        Date now = Date.from(Instant.now());
+        LocalDateTime now = LocalDateTime.now();
         Reservation reservation = reservationRepository
                 .findByUserIdAndStartTimestampBeforeAndEndTimestampAfter(userId, now, now);
 

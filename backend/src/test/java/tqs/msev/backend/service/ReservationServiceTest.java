@@ -9,11 +9,13 @@ import tqs.msev.backend.repository.ReservationRepository;
 import tqs.msev.backend.entity.Reservation;
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import tqs.msev.backend.entity.Charger;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.Date;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,9 +32,9 @@ class ReservationServiceTest {
     void whenReservationsExist_thenReturnReservations() {
         UUID chargerId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().plusHours(1));
         Reservation mockReservation2 = new Reservation();
-        mockReservation2.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24));
+        mockReservation2.setStartTimestamp(LocalDateTime.now().plusHours(3));
         List<Reservation> mockReservations = List.of(mockReservation, mockReservation2);
         
         when(reservationRepository.findByChargerId(chargerId)).thenReturn(mockReservations);
@@ -46,11 +48,11 @@ class ReservationServiceTest {
     @Requirement("MSEV-17")
     void whenReservationsNotInCloseFuture_thenReturnEmptyList() {
         UUID chargerId = UUID.randomUUID();
-        
+
         Reservation mockReservation = new Reservation();
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().minusHours(1));
         Reservation mockReservation2 = new Reservation();
-        mockReservation2.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 10));
+        mockReservation2.setStartTimestamp(LocalDateTime.now().plusDays(10));
         List<Reservation> mockReservations = List.of(mockReservation, mockReservation2);
         
         when(reservationRepository.findByChargerId(chargerId)).thenReturn(mockReservations);
@@ -64,8 +66,8 @@ class ReservationServiceTest {
     @Requirement("MSEV-19")
     void whenReservationCorrect_thenReturnReservation() {
         Reservation mockReservation = new Reservation();
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().plusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().plusHours(2));
         Charger mockCharger = new Charger();
         mockCharger.setId(UUID.randomUUID());
         mockReservation.setCharger(mockCharger);
@@ -80,9 +82,9 @@ class ReservationServiceTest {
     @Requirement("MSEV-19")
     void whenReservationInThePast_thenThrowException() {
         Reservation mockReservation = new Reservation();
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60 * 2)); 
-        
+        mockReservation.setStartTimestamp(LocalDateTime.now().minusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().minusHours(2));
+
         try {
             reservationService.createReservation(mockReservation);
         } catch (IllegalArgumentException e) {
@@ -94,8 +96,8 @@ class ReservationServiceTest {
     @Requirement("MSEV-19")
     void whenReservationStartAfterEnd_thenThrowException() {
         Reservation mockReservation = new Reservation();
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().plusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().plusHours(2));
         Charger mockCharger = new Charger();
         mockCharger.setId(UUID.randomUUID());
         mockReservation.setCharger(mockCharger);
@@ -112,14 +114,15 @@ class ReservationServiceTest {
     @Requirement("MSEV-19")
     void whenReservationOverlaps_thenThrowException() {
         Reservation mockReservation = new Reservation();
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().plusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().plusHours(2));
         Charger mockCharger = new Charger();
         mockCharger.setId(UUID.randomUUID());
         mockReservation.setCharger(mockCharger);
         Reservation existingReservation = new Reservation();
-        existingReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 30)); 
-        existingReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 90)); 
+
+        existingReservation.setStartTimestamp(LocalDateTime.now().plusMinutes(30));
+        existingReservation.setEndTimestamp(LocalDateTime.now().plusHours(90));
 
         when(reservationRepository.findByChargerId(any())).thenReturn(List.of(existingReservation));
         
@@ -150,14 +153,14 @@ class ReservationServiceTest {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
         mockReservation.setId(reservationId);
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().minusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().plusHours(1));
         
         when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(mockReservation));
         
         Reservation usedReservation = reservationService.markReservationAsUsed(reservationId);
-        
-        assertEquals(true, usedReservation.isUsed());
+
+        assertTrue(usedReservation.isUsed());
     }
 
     @Test
@@ -166,8 +169,8 @@ class ReservationServiceTest {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
         mockReservation.setId(reservationId);
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().minusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().plusHours(1));
         mockReservation.setUsed(true);
         
         when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(mockReservation));
@@ -185,8 +188,8 @@ class ReservationServiceTest {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
         mockReservation.setId(reservationId);
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 2)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().plusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().plusHours(2));
         
         when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(mockReservation));
         
@@ -203,8 +206,8 @@ class ReservationServiceTest {
         UUID reservationId = UUID.randomUUID();
         Reservation mockReservation = new Reservation();
         mockReservation.setId(reservationId);
-        mockReservation.setStartTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 60)); 
-        mockReservation.setEndTimestamp(new Date(System.currentTimeMillis() - 1000 * 60 * 30)); 
+        mockReservation.setStartTimestamp(LocalDateTime.now().minusHours(1));
+        mockReservation.setEndTimestamp(LocalDateTime.now().minusMinutes(30));
         
         when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(mockReservation));
         
