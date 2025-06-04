@@ -2,15 +2,13 @@ package tqs.msev.backend.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tqs.msev.backend.entity.ChargeSession;
 import tqs.msev.backend.entity.User;
 import tqs.msev.backend.service.ChargerService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/charge-sessions")
@@ -27,5 +25,10 @@ public class ChargeSessionController {
         User user = (User) auth.getPrincipal();
 
         return chargerService.getChargeSessions(user.getId(), activeOnly);
+    }
+
+    @GetMapping("/{chargerId}/statistics")
+    public ChargeSession getChargeSessionStatistics(@PathVariable UUID chargerId) {
+        return chargerService.getChargeSessionByChargerId(chargerId);
     }
 }

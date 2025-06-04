@@ -12,10 +12,7 @@ import tqs.msev.backend.repository.StationRepository;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ChargerService {
@@ -24,6 +21,8 @@ public class ChargerService {
     private final ChargeSessionRepository chargeSessionRepository;
     private final UserRepository userRepository;
     private final StationRepository stationRepository;
+
+    private Random random = new Random();
 
     public ChargerService(ChargerRepository chargerRepository, ReservationRepository reservationRepository, ChargeSessionRepository chargeSessionRepository, UserRepository userRepository, StationRepository stationRepository) {
         this.chargerRepository = chargerRepository;
@@ -127,5 +126,16 @@ public class ChargerService {
         }
 
         return sessions;
+    }
+
+    public ChargeSession getChargeSessionByChargerId(UUID chargerId) {
+        ChargeSession chargeSession =  chargeSessionRepository.findByChargerIdAndEndTimestamp(chargerId, null);
+        double randomDouble = random.nextDouble();
+        chargeSession.setConsumption(randomDouble * chargeSession.getConsumption() + chargeSession.getConsumption());
+        chargeSession.setChargingSpeed(randomDouble + chargeSession.getCharger().getChargingSpeed() -0.5);
+
+
+        chargeSessionRepository.saveAndFlush(chargeSession);
+        return chargeSession;
     }
 }
