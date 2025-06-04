@@ -312,7 +312,7 @@ class StationIT {
                 .assertThat()
                 .statusCode(200);
 
-        Station newS=stationRepository.findById(s.getId()).get();
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
         assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.DISABLED);
     }
 
@@ -342,7 +342,7 @@ class StationIT {
                 .assertThat()
                 .statusCode(403);
 
-    Station newS=stationRepository.findById(s.getId()).get();
+    Station newS=stationRepository.findById(s.getId()).orElseThrow();
     assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.ENABLED);
 
     }
@@ -374,7 +374,7 @@ class StationIT {
                 .assertThat()
                 .statusCode(200);
 
-        Station newS=stationRepository.findById(s.getId()).get();
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
         assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.ENABLED);
     }
 
@@ -404,7 +404,7 @@ class StationIT {
                 .assertThat()
                 .statusCode(403);
 
-        Station newS=stationRepository.findById(s.getId()).get();
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
         assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.DISABLED);
     }
 }
