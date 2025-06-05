@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import tqs.msev.backend.entity.ChargeSession;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import tqs.msev.backend.configuration.TestSecurityConfig;
 import tqs.msev.backend.service.ChargerService;
@@ -58,6 +59,25 @@ class ChargeSessionControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)));
     }
 
+    @WithUserDetails("test")
+    @Test
+    void whenGetChargeSessionByChargerId_thenReturnChargeSession() throws Exception {
+        UUID chargerId = UUID.randomUUID();
+
+        Charger charger = Charger.builder().build();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .charger(charger)
+                .startTimestamp(LocalDateTime.now())
+                .build();
+
+        when(chargerService.getChargeSessionByChargerId(chargerId)).thenReturn(session1);
+
+        mockMvc.perform(get("/api/v1/charge-sessions/{chargerId}/statistics", chargerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isNotEmpty());
+    }
+
     @WithUserDetails("test_operator")
     @Test
     @Requirement("MSEV-25")
@@ -78,5 +98,6 @@ class ChargeSessionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(2)));
+
     }
 }
