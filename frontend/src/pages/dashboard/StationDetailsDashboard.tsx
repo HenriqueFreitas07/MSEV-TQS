@@ -32,6 +32,20 @@ export default function StationDetailsDashboard() {
     loadData();
   }, [stationId]);
 
+  async function updateCharger(chargerId: string, status: string) {
+    await ChargerService.updateChargerStatus(chargerId, status);
+
+    setChargers(prev => {
+      const charger = prev.find(s => s.id === chargerId)!;
+      charger.status = status
+
+      return [
+        ...prev.filter(s => s.id !== chargerId),
+        charger
+      ]
+    });
+  }
+
   async function handleCreateCharger(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -68,7 +82,7 @@ export default function StationDetailsDashboard() {
 
         <div className="flex flex-col gap-4 mt-6">
           {
-            chargers.map(charger => <ChargerCard key={charger.id} charger={charger} />)
+            chargers.map(charger => <ChargerCard key={charger.id} charger={charger} updateCharger={updateCharger} />)
           }
         </div>
       </div>
