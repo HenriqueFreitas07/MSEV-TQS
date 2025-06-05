@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import tqs.msev.backend.dto.UpdateChargerPriceDTO;
+import tqs.msev.backend.dto.UpdateChargerStatusDTO;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
 
@@ -48,6 +50,26 @@ public class ChargerController {
         return reservationService.getFutureReservationsOnCharger(chargerId);
     }
 
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{chargerId}/disable")
+    public void disableCharger(@PathVariable UUID chargerId) {
+        Charger charger = chargerService.getChargerById(chargerId);
+        chargerService.disableCharger(charger);
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{chargerId}/enable")
+    public void enableCharger(@PathVariable UUID chargerId) {
+        Charger charger = chargerService.getChargerById(chargerId);
+        chargerService.enableCharger(charger);
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{chargerId}")
+    public void updateChargerStatus(@PathVariable UUID chargerId, @Valid @RequestBody UpdateChargerStatusDTO dto) {
+        chargerService.updateChargerStatus(chargerId, dto.getStatus());
+    }
+
     @PatchMapping("/{chargerId}/unlock")
     @Operation(summary = "Unlocks a charger")
     public void unlockCharger(@PathVariable UUID chargerId) {
@@ -72,5 +94,11 @@ public class ChargerController {
     @Operation(summary = "Creates a charger")
     public Charger createCharger(@Valid @RequestBody Charger charger) {
         return chargerService.createCharger(charger);
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{chargerId}/update")
+    public Charger updateChargerPrice(@PathVariable UUID chargerId, @RequestBody UpdateChargerPriceDTO dto) {
+        return chargerService.updateChargerPrice(chargerId, dto.getPrice());
     }
 }

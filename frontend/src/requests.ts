@@ -131,7 +131,6 @@ export const StationService = {
       throw error;
     }
   },
-
   createStation: async (name: string, address: string, latitude: number, longitude: number): Promise<Station> => {
     const { data } = await api.post<Station>("/stations", {
       name,
@@ -141,6 +140,22 @@ export const StationService = {
     });
 
     return data;
+  },
+  disableStation: async (stationId: string) => {
+    try {
+      await api.patch(`/stations/${stationId}/disable`);
+    } catch (error) {
+      console.error("Error disabling station:", error);
+      throw error;
+    }
+  },
+  enableStation: async (stationId: string) => {
+    try {
+      await api.patch(`/stations/${stationId}/enable`);
+    } catch (error) {
+      console.error("Error enabling station:", error);
+      throw error;
+    }
   }
 }
 export const GoogleService = {
@@ -151,7 +166,7 @@ export const GoogleService = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching restaurants:", error);
+      console.error("Error in the autocomplete:", error);
       throw error;
     }
   },
@@ -166,7 +181,7 @@ export const GoogleService = {
       });
       return response.data;
     } catch (error) {
-      console.error("Error fetching restaurants:", error);
+      console.error("Error fetching Place:", error);
       throw error;
     }
   },
@@ -236,6 +251,48 @@ export const ChargerService = {
       return data;
     } catch (error) {
       console.log("Error fetching charge sessions");
+      throw error;
+    }
+  },
+  getStatistics: async(chargerId:string):Promise<ChargeSession> =>{
+    try {
+      const { data } = await api.get<ChargeSession>(`/charge-sessions/${chargerId}/statistics`);
+      return data;
+    } catch (error) {
+      console.log("Error fetching charge sessions");
+      throw error;
+    }
+  },
+  disableCharger: async (chargerId: string) => {
+    try {
+      await api.patch(`/chargers/${chargerId}/disable`);
+    } catch (error) {
+      console.error("Error disabling charger:", error);
+      throw error;
+    }
+  },
+  enableCharger: async (chargerId: string) => {
+    try {
+      await api.patch(`/chargers/${chargerId}/enable`);
+    } catch (error) {
+      console.error("Error enabling charger:", error);
+      throw error;
+    }
+  },
+  updateChargerStatus: async (chargerId: string, status: string) => {
+    try {
+      await api.patch(`/chargers/${chargerId}`, { status });
+    } catch (error) {
+      console.error("Error updating charger:", error);
+      throw error;
+    }
+  },
+
+  updateChargerPrice: async (chargerId: string, price: number) => {
+    try {
+      await api.patch(`/chargers/${chargerId}/update`, { price });
+    } catch (error) {
+      console.error("Error updating charger price:", error);
       throw error;
     }
   }

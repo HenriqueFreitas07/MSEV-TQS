@@ -13,6 +13,7 @@ import tqs.msev.backend.entity.User;
 import tqs.msev.backend.service.AuthService;
 import tqs.msev.backend.service.JwtService;
 
+
 @RestController
 @RequestMapping("/api/v1")
 public class AuthenticationController {

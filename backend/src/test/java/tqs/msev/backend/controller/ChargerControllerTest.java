@@ -183,6 +183,33 @@ class ChargerControllerTest {
         .andExpect(status().isBadRequest());
     }
 
+    @Test
+    @WithUserDetails("test_operator")
+    @Requirement("MSEV-25")
+    void whenUpdateChargerPrice_thenReturnOk() throws Exception {
+        UUID chargerId = UUID.randomUUID();
+
+        Charger updatedCharger = new Charger();
+        updatedCharger.setId(chargerId);
+        updatedCharger.setPrice(0.7);
+        
+        when(chargerService.updateChargerPrice(chargerId, 0.7)).thenReturn(updatedCharger);
+       
+        
+        mockMvc.perform(
+            patch("/api/v1/chargers/{chargerId}/update", chargerId)
+                .contentType("application/json")
+                .content("0.7")
+                .with(csrf()
+
+
+        )        )        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(chargerId.toString()))
+        .andExpect(jsonPath("$.price").value(0.7));
+    }
+
+    
+
 
 
 }

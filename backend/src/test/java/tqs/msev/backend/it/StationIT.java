@@ -10,23 +10,32 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import tqs.msev.backend.configuration.TestDatabaseConfig;
+import tqs.msev.backend.entity.ChargeSession;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.entity.User;
+import tqs.msev.backend.repository.ChargeSessionRepository;
+import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.StationRepository;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.service.JwtService;
 
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(TestDatabaseConfig.class)
 class StationIT {
     @LocalServerPort
@@ -44,13 +53,36 @@ class StationIT {
 
     private RequestSpecification operatorSpec;
 
-    @BeforeEach
-    void setUp() {
+    @Autowired
+    private ChargerRepository chargerRepository;
+
+    @Autowired
+    private ChargeSessionRepository chargeSessionRepository;
+    
+
+    @BeforeAll
+    void beforeAll() {
+        User operator1 = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+        userRepository.saveAndFlush(operator1);
+
+        User user1 = User.builder()
+                .email("test")
+                .name("test")
+                .password("test_user")
+                .isOperator(false)
+                .build();
+        userRepository.saveAndFlush(user1);
+        
         RestAssured.port = port;
 
         User user = User.builder()
                 .email("test@gmail.com")
-                .name("Test")
+                .name("test")
                 .password("test")
                 .isOperator(false)
                 .build();
@@ -60,7 +92,7 @@ class StationIT {
         String jwtToken = jwtService.generateToken(user);
 
         User operator = User.builder()
-                .email("test_operator")
+                .email("test_operator@gmail.com")
                 .name("test_operator")
                 .password("test_operator")
                 .isOperator(true)
@@ -78,10 +110,18 @@ class StationIT {
                 .build();
     }
 
+    @AfterAll
+    void afterAll() {
+        userRepository.deleteAll();
+    }
+
+
+
     @AfterEach
     void resetDb() {
+        chargeSessionRepository.deleteAll();
+        chargerRepository.deleteAll();
         stationRepository.deleteAll();
-        userRepository.deleteAll();
         RestAssured.reset();
     }
 
@@ -282,5 +322,195 @@ class StationIT {
                 .then()
                 .assertThat()
                 .statusCode(400);
+    }
+    @Test
+    @Requirement("MSEV-19")
+    void whenOperatorDisabled_thenReturnOk() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+
+        Charger charger = new Charger();
+        charger.setStation(station);
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        station.setChargers(List.of(charger));
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(operatorSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
+        assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.DISABLED);
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenUserTriesDisabledStation_thenReturnForbidden() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.ENABLED);
+        Charger charger = new Charger();
+
+        charger.setStation(station);
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        station.setChargers(List.of(charger));
+
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(defaultSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(403);
+
+    Station newS=stationRepository.findById(s.getId()).orElseThrow();
+    assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.ENABLED);
+
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenOperatorEnable_thenReturnOk() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        Charger charger = new Charger();
+        charger.setStation(station);
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
+        station.setChargers(List.of(charger));
+        station.setStatus(Station.StationStatus.DISABLED);
+
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(operatorSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/enable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(200);
+
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
+        assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.ENABLED);
+    }
+
+    @Test
+    @Requirement("MSEV-19")
+    void whenUserTriesEnableStation_thenReturnForbidden() {
+        Station station = new Station();
+        station.setName("Test");
+        station.setAddress("New Address");
+        station.setLatitude(20.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.DISABLED);
+        Charger charger = new Charger();
+        charger.setConnectorType("Type 2");
+        charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
+        charger.setStation(station);
+        station.setChargers(List.of(charger));
+        Station s =stationRepository.saveAndFlush(station);
+
+        given()
+                .spec(defaultSpec)
+                .contentType(ContentType.JSON)
+                .body(s)
+                .when()
+                .patch("/api/v1/stations/{id}/disable", s.getId())
+                .then()
+                .assertThat()
+                .statusCode(403);
+
+        Station newS=stationRepository.findById(s.getId()).orElseThrow();
+        assertThat(newS.getStatus()).isEqualTo(Station.StationStatus.DISABLED);
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    @WithUserDetails("test_operator")
+    void whenGetStationStats_thenReturnStats() {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setAddress("Test Address");
+        station.setLatitude(40.7128);
+        station.setLongitude(-74.0060);
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.saveAndFlush(station);
+
+        Charger charger1 = new Charger();
+        charger1.setConnectorType("Type 2");
+        charger1.setStatus(Charger.ChargerStatus.AVAILABLE);
+        charger1.setStation(station);
+
+        chargerRepository.saveAndFlush(charger1);
+
+        Charger charger2 = new Charger();
+        charger2.setConnectorType("CCS");
+        charger2.setStatus(Charger.ChargerStatus.AVAILABLE);
+        charger2.setStation(station);
+
+
+
+        chargerRepository.saveAndFlush(charger2);
+
+        station.setChargers(List.of(charger1, charger2));
+
+        stationRepository.saveAndFlush(station);
+
+        User user = new User();
+        user.setEmail("teststats");
+        user.setName("Test Stats");
+        user.setPassword("teststats");
+        user.setOperator(false);
+        user = userRepository.saveAndFlush(user);
+
+        ChargeSession session1 = new ChargeSession();
+        session1.setCharger(charger1);
+        session1.setStartTimestamp(LocalDateTime.now().minusHours(2));
+        session1.setEndTimestamp(LocalDateTime.now().minusHours(1));
+        session1.setUser(user);
+
+        ChargeSession session2 = new ChargeSession();
+        session2.setCharger(charger2);
+        session2.setStartTimestamp(LocalDateTime.now().minusHours(3));
+        session2.setEndTimestamp(null);
+        session2.setUser(user);
+
+        chargeSessionRepository.saveAllAndFlush(List.of(session1, session2));
+
+        given()
+                .spec(operatorSpec)
+                .when()
+                .get("/api/v1/stations/stats/{stationId}", station.getId())
+                .then()
+                .assertThat()
+                .statusCode(200)
+                .body("$", hasSize(1))
+                .body("[0].charger.id", is(charger1.getId().toString()));
     }
 }

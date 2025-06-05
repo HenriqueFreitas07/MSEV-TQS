@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import { ChargerService, ReservationService } from "../requests.js";
 import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 import type { Reservation } from "../types/Reservation.js";
 import type { Charger } from "../types/Charger.js";
 import { TbGasStation, TbGasStationOff } from "react-icons/tb";
@@ -73,8 +75,8 @@ function Reserve() {
     if (auth.user && charger) {
 
       for (const reserve of slots) {
-        const startTimestamp = dayjs(reserve.date + " " + reserve.slots.start, "YYYY-MM-DD HH:mm").toISOString();
-        const endTimestamp = dayjs(reserve.date + " " + reserve.slots.end, "YYYY-MM-DD HH:mm").toISOString();
+        const startTimestamp = dayjs.utc(reserve.date + " " + reserve.slots.start, "YYYY-MM-DD HH:mm").toISOString();
+        const endTimestamp = dayjs.utc(reserve.date + " " + reserve.slots.end, "YYYY-MM-DD HH:mm").toISOString();
         const reservation = {
           user: auth.user,
           startTimestamp: startTimestamp,
@@ -85,7 +87,7 @@ function Reserve() {
 
         setReservations((prev) => [...prev, response])
       }
-      
+
       setCar([]);
     }
 

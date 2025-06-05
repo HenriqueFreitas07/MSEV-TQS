@@ -66,11 +66,11 @@ export default function Login() {
           </div>
 
           <div className="form-control mt-4">
-            <button type="submit" className="btn btn-primary w-full">Login</button>
+            <button type="submit" className="btn btn-primary w-full" data-testid="login-btn">Login</button>
           </div>
           <p className="text-center text-sm mt-4">
             Don&apos;t have an account?{" "}
-            <NavLink to="/signup" className="text-primary hover:underline">Sign up</NavLink>
+            <NavLink to="/signup" className="text-primary hover:underline" data-testid="signup-link">Sign up</NavLink>
           </p>
         </form>
       </div>

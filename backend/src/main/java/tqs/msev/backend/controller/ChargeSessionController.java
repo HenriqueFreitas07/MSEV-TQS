@@ -2,17 +2,17 @@ package tqs.msev.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.web.bind.annotation.*;
 import tqs.msev.backend.entity.ChargeSession;
 import tqs.msev.backend.entity.User;
 import tqs.msev.backend.service.ChargerService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/charge-sessions")
@@ -31,5 +31,19 @@ public class ChargeSessionController {
         User user = (User) auth.getPrincipal();
 
         return chargerService.getChargeSessions(user.getId(), activeOnly);
+    }
+
+    @GetMapping("/{chargerId}/statistics")
+    @Operation(summary = "Get charge session statistics by charger id")
+    public ChargeSession getChargeSessionStatistics(@PathVariable UUID chargerId) {
+        return chargerService.getChargeSessionByChargerId(chargerId);
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @GetMapping("/stats/{chargerId}")
+    @Operation(summary = "Get operator statistics")
+    public List<ChargeSession> getChargerStats(@PathVariable UUID chargerId) {
+
+        return chargerService.getChargeSessionsByCharger(chargerId);
     }
 }
