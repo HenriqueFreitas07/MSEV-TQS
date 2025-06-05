@@ -43,6 +43,17 @@ public class Init implements CommandLineRunner {
             userRepository.save(user);
         }
 
+        if (userRepository.findUserByEmail("test_user@gmail.com").isEmpty()) {
+            User user = User.builder()
+                    .name("Test User")
+                    .email("test_user@gmail.com")
+                    .password(bCryptPasswordEncoder.encode(operatorPassword))
+                    .isOperator(true)
+                    .build();
+
+            userRepository.save(user);
+        }
+
         if (!stationRepository.findAll().isEmpty())
             return;
 
