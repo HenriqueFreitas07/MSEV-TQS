@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ChargerService } from "../requests";
+import { GoPencil } from "react-icons/go";
 
 import type { Reservation } from "../types/Reservation";
 import type { Charger } from "../types/Charger"
@@ -11,6 +12,8 @@ type Props = {
 
 export function ChargerCard({ charger, updateCharger }: Props) {
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [editing, setEditing] = useState(false);
+  const [price, setPrice] = useState(charger.price);
 
   useEffect(() => {
     async function loadResevationsOfCharger() {
@@ -20,13 +23,40 @@ export function ChargerCard({ charger, updateCharger }: Props) {
     loadResevationsOfCharger();
   }, [charger]);
 
+  useEffect(() => {
+    setPrice(charger.price);
+  }, [charger.price]);
+
+  const handleEditClick = async () => {
+    if (editing) {
+      // Guardar novo preço
+      await ChargerService.updateChargerPrice(charger.id, price);
+      // Atualizar o estado do charger (pode ser necessário refetch externo)
+    }
+    setEditing(!editing);
+  };
 
   return (
     <div className={`w-full flex  justify-between gap-2 rounded-md border p-6 ${charger.status === "OUT_OF_ORDER" || charger.status === "TEMPORARILY_DISABLED" ? " border-red-400" : " border-zinc-400"}`}>
       <div className="flex flex-col">
         <span>Connector Type: {charger.connectorType}</span>
         <span>Status: {charger.status}</span>
-        <span>Price (per kWh): {charger.price}</span>
+
+        <div className="flex">
+          <span>Price (per kWh):</span>
+          {editing ?
+            <input
+              type="number"
+              value={price}
+              min={0}
+              step={0.01}
+              onChange={e => setPrice(Number(e.target.value))}
+              className="input input-sm w-20 mx-2"
+            />
+            :
+            <span className="mx-2">{price}</span>
+          }
+          <button onClick={handleEditClick}><GoPencil /></button></div>
         <span>Charging Speed: {charger.chargingSpeed}</span>
         <span>Reservations for the next 5 days: {reservations.length}</span>
       </div>

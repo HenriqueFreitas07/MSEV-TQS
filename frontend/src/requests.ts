@@ -286,8 +286,16 @@ export const ChargerService = {
       console.error("Error updating charger:", error);
       throw error;
     }
-  }
+  },
 
+  updateChargerPrice: async (chargerId: string, price: number) => {
+    try {
+      await api.patch(`/chargers/${chargerId}/update`, { price });
+    } catch (error) {
+      console.error("Error updating charger price:", error);
+      throw error;
+    }
+  }
 }
 
 
