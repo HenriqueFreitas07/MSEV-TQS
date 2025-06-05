@@ -105,13 +105,13 @@ export default function Signup() {
               className="input input-bordered w-full"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              data-testid="password-input"
+              data-testid="confirm-password-input"
               required
             />
           </div>
 
           <div className="form-control mt-4">
-            <button type="submit" className="btn btn-primary w-full">Sign up</button>
+            <button type="submit" className="btn btn-primary w-full" data-testid="signup-btn">Sign up</button>
           </div>
           <p className="text-center text-sm mt-4">
             Already have an account?{" "}
