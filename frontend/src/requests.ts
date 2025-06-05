@@ -254,6 +254,15 @@ export const ChargerService = {
       throw error;
     }
   },
+  getStatistics: async(chargerId:string):Promise<ChargeSession> =>{
+    try {
+      const { data } = await api.get<ChargeSession>(`/charge-sessions/${chargerId}/statistics`);
+      return data;
+    } catch (error) {
+      console.log("Error fetching charge sessions");
+      throw error;
+    }
+  },
   disableCharger: async (chargerId: string) => {
     try {
       await api.patch(`/chargers/${chargerId}/disable`);

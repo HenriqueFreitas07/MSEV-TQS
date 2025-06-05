@@ -118,7 +118,7 @@ export default function Dashboard() {
           </div>
         </div>
         <hr />
-        <div className="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-4 mt-6">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-3 mt-2 w-ful">
           {
             stations.filter(s => s.name.toLowerCase().startsWith(searchQuery)).map(station => (
               <StationCard key={station.id} station={station} onClick={() => handleStationClick(station.id)} onUpdate={() => toggleEnable(station)} />

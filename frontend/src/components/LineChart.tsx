@@ -6,13 +6,14 @@ import {
   LineElement,
   Title,
   Tooltip,
+  Filler,
   Legend,
   type ChartData,
 } from 'chart.js';
-import { useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
+  Filler,
   CategoryScale,
   LinearScale,
   PointElement,

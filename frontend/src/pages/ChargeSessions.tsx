@@ -27,7 +27,6 @@ export default function ChargeSessions() {
 
   return (
     <>
-
       <NavLayout title="MSEV" footer={false}>
         <div className="p-8">
           <div className="flex items-center justify-between">
