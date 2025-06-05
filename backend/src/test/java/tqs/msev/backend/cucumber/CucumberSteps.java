@@ -1,5 +1,6 @@
 package tqs.msev.backend.cucumber;
 
+import io.cucumber.java.After;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -125,5 +126,10 @@ public class CucumberSteps {
         String msg = driver.findElement(By.cssSelector("#swal2-html-container")).getText();
 
         assertThat(msg).isEqualTo(message);
+    }
+
+    @After
+    public void cleanup() {
+        driver.quit();
     }
 }
