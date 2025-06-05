@@ -11,9 +11,8 @@ import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.StationRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
+
 
 @Service
 public class ChargerService {
@@ -22,6 +21,8 @@ public class ChargerService {
     private final ChargeSessionRepository chargeSessionRepository;
     private final UserRepository userRepository;
     private final StationRepository stationRepository;
+
+    private Random random = new Random();
 
     public ChargerService(ChargerRepository chargerRepository, ReservationRepository reservationRepository, ChargeSessionRepository chargeSessionRepository, UserRepository userRepository, StationRepository stationRepository) {
         this.chargerRepository = chargerRepository;
@@ -38,6 +39,20 @@ public class ChargerService {
     public Charger getChargerById(UUID chargerId) {
         return chargerRepository.findById(chargerId)
                 .orElseThrow(() -> new NoSuchElementException("Charger not found"));
+    }
+    public void disableCharger(Charger charger) {
+        charger.setStatus(Charger.ChargerStatus.TEMPORARILY_DISABLED);
+        chargerRepository.save(charger);
+    }
+
+    public void outOfOrderCharger(Charger charger) {
+        charger.setStatus(Charger.ChargerStatus.OUT_OF_ORDER);
+        chargerRepository.save(charger);
+    }
+
+    public void enableCharger(Charger charger) {
+        charger.setStatus(Charger.ChargerStatus.AVAILABLE);
+        chargerRepository.save(charger);
     }
 
     public void unlockCharger(UUID chargerId, UUID userId) {
@@ -105,7 +120,6 @@ public class ChargerService {
         charger.setStatus(Charger.ChargerStatus.AVAILABLE);
         chargerRepository.save(charger);
     }
-
     public Charger createCharger(Charger charger) {
         if (charger.getStation() == null || stationRepository.findById(charger.getStation().getId()).isEmpty()) {
             throw new IllegalArgumentException("Charger must be associated with a valid station");
@@ -126,4 +140,59 @@ public class ChargerService {
 
         return sessions;
     }
+
+    public ChargeSession getChargeSessionByChargerId(UUID chargerId) {
+        ChargeSession chargeSession = chargeSessionRepository.findByChargerIdAndEndTimestamp(chargerId, null);
+        if (chargeSession != null && chargeSession.getCharger() != null) {
+            double randomDouble = random.nextDouble();
+            chargeSession.setConsumption(randomDouble * chargeSession.getConsumption() + chargeSession.getConsumption());
+            chargeSession.setChargingSpeed(randomDouble + chargeSession.getCharger().getChargingSpeed() - 0.5);
+
+            chargeSessionRepository.saveAndFlush(chargeSession);
+            return chargeSession;
+        }
+
+        return null;
+    }
+        
+    public Charger updateChargerPrice(UUID chargerId, double price) {
+        Charger existingCharger = getChargerById(chargerId);
+        if (price < 0) {
+            throw new IllegalArgumentException("Price must be non-negative");
+        }
+        existingCharger.setPrice(price);
+        return chargerRepository.save(existingCharger);
+    }
+    
+    public List<ChargeSession> getChargeSessionsByCharger(UUID chargerId) {
+        List<ChargeSession> sessions = chargeSessionRepository.findAllByChargerId(chargerId);
+        if (sessions.isEmpty()) {
+            throw new NoSuchElementException("No charge sessions found for this charger");
+        }
+        
+        return sessions.stream()
+                .filter(session -> session.getEndTimestamp() != null)
+                .toList();
+    }
+
+
+    public List<ChargeSession> getStationStats(UUID stationId) {
+        List<Charger> chargers = chargerRepository.findByStationId(stationId);
+        if (chargers.isEmpty()) {
+            throw new NoSuchElementException("No chargers found for this station");
+        }
+
+        List<ChargeSession> sessions = new ArrayList<>();
+        for (Charger charger : chargers) {
+            List<ChargeSession> chargerSessions = chargeSessionRepository.findAllByChargerId(charger.getId());
+            sessions.addAll(chargerSessions.stream()
+                    .filter(session -> session.getEndTimestamp() != null)
+                    .toList());
+        }
+        if (sessions.isEmpty()) {
+            throw new NoSuchElementException("No charge sessions found for this station");
+        }
+        return sessions;
+    }
 }
+

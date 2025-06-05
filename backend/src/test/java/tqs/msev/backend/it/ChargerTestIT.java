@@ -26,9 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.ReservationRepository;
@@ -71,6 +70,14 @@ class ChargerTestIT {
                 .isOperator(true)
                 .build();
         userRepository.saveAndFlush(operator);
+
+        User user = User.builder()
+                .email("test")
+                .name("test")
+                .password("test_user")
+                .isOperator(false)
+                .build();
+        userRepository.saveAndFlush(user);
     }
 
     @AfterAll
@@ -153,6 +160,71 @@ class ChargerTestIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.connectorType").value("Type 2"));
     }
+    @Test
+    @Requirement("MSEV-19")
+    @WithUserDetails("test_operator")
+    void whenUserIsOperator_thenDisableCharger() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        UUID chargerId = charger.getId();
+        mockMvc.perform(patch("/api/v1/chargers/{chargerId}/disable", chargerId))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/chargers/{chargerId}", chargerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("TEMPORARILY_DISABLED"));
+    }
+    @Test
+    @Requirement("MSEV-19")
+    @WithUserDetails("test")
+    void whenUserNotOperator_thenNotAllowDisableCharger() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        UUID chargerId = charger.getId();
+        mockMvc.perform(patch("/api/v1/chargers/{chargerId}/disable", chargerId))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/v1/chargers/{chargerId}", chargerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("AVAILABLE"));
+    }
+
 
     @Test
     @Requirement("MSEV-18")
@@ -302,5 +374,73 @@ class ChargerTestIT {
 
         mockMvc.perform(post("/api/v1/chargers").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(charger)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    @WithUserDetails("test_operator")
+    void whenUpdateChargerPrice_thenReturnUpdatedCharger() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        UUID chargerId = charger.getId();
+        
+        mockMvc.perform(put("/api/v1/chargers/{chargerId}/update", chargerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("0.7")
+                .with(csrf()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(chargerId.toString()))
+            .andExpect(jsonPath("$.price").value(0.7));
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    @WithUserDetails("test_operator")
+    void whenUpdateChargerPriceWithInvalidData_thenReturnBadRequest() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        UUID chargerId = charger.getId();
+        
+        mockMvc.perform(put("/api/v1/chargers/{chargerId}/update", chargerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("-1.0")
+                .with(csrf()))
+            .andExpect(status().isBadRequest());
     }
 }

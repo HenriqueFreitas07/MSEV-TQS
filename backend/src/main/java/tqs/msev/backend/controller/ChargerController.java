@@ -44,6 +44,19 @@ public class ChargerController {
         return reservationService.getFutureReservationsOnCharger(chargerId);
     }
 
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{chargerId}/disable")
+    public void disableCharger(@PathVariable UUID chargerId) {
+        Charger charger = chargerService.getChargerById(chargerId);
+        chargerService.disableCharger(charger);
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{chargerId}/enable")
+    public void enableCharger(@PathVariable UUID chargerId) {
+        Charger charger = chargerService.getChargerById(chargerId);
+        chargerService.enableCharger(charger);
+    }
     @PatchMapping("/{chargerId}/unlock")
     public void unlockCharger(@PathVariable UUID chargerId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -65,5 +78,11 @@ public class ChargerController {
     @ResponseStatus(HttpStatus.CREATED)
     public Charger createCharger(@Valid @RequestBody Charger charger) {
         return chargerService.createCharger(charger);
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PutMapping("/{chargerId}/update")
+    public Charger updateChargerPrice(@PathVariable UUID chargerId, @RequestBody double price) {
+        return chargerService.updateChargerPrice(chargerId, price);
     }
 }

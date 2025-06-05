@@ -34,6 +34,7 @@ public class ReservationService {
     }
 
     public Reservation createReservation(Reservation reservation) {
+
         LocalDateTime now = LocalDateTime.now();
 
         if (reservation.getStartTimestamp().isBefore(now) || reservation.getEndTimestamp().isBefore(now)) {

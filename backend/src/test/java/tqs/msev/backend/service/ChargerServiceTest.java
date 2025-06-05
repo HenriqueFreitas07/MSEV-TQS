@@ -10,12 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import tqs.msev.backend.entity.ChargeSession;
 import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
-import tqs.msev.backend.repository.ChargeSessionRepository;
-import tqs.msev.backend.repository.ChargerRepository;
+import tqs.msev.backend.repository.*;
 import tqs.msev.backend.entity.Charger;
-import tqs.msev.backend.repository.ReservationRepository;
-import tqs.msev.backend.repository.UserRepository;
-import tqs.msev.backend.repository.StationRepository;
 
 import tqs.msev.backend.entity.Station;
 
@@ -28,11 +24,12 @@ import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChargerServiceTest {
-    @Mock
-    private ReservationRepository reservationRepository;
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ReservationRepository reservationRepository;
 
     @Mock
     private ChargeSessionRepository chargeSessionRepository;
@@ -290,6 +287,7 @@ class ChargerServiceTest {
 
         verify(chargeSessionRepository, times(1)).save(Mockito.any());
         verify(chargerRepository, times(1)).save(Mockito.any());
+
     }
 
     @Test
@@ -393,5 +391,150 @@ class ChargerServiceTest {
         assertThat(sessions).hasSize(1);
 
         verify(chargeSessionRepository, times(1)).findAllByUserId(id);
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetChargeSessionByChargerId_thenReturnChargeSession() {
+        UUID id = UUID.randomUUID();
+
+        Charger charger = Charger.builder()
+                .chargingSpeed(3.0)
+                .build();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .chargingSpeed(7.0)
+                .consumption(3.0)
+                .charger(charger)
+                .build();
+
+        when(chargeSessionRepository.findByChargerIdAndEndTimestamp(id, null)).thenReturn(session1);
+
+        ChargeSession session = chargerService.getChargeSessionByChargerId(id);
+
+        assertThat(session).isEqualTo(session1);
+
+        verify(chargeSessionRepository, times(1)).findByChargerIdAndEndTimestamp(id, null);
+    }
+
+    @Test
+    @Requirement("MSEV-20")
+    void whenGetChargeSessionByChargerId_WithNoChargerSession_thenReturnChargeSession() {
+        UUID id = UUID.randomUUID();
+
+        when(chargeSessionRepository.findByChargerIdAndEndTimestamp(id, null)).thenReturn(null);
+
+        ChargeSession session = chargerService.getChargeSessionByChargerId(id);
+
+        assertThat(session).isNull();
+
+        verify(chargeSessionRepository, times(1)).findByChargerIdAndEndTimestamp(id, null);
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    void whenUpdateChargerPrice_thenReturnUpdatedCharger() {
+        UUID chargerId = UUID.randomUUID();
+        double newPrice = 0.7;
+
+        Charger mockCharger = new Charger();
+        mockCharger.setId(chargerId);
+        mockCharger.setPrice(newPrice);
+
+        when(chargerRepository.findById(chargerId)).thenReturn(Optional.of(mockCharger));
+        when(chargerRepository.save(Mockito.any(Charger.class))).thenReturn(mockCharger);
+
+        Charger updatedCharger = chargerService.updateChargerPrice(chargerId, newPrice);
+
+        assertEquals(mockCharger, updatedCharger);
+        assertEquals(newPrice, updatedCharger.getPrice());
+    }
+    
+    @Test
+    @Requirement("MSEV-25")
+    void whenUpdateChargerWithInvalidPrice_thenThrowException() {
+        UUID chargerId = UUID.randomUUID();
+        double invalidPrice = -1.0;
+
+        Charger mockCharger = new Charger();
+        mockCharger.setId(chargerId);
+        
+        when(chargerRepository.findById(chargerId)).thenReturn(Optional.of(mockCharger));
+
+        assertThatThrownBy(() -> chargerService.updateChargerPrice(chargerId, invalidPrice))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Price must be non-negative");
+
+        verify(chargerRepository, never()).save(Mockito.any(Charger.class));
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    void whenUpdateChargerThatDoesNotExist_thenThrowException() {
+        UUID chargerId = UUID.randomUUID();
+        double newPrice = 0.7;
+        when(chargerRepository.findById(chargerId)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> chargerService.updateChargerPrice(chargerId, newPrice))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessageContaining("Charger not found");
+        verify(chargerRepository, never()).save(Mockito.any(Charger.class));
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    void whenGetChargeSessionsByCharger_thenReturnChargeSessions() {
+        UUID chargerId = UUID.randomUUID();
+        ChargeSession session1 = ChargeSession.builder()
+                .id(UUID.randomUUID())
+                .charger(Charger.builder().id(chargerId).build())
+                .startTimestamp(LocalDateTime.now())
+                .endTimestamp(LocalDateTime.now().plusMinutes(30))      
+                .build();
+        ChargeSession session2 = ChargeSession.builder()
+                .id(UUID.randomUUID())               
+                .charger(Charger.builder().id(chargerId).build())
+                .startTimestamp(LocalDateTime.now().minusMinutes(60))
+                .endTimestamp(null)
+                .build();
+        when(chargeSessionRepository.findAllByChargerId(chargerId)).thenReturn(List.of(session1, session2));
+        List<ChargeSession> sessions = chargerService.getChargeSessionsByCharger(chargerId);
+        assertThat(sessions).hasSize(1)
+                .contains(session1);
+        verify(chargeSessionRepository, times(1)).findAllByChargerId(chargerId);
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    void whenGetStationStats_thenReturnStats() {
+        UUID stationId = UUID.randomUUID();
+        Charger charger1 = Charger.builder().id(UUID.randomUUID()).station(Station.builder().id(stationId).build()).build();
+        Charger charger2 = Charger.builder().id(UUID.randomUUID()).station(Station.builder().id(stationId).build()).build();
+        
+        ChargeSession session1 = ChargeSession.builder().charger(charger1).startTimestamp(LocalDateTime.now().minusHours(1)).endTimestamp(LocalDateTime.now()).build();
+        ChargeSession session2 = ChargeSession.builder().charger(charger2).startTimestamp(LocalDateTime.now().minusHours(2)).endTimestamp(LocalDateTime.now().minusHours(1)).build();
+        
+        when(chargerRepository.findByStationId(stationId)).thenReturn(List.of(charger1, charger2));
+        when(chargeSessionRepository.findAllByChargerId(charger1.getId())).thenReturn(List.of(session1));
+        when(chargeSessionRepository.findAllByChargerId(charger2.getId())).thenReturn(List.of(session2));
+        
+        List<ChargeSession> stats = chargerService.getStationStats(stationId);
+        
+        assertThat(stats).hasSize(2)
+                .contains(session1, session2);
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    void whenGetStationStatsWithNoChargers_thenThrowException() {
+        UUID stationId = UUID.randomUUID();
+        
+        when(chargerRepository.findByStationId(stationId)).thenReturn(List.of());
+        
+        assertThatThrownBy(() -> chargerService.getStationStats(stationId))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessageContaining("No chargers found for this station");
+        
+        verify(chargeSessionRepository, never()).findAllByChargerId(Mockito.any());
     }
 }
