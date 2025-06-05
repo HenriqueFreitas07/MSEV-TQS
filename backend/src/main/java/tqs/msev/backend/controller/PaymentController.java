@@ -22,7 +22,6 @@ public class PaymentController {
 
     public PaymentController(@Value("${stripe.api.key}") String stripeApiKey, PaymentService paymentService) {
         Stripe.apiKey = stripeApiKey;
-        System.out.println("Stripe API Key set to: " + stripeApiKey);
         this.paymentService = paymentService;
     }
     
