@@ -42,14 +42,14 @@ jobs:
       - name: Build and push Docker image (Frontend)
         id: push_front
         uses: docker/build-push-action@v5
-        env:
-          VITE_BACKEND_URL: ${{ vars.STAGING_VM }}/api
-          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:staging
+          build-args: |
+            VITE_BACKEND_URL=${{ vars.STAGING_VM }}/api
+            VITE_GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
 
   pull_image_vm:
     name: Pull staging images
