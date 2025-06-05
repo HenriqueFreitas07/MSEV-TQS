@@ -57,7 +57,7 @@ export function ChargeSessionCard({ session, endSession }: Props) {
   }
 
   useEffect(() => {
-    if(session.endTimestamp==null)
+    if(session.endTimestamp==null) 
     {
       addPoints()
     }
@@ -78,12 +78,12 @@ export function ChargeSessionCard({ session, endSession }: Props) {
       }
       <p>{session.endTimestamp === null ? "Estimated " : ""}Price: {session.consumption * session.charger.price} €</p>
 
-      <div className="w-full p-2 min-h-[100px]">
+      <div className="w-full p-2 min-h-[300px]">
         {data !== null && <LineChart options={options} data={data} />}
       </div>
 
       {
-        session.endTimestamp === null && (
+        session.endTimestamp === null  && (
           <button className="btn btn-primary" onClick={() => handleLockCharger(session.charger.id)}>
             Lock Charger
           </button>
