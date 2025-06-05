@@ -49,6 +49,7 @@ jobs:
   #         tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:staging
 
   pull_image_vm:
+    name: Pull staging images
     # needs: build-and-push-image
     runs-on: self-hosted
 
@@ -72,6 +73,7 @@ jobs:
           docker-compose up -d 
 
   run_tests:
+    name: "Run all tests"
     runs-on: self-hosted
     needs: [pull_image_vm]
 
@@ -111,6 +113,7 @@ jobs:
         run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} xray:import-results  
 
   dispose_staging:
+    name: "Dispose staging containers"
     runs-on: self-hosted
     needs: [pull_image_vm, run_tests]
     steps:
