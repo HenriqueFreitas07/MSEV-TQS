@@ -52,6 +52,7 @@ public class ChargerController {
 
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PatchMapping("/{chargerId}/disable")
+    @Operation(summary = "Disables a charger")
     public void disableCharger(@PathVariable UUID chargerId) {
         Charger charger = chargerService.getChargerById(chargerId);
         chargerService.disableCharger(charger);
@@ -59,6 +60,7 @@ public class ChargerController {
 
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PatchMapping("/{chargerId}/enable")
+    @Operation(summary = "Enables a charger")
     public void enableCharger(@PathVariable UUID chargerId) {
         Charger charger = chargerService.getChargerById(chargerId);
         chargerService.enableCharger(charger);
@@ -66,6 +68,7 @@ public class ChargerController {
 
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PatchMapping("/{chargerId}")
+    @Operation(summary = "Update a charger status")
     public void updateChargerStatus(@PathVariable UUID chargerId, @Valid @RequestBody UpdateChargerStatusDTO dto) {
         chargerService.updateChargerStatus(chargerId, dto.getStatus());
     }
@@ -98,6 +101,7 @@ public class ChargerController {
 
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @PatchMapping("/{chargerId}/update")
+    @Operation(summary = "Updates the charging price of a charger")
     public Charger updateChargerPrice(@PathVariable UUID chargerId, @RequestBody UpdateChargerPriceDTO dto) {
         return chargerService.updateChargerPrice(chargerId, dto.getPrice());
     }
