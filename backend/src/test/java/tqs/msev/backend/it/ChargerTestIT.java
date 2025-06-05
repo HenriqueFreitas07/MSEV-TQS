@@ -375,4 +375,72 @@ class ChargerTestIT {
         mockMvc.perform(post("/api/v1/chargers").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(charger)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @Requirement("MSEV-25")
+    @WithUserDetails("test_operator")
+    void whenUpdateChargerPrice_thenReturnUpdatedCharger() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        UUID chargerId = charger.getId();
+        
+        mockMvc.perform(put("/api/v1/chargers/{chargerId}/update", chargerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("0.7")
+                .with(csrf()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(chargerId.toString()))
+            .andExpect(jsonPath("$.price").value(0.7));
+    }
+
+    @Test
+    @Requirement("MSEV-25")
+    @WithUserDetails("test_operator")
+    void whenUpdateChargerPriceWithInvalidData_thenReturnBadRequest() throws Exception {
+        Station station = new Station();
+        station.setName("Test Station");
+        station.setLongitude(-74.0060);
+        station.setLatitude(40.7128);
+        station.setAddress("Idk St.");
+        station.setStatus(Station.StationStatus.ENABLED);
+
+        station = stationRepository.save(station);
+        stationRepository.flush();
+
+        Charger charger = Charger.builder()
+                .station(station)
+                .connectorType("Type 2")
+                .price(0.5)
+                .chargingSpeed(22)
+                .status(Charger.ChargerStatus.AVAILABLE)
+                .build();
+
+        charger = chargerRepository.save(charger);
+        chargerRepository.flush();
+        UUID chargerId = charger.getId();
+        
+        mockMvc.perform(put("/api/v1/chargers/{chargerId}/update", chargerId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("-1.0")
+                .with(csrf()))
+            .andExpect(status().isBadRequest());
+    }
 }

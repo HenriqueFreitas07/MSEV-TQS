@@ -11,6 +11,7 @@ import tqs.msev.backend.repository.UserRepository;
 import tqs.msev.backend.repository.StationRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -137,6 +138,46 @@ public class ChargerService {
             return sessions.stream().filter(s -> s.getEndTimestamp() == null).toList();
         }
 
+        return sessions;
+    }
+
+    public Charger updateChargerPrice(UUID chargerId, double price) {
+        Charger existingCharger = getChargerById(chargerId);
+        if (price < 0) {
+            throw new IllegalArgumentException("Price must be non-negative");
+        }
+        existingCharger.setPrice(price);
+        return chargerRepository.save(existingCharger);
+    }
+    
+    public List<ChargeSession> getChargeSessionsByCharger(UUID chargerId) {
+        List<ChargeSession> sessions = chargeSessionRepository.findAllByChargerId(chargerId);
+        if (sessions.isEmpty()) {
+            throw new NoSuchElementException("No charge sessions found for this charger");
+        }
+        
+        return sessions.stream()
+                .filter(session -> session.getEndTimestamp() != null)
+                .toList();
+    }
+
+
+    public List<ChargeSession> getStationStats(UUID stationId) {
+        List<Charger> chargers = chargerRepository.findByStationId(stationId);
+        if (chargers.isEmpty()) {
+            throw new NoSuchElementException("No chargers found for this station");
+        }
+
+        List<ChargeSession> sessions = new ArrayList<>();
+        for (Charger charger : chargers) {
+            List<ChargeSession> chargerSessions = chargeSessionRepository.findAllByChargerId(charger.getId());
+            sessions.addAll(chargerSessions.stream()
+                    .filter(session -> session.getEndTimestamp() != null)
+                    .toList());
+        }
+        if (sessions.isEmpty()) {
+            throw new NoSuchElementException("No charge sessions found for this station");
+        }
         return sessions;
     }
 }
