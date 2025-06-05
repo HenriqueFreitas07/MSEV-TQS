@@ -1,33 +1,71 @@
+name: "Deploy CD"
 on:
   push:
     branches:
       - main  
 
 jobs:
-  deploy:
-    runs-on: self-hosted 
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Setup SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
-          chmod 644 ~/.ssh/known_hosts
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Deploy via SSH
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
-          cd MSEV-TQS 
-          git restore .
-          git checkout main
-          git pull origin main
-          chmod +x deploy.sh
-          ./deploy.sh
-          EOF
+      - name: Build and push Docker image (Backend)
+        id: push_back
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ghcr.io/henriquefreitas07/msev-tqs_backend:staging
+
+      - name: Build and push Docker image (Frontend)
+        id: push_front
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:staging
+          build-args: |
+            VITE_BACKEND_URL=${{ vars.STAGING_VM }}/api
+            VITE_GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
+
+    pull_image_vm:
+      name: Pull staging images
+      # needs: build-and-push-image
+      runs-on: self-hosted
+
+      steps:
+        - name: Setup SSH
+          env:
+            SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
+          run: |
+            mkdir -p ~/.ssh
+            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
+
+        - name: "Pull Images"
+          run: |
+            cd ~/deploy
+            docker compose pull
+            docker compose down
+            docker compose up -d 
 

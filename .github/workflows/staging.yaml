@@ -1,0 +1,139 @@
+name: Staging Action
+
+on:
+  push:
+    branches: ['dev']
+
+  pull_request:
+    branches: [ 'main', 'dev' ]
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image (Backend)
+        id: push_back
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ghcr.io/henriquefreitas07/msev-tqs_backend:staging
+
+      - name: Build and push Docker image (Frontend)
+        id: push_front
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:staging
+          build-args: |
+            VITE_BACKEND_URL=${{ vars.STAGING_VM }}/api/v1
+            VITE_GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
+
+  pull_image_vm:
+    name: Pull staging images
+    needs: build-and-push-image
+    runs-on: self-hosted
+
+    steps:
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
+
+      - name: "Pull Images"
+        run: |
+          cd ~/staging
+          docker compose pull
+          docker compose down
+          docker compose up -d 
+
+  run_tests:
+    name: "Run all tests"
+    runs-on: self-hosted
+    needs: [pull_image_vm]
+
+    continue-on-error: true
+
+    env:
+      GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
+      STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run integration tests
+        working-directory: backend
+        run: mvn verify -DwebUrl=${{ vars.STAGING_VM }} --file pom.xml
+
+      - name: Check test result file exists and is valid
+        working-directory: backend
+        run: |
+          ls -l ./reports
+          cat ./reports/TEST-*.xml || true
+
+      - name: Push results to Xray on Jira Cloud
+        if: always()
+        working-directory: backend
+        env:
+          XRAYCLOUD_CLIENT_ID: ${{ secrets.CLIENT_ID_XRAY }}
+          XRAYCLOUD_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_XRAY }}
+        run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} xray:import-results  
+
+  dispose_staging:
+    name: "Dispose staging containers"
+    runs-on: self-hosted
+    needs: [pull_image_vm, run_tests]
+    steps:
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
+
+      - name: "Remove containers"
+        run: |
+          cd ~/staging
+          docker compose down

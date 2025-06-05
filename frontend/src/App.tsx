@@ -1,34 +1,62 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router";
+import Home from "./pages/Home";
+import "./index.css"
+import NotFound from "./pages/NotFound";
+import Stations from "./pages/StationDiscovery";
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/auth";
+import Signup from "./pages/Signup";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import StationDetails from "./pages/StationDetails";
+
+import Reserve from "./pages/Reserve";
+import UserReserves from "./pages/UserReserves";
+
+import Dashboard from "./pages/dashboard/Dashboard";
+import StationDetailsDashboard from "./pages/dashboard/StationDetailsDashboard";
+import ChargeSessions from "./pages/ChargeSessions";
+
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    children: [
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "signup", element: <Signup /> },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "stations", element: <Stations /> },
+          { path: "stations/:postId", element: <StationDetails /> },
+          { path: "reserve/:postId", element: <Reserve />},
+          { path: "my-reserves", element: <UserReserves />},
+          { path: "charge-sessions", element: <ChargeSessions /> },
+        ]
+      },
+      {
+        element: <ProtectedRoute operatorOnly />,
+        children: [
+          { path: "dashboard", element: <Dashboard /> },
+          { path: "dashboard/stations/:stationId", element: <StationDetailsDashboard /> }
+        ]
+      },
+      {
+        path: "/*",
+        element: <NotFound />
+      },
+    ]
+  }
+]);
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
 }
 
