@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import tqs.msev.backend.dto.UpdateChargerStatusDTO;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
 
@@ -57,6 +58,13 @@ public class ChargerController {
         Charger charger = chargerService.getChargerById(chargerId);
         chargerService.enableCharger(charger);
     }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PatchMapping("/{chargerId}")
+    public void updateChargerStatus(@PathVariable UUID chargerId, @Valid @RequestBody UpdateChargerStatusDTO dto) {
+        chargerService.updateChargerStatus(chargerId, dto.getStatus());
+    }
+
     @PatchMapping("/{chargerId}/unlock")
     public void unlockCharger(@PathVariable UUID chargerId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -78,5 +86,11 @@ public class ChargerController {
     @ResponseStatus(HttpStatus.CREATED)
     public Charger createCharger(@Valid @RequestBody Charger charger) {
         return chargerService.createCharger(charger);
+    }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PutMapping("/{chargerId}/update")
+    public Charger updateChargerPrice(@PathVariable UUID chargerId, @RequestBody double price) {
+        return chargerService.updateChargerPrice(chargerId, price);
     }
 }

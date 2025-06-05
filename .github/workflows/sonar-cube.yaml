@@ -19,6 +19,7 @@ jobs:
         working-directory: ./backend
     env:
       GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
+      STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
         with:

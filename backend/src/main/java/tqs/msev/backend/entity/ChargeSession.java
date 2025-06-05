@@ -25,9 +25,13 @@ public class ChargeSession {
 
     private LocalDateTime endTimestamp;
 
-    private int consumption;
+    @Builder.Default
+    @Column(nullable = false)
+    private double consumption = 7.0;
 
-    private int chargingSpeed;
+    @Builder.Default
+    @Column(nullable = false)
+    private double chargingSpeed= 3.2;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
