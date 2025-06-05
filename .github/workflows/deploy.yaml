@@ -44,7 +44,7 @@ jobs:
           push: true
           tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:prod
           build-args: |
-            VITE_BACKEND_URL=${{ vars.STAGING_VM }}/api/v1
+            VITE_BACKEND_URL=${{ vars.DEPLOY_VM }}/api/v1
             VITE_GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
 
   pull_image_vm:
