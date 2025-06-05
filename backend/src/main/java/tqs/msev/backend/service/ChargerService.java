@@ -142,17 +142,18 @@ public class ChargerService {
     }
 
     public ChargeSession getChargeSessionByChargerId(UUID chargerId) {
-        ChargeSession chargeSession =  chargeSessionRepository.findByChargerIdAndEndTimestamp(chargerId, null);
-        if (chargeSession != null && chargeSession.getCharger() != null ) {
+        ChargeSession chargeSession = chargeSessionRepository.findByChargerIdAndEndTimestamp(chargerId, null);
+        if (chargeSession != null && chargeSession.getCharger() != null) {
             double randomDouble = random.nextDouble();
             chargeSession.setConsumption(randomDouble * chargeSession.getConsumption() + chargeSession.getConsumption());
-            chargeSession.setChargingSpeed(randomDouble + chargeSession.getCharger().getChargingSpeed() -0.5);
+            chargeSession.setChargingSpeed(randomDouble + chargeSession.getCharger().getChargingSpeed() - 0.5);
 
             chargeSessionRepository.saveAndFlush(chargeSession);
             return chargeSession;
         }
 
         return null;
+    }
         
     public Charger updateChargerPrice(UUID chargerId, double price) {
         Charger existingCharger = getChargerById(chargerId);
