@@ -402,7 +402,7 @@ class ChargerTestIT {
         chargerRepository.flush();
         UUID chargerId = charger.getId();
         
-        mockMvc.perform(put("/api/v1/chargers/{chargerId}/update", chargerId)
+        mockMvc.perform(patch("/api/v1/chargers/{chargerId}/update", chargerId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("0.7")
                 .with(csrf()))
@@ -437,7 +437,7 @@ class ChargerTestIT {
         chargerRepository.flush();
         UUID chargerId = charger.getId();
         
-        mockMvc.perform(put("/api/v1/chargers/{chargerId}/update", chargerId)
+        mockMvc.perform(patch("/api/v1/chargers/{chargerId}/update", chargerId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("-1.0")
                 .with(csrf()))

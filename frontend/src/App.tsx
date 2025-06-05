@@ -35,6 +35,7 @@ const router = createBrowserRouter([
           { path: "reserve/:postId", element: <Reserve />},
           { path: "my-reserves", element: <UserReserves />},
           { path: "charge-sessions", element: <ChargeSessions /> },
+
         ]
       },
       {
