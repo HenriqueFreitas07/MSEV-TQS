@@ -430,7 +430,8 @@ class ChargerServiceTest {
         assertThat(session).isNull();
 
         verify(chargeSessionRepository, times(1)).findByChargerIdAndEndTimestamp(id, null);
-
+    }
+    
     @Test
     @Requirement("MSEV-25")
     void whenUpdateChargerPrice_thenReturnUpdatedCharger() {

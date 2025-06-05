@@ -76,6 +76,7 @@ class ChargeSessionControllerTest {
         mockMvc.perform(get("/api/v1/charge-sessions/{chargerId}/statistics", chargerId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty());
+    }
 
     @WithUserDetails("test_operator")
     @Test
