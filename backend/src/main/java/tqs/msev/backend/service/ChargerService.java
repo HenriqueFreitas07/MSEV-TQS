@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import tqs.msev.backend.entity.ChargeSession;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
+import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.ChargeSessionRepository;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.ReservationRepository;
@@ -138,5 +139,14 @@ public class ChargerService {
         }
 
         return sessions;
+    }
+
+    public void updateChargerStatus(UUID chargerId, Charger.ChargerStatus status) {
+        Charger charger = chargerRepository.findById(chargerId).orElseThrow(() -> new NoSuchElementException("Invalid charger id"));
+        if (charger.getStation().getStatus() == Station.StationStatus.DISABLED && (status == Charger.ChargerStatus.AVAILABLE ||status == Charger.ChargerStatus.IN_USE) ) {
+            throw new IllegalStateException("Station is disabled");
+        }
+        charger.setStatus(status);
+        chargerRepository.save(charger);
     }
 }
