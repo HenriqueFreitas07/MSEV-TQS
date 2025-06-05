@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface ChargeSessionRepository extends JpaRepository<ChargeSession, UUID> {
     ChargeSession findByChargerIdAndEndTimestamp(UUID chargerId, LocalDateTime endTimestamp);
     List<ChargeSession> findAllByUserId(UUID userId);
+    List<ChargeSession> findAllByChargerId(UUID chargerId);
 }
