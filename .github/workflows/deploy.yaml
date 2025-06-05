@@ -31,7 +31,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ghcr.io/henriquefreitas07/msev-tqs_backend:staging
+          tags: ghcr.io/henriquefreitas07/msev-tqs_backend:prod
 
       - name: Build and push Docker image (Frontend)
         id: push_front
@@ -40,32 +40,32 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:staging
+          tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:prod
           build-args: |
-            VITE_BACKEND_URL=${{ vars.STAGING_VM }}/api
+            VITE_BACKEND_URL=${{ vars.STAGING_VM }}/api/v1
             VITE_GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
 
-    pull_image_vm:
-      name: Pull staging images
-      # needs: build-and-push-image
-      runs-on: self-hosted
+  pull_image_vm:
+    name: Pull staging images
+    needs: build-and-push-image
+    runs-on: self-hosted
 
-      steps:
-        - name: Setup SSH
-          env:
-            SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
-          run: |
-            mkdir -p ~/.ssh
-            echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
-            chmod 644 ~/.ssh/known_hosts
-            ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
+    steps:
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
 
-        - name: "Pull Images"
-          run: |
-            cd ~/deploy
-            docker compose pull
-            docker compose down
-            docker compose up -d 
+      - name: "Pull Images"
+        run: |
+          cd ~/deploy
+          docker compose pull
+          docker compose down
+          docker compose up -d 
 
