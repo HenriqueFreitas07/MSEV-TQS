@@ -67,7 +67,7 @@ function Reserve() {
       setReservations(reservationsResponse);
     }
     fetchData();
-  }, [setReservations]);
+  }, []);
 
   const handleReserve = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -192,7 +192,7 @@ function Reserve() {
             </div>
           </div>
           <div>
-            <button className="btn btn-lg w-full bg-green-600 text-white" onClick={() => { modalRef.current?.showModal(); concat(); }}>Reserve now</button>
+            <button className="btn btn-lg w-full bg-green-600 text-white" onClick={() => { modalRef.current?.showModal(); concat(); }} data-testid="reserve-now-btn">Reserve now</button>
           </div>
         </div>
         <dialog className="modal" ref={modalRef}>
@@ -215,7 +215,7 @@ function Reserve() {
                     <tbody>
                       {
                         slots.map((reservation, i) => (
-                          <tr key={i}>
+                          <tr key={i} data-testid="tr-timeslot">
                             <th>{reservation.date}</th>
                             <td>{reservation.slots.start}</td>
                             <td>{reservation.slots.end}</td>
@@ -226,7 +226,7 @@ function Reserve() {
                   </table>
                   <div className="justify-center items-center mt-3">
                     <form>
-                      <button className="btn btn-md  bg-green-600 text-white" onClick={(e) => handleReserve(e)}>Confirm Reserve</button>
+                      <button className="btn btn-md  bg-green-600 text-white" onClick={(e) => handleReserve(e)} data-testid="confirm-reservation-btn">Confirm Reserve</button>
                     </form>
                   </div>
                 </div>
@@ -268,11 +268,11 @@ function Reserve() {
 
                             ) ?
                               <button key={idx} className={`btn btn-sm w-full ${car.some(item => item.date === day.date && item.slots.start === slot.start && item.slots.end === slot.end) ? "bg-red-400" : "bg-blue-400"}`}
-                                onClick={() => addToCar(slot, day.date)}>
+                                onClick={() => addToCar(slot, day.date)} data-testid="timeslot">
                                 {slot.start} - {slot.end}
                               </button>
                               :
-                              <button className="btn btn-sm w-full bg-gray-400">
+                              <button className="btn btn-sm w-full bg-gray-400" data-testid="gray-timeslot">
                                 {slot.start} - {slot.end}
                               </button>
                             }

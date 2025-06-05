@@ -27,7 +27,7 @@ export function StationCard({ station, onClick, onUpdate }: Props) {
   }, [station]);
 
   return (
-    <div className={`border rounded-md flex flex-col justify-center cursor-pointer bg-base-200 hover:scale-105 duration-75 shadow-xs ${chargersOutOfOrder > 0 ? "border-red-400 shadow-red-600" : "border-zinc-400"}`} >
+    <div className={`border rounded-md flex flex-col justify-center cursor-pointer bg-base-200 hover:scale-105 duration-75 shadow-xs ${chargersOutOfOrder > 0 ? "border-red-400 shadow-red-600" : "border-zinc-400"}`} data-testid="station-card">
       <div className="h-3/4 p-6 " onClick={onClick}>
         <span onClick={onClick}><strong>Name:</strong> {station.name}</span><br />
         <span onClick={onClick}><strong>Address:</strong> {station.address}</span><br />
