@@ -129,7 +129,11 @@ function StationDetails() {
                         <button className="btn btn-info flex-1" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }}>Availability</button>
                         <button className="btn btn-primary flex-1" onClick={() => handleUnlockCharger(charger.id)} disabled={!canUnlockCharger(charger.id, charger.status)}>Unlock</button>
                       </div>
-                      <button className="btn btn-success w-full" onClick={() => { navigate(`/reserve/${charger.id}`) }}>Reserve now</button>
+                      {charger.status === "AVAILABLE" || charger.status === "IN_USE" ?
+                        <button className="btn btn-success w-full" onClick={() => { navigate(`/reserve/${charger.id}`) }}>Reserve now</button>
+                        :
+                        <></>
+                      }
                     </div>
                   </div>
                 </div>
