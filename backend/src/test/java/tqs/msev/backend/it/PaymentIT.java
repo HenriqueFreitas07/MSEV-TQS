@@ -69,7 +69,7 @@ class PaymentIT {
         
         String paymentRequestJson = "{ \"amount\": 1000, \"currency\": \"USD\", \"paymentMethod\": \"pm_card_visa\" }";
 
-        mockMvc.perform(post("/api/payments")
+        mockMvc.perform(post("/api/v1/payments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(paymentRequestJson)
                 .with(csrf()))
@@ -84,7 +84,7 @@ class PaymentIT {
         
         String paymentRequestJson = "{ \"amount\": 1000, \"currency\": \"USD\", \"paymentMethod\": \"pm_card_chargeCustomerFail\" }";
 
-        mockMvc.perform(post("/api/payments")
+        mockMvc.perform(post("/api/v1/payments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(paymentRequestJson)
                 .with(csrf()))
