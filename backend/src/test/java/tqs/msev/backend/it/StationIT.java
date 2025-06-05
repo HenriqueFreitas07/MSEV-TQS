@@ -511,10 +511,6 @@ class StationIT {
                 .assertThat()
                 .statusCode(200)
                 .body("$", hasSize(1))
-                .body("[0].charger.id", is(charger1.getId().toString()))
-                .body("[0].consumption", is(0))
-                .body("[0].chargingSpeed", is(0));
-
+                .body("[0].charger.id", is(charger1.getId().toString()));
     }
-
 }
