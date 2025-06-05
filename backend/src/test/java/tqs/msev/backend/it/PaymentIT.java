@@ -2,44 +2,34 @@ package tqs.msev.backend.it;
 
 
 import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
-import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import tqs.msev.backend.configuration.TestDatabaseConfig;
-import tqs.msev.backend.entity.Charger;
-import tqs.msev.backend.repository.ChargerRepository;
-import tqs.msev.backend.repository.StationRepository;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-import tqs.msev.backend.entity.Station;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import tqs.msev.backend.repository.UserRepository;
-import tqs.msev.backend.repository.ReservationRepository;
-import tqs.msev.backend.entity.Reservation;
 import tqs.msev.backend.entity.User;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(TestDatabaseConfig.class)
-public class PaymentIT {
+class PaymentIT {
 
 
     @Autowired
