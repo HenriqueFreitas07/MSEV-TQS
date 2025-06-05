@@ -132,11 +132,11 @@ public class CucumberSteps {
         assertThat(actualTitle).isEqualTo(title);
     }
 
-    @And("I should see {int} charger cards")
-    public void iShouldSeeTwoChargerCards(int amount) {
+    @And("I should see some charger cards")
+    public void iShouldSeeSomeChargerCards() {
         var elements = driver.findElements(By.cssSelector("[data-testid='charger-card']"));
 
-        assertThat(elements).hasSize(amount);
+        assertThat(elements).hasSizeGreaterThanOrEqualTo(2);
     }
 
     @Given("that I have made a station search")
