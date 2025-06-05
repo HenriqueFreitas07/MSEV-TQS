@@ -5,7 +5,7 @@ on:
     branches: ['dev']
 
   pull_request:
-    branches: ['dev']
+    branches: [ 'main', 'dev' ]
 
 env:
   REGISTRY: ghcr.io
@@ -61,7 +61,44 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      - name: "Selenium Tests"
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        working-directory: backend
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run integration tests
+        working-directory: backend
+        run: mvn verify -DwebUrl=${{ vars.STAGING_VM }} --file pom.xml
+
+      - name: Check test result file exists and is valid
+        working-directory: backend
         run: |
-          cd backend
-          mvn test -Dtest=CucumberTest
+          ls -l ./reports
+          cat ./reports/TEST-*.xml || true
+
+      - name: Add code coverage information to PR
+        working-directory: backend
+        id: jacoco-pr
+        uses: madrapps/jacoco-report@v1.7.1
+        if: github.event_name == 'pull_request'
+        with:
+          paths: |
+            ${{ github.workspace }}/**/target/site/jacoco-merged-test-coverage-report/jacoco.xml 
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 80
+          min-coverage-changed-files: 80
+      - name: Push results to Xray on Jira Cloud
+        if: always()
+        working-directory: backend
+        env:
+          XRAYCLOUD_CLIENT_ID: ${{ secrets.CLIENT_ID_XRAY }}
+          XRAYCLOUD_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_XRAY }}
+        run: mvn -Dxray.clientId=${{ env.XRAYCLOUD_CLIENT_ID }} -Dxray.clientSecret=${{ env.XRAYCLOUD_CLIENT_SECRET }} xray:import-results  
+
+      - name: "Pull Images"
+        run: |
+          cd ~/staging
+          docker-compose down
