@@ -63,8 +63,8 @@ jobs:
       
       - name: Set up JDK
         uses: actions/setup-java@v4
-        working-directory: backend
         with:
+          working-directory: ./backend
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: maven
@@ -80,11 +80,11 @@ jobs:
           cat ./reports/TEST-*.xml || true
 
       - name: Add code coverage information to PR
-        working-directory: backend
         id: jacoco-pr
         uses: madrapps/jacoco-report@v1.7.1
         if: github.event_name == 'pull_request'
         with:
+          working-directory: backend
           paths: |
             ${{ github.workspace }}/**/target/site/jacoco-merged-test-coverage-report/jacoco.xml 
           token: ${{ secrets.GITHUB_TOKEN }}
