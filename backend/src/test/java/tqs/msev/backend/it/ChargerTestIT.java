@@ -318,7 +318,7 @@ class ChargerTestIT {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     @WithUserDetails("test_operator")
     void whenCreateCharger_thenReturnCreatedCharger() throws Exception {
         Station station = new Station();
@@ -350,7 +350,7 @@ class ChargerTestIT {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     @WithUserDetails("test_operator")
     void whenCreateChargerWithInvalidData_thenReturnBadRequest() throws Exception {
         Station station = new Station();

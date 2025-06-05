@@ -281,7 +281,7 @@ class StationIT {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void whenCreateStation_thenReturnCreatedStation() {
         Station station = new Station();
         station.setName("New Station");
@@ -305,7 +305,7 @@ class StationIT {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void whenCreateStationWithInvalidData_thenReturnBadRequest() {
         Station station = new Station();
         station.setName("");

@@ -168,7 +168,7 @@ class ChargerControllerTest {
     
     @Test
     @WithUserDetails("test_operator")
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void whenCreateInvalidCharger_thenReturnBadRequest() throws Exception {
         Charger invalidCharger = new Charger();
         invalidCharger.setConnectorType("INVALID_TYPE");
