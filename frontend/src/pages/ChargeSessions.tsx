@@ -26,23 +26,27 @@ export default function ChargeSessions() {
   }
 
   return (
-    <NavLayout title="MSEV" footer={false}>
-      <div className="p-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold mb-2">Charge Sessions</h2>
-          <div className="flex items-center justify-center gap-2">
-            <p>Active Sessions Only:</p>
-            <input type="checkbox" checked={activeOnly} onChange={() => setActiveOnly(prev => !prev)} className="toggle toggle-primary" />
-          </div>
-        </div>
-        <hr />
+    <>
 
-        <div className="grid lg:grid-cols-5 md:grid-cols-3 grid-cols-2 gap-4 mt-6">
-          {
-            sessions.filter(s => !activeOnly || s.endTimestamp === null).map(s => <ChargeSessionCard key={s.id} session={s} endSession={() => endSession(s.id)} />)
-          }
+      <NavLayout title="MSEV" footer={false}>
+        <div className="p-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold mb-2">Charge Sessions</h2>
+            <div className="flex items-center justify-center gap-2">
+              <p>Active Sessions Only:</p>
+              <input type="checkbox" checked={activeOnly} onChange={() => setActiveOnly(prev => !prev)} className="toggle toggle-primary" />
+            </div>
+          </div>
+          <hr />
+
+          <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-4 mt-6">
+            {
+              sessions.filter(s => !activeOnly || s.endTimestamp === null).map(s => <ChargeSessionCard key={s.id} session={s} endSession={() => endSession(s.id)} />)
+            }
+          </div>
+
         </div>
-      </div>
-    </NavLayout>
+      </NavLayout>
+    </>
   )
 }
