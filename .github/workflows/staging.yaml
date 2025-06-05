@@ -51,7 +51,22 @@ jobs:
   pull_image_vm:
     needs: build-and-push-image
     runs-on: self-hosted
+    env:
+      GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
+      STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
+
     steps:
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_VM_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H deti-tqs-22.ua.pt >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no hfreitas07@deti-tqs-22.ua.pt << 'EOF'
+
       - name: "Pull Images"
         run: |
           cd ~/staging
