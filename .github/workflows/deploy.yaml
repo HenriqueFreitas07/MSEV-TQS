@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main  
+env:
+  REGISTRY: ghcr.io
 
 jobs:
   build-and-push-image:
