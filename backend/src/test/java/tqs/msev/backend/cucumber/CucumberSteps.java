@@ -7,6 +7,7 @@ import io.cucumber.java.en.When;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -16,8 +17,17 @@ import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CucumberSteps {
-    private final WebDriver driver = new ChromeDriver();
-    private final Wait<WebDriver> wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+    private final WebDriver driver;
+    private final Wait<WebDriver> wait;
+
+    public CucumberSteps() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless=new");
+
+        driver = new ChromeDriver(options);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(2));
+    }
 
     private final String webUrl = System.getProperty("webUrl");
 
