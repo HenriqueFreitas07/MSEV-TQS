@@ -198,7 +198,7 @@ class ChargerControllerTest {
        
         
         mockMvc.perform(
-            put("/api/v1/chargers/{chargerId}/update", chargerId)
+            patch("/api/v1/chargers/{chargerId}/update", chargerId)
                 .contentType("application/json")
                 .content("0.7")
                 .with(csrf()
