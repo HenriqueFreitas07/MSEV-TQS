@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import tqs.msev.backend.dto.UpdateChargerPriceDTO;
 import tqs.msev.backend.dto.UpdateChargerStatusDTO;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
@@ -89,8 +90,8 @@ public class ChargerController {
     }
 
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
-    @PutMapping("/{chargerId}/update")
-    public Charger updateChargerPrice(@PathVariable UUID chargerId, @RequestBody double price) {
-        return chargerService.updateChargerPrice(chargerId, price);
+    @PatchMapping("/{chargerId}/update")
+    public Charger updateChargerPrice(@PathVariable UUID chargerId, @RequestBody UpdateChargerPriceDTO dto) {
+        return chargerService.updateChargerPrice(chargerId, dto.getPrice());
     }
 }
