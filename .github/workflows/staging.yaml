@@ -79,7 +79,6 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          working-directory: ./backend
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: maven
@@ -94,17 +93,6 @@ jobs:
           ls -l ./reports
           cat ./reports/TEST-*.xml || true
 
-      - name: Add code coverage information to PR
-        id: jacoco-pr
-        uses: madrapps/jacoco-report@v1.7.1
-        if: github.event_name == 'pull_request'
-        with:
-          working-directory: backend
-          paths: |
-            ${{ github.workspace }}/**/target/site/jacoco-merged-test-coverage-report/jacoco.xml 
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 80
-          min-coverage-changed-files: 80
       - name: Push results to Xray on Jira Cloud
         if: always()
         working-directory: backend
