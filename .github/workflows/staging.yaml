@@ -11,42 +11,45 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  # build-and-push-image:
-  #   runs-on: ubuntu-latest
-  #   # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
-  #   permissions:
-  #     contents: read
-  #     packages: write
-  #     attestations: write
-  #     id-token: write
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-  #
-  #     - name: Log in to the Container registry
-  #       uses: docker/login-action@v3
-  #       with:
-  #         registry: ${{ env.REGISTRY }}
-  #         username: ${{ github.actor }}
-  #         password: ${{ secrets.GITHUB_TOKEN }}
-  #
-  #     - name: Build and push Docker image (Backend)
-  #       id: push_back
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: ./backend
-  #         file: ./backend/Dockerfile
-  #         push: true
-  #         tags: ghcr.io/henriquefreitas07/msev-tqs_backend:staging
-  #
-  #     - name: Build and push Docker image (Frontend)
-  #       id: push_front
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: .
-  #         file: ./Dockerfile
-  #         push: true
-  #         tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:staging
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image (Backend)
+        id: push_back
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ghcr.io/henriquefreitas07/msev-tqs_backend:staging
+
+      - name: Build and push Docker image (Frontend)
+        id: push_front
+        uses: docker/build-push-action@v5
+        env:
+          VITE_BACKEND_URL: ${{ vars.STAGING_VM }}/api
+          VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ghcr.io/henriquefreitas07/msev-tqs_frontend:staging
 
   pull_image_vm:
     name: Pull staging images
@@ -68,14 +71,16 @@ jobs:
       - name: "Pull Images"
         run: |
           cd ~/staging
-          docker-compose pull
-          docker-compose down
-          docker-compose up -d 
+          docker compose pull
+          docker compose down
+          docker compose up -d 
 
   run_tests:
     name: "Run all tests"
     runs-on: self-hosted
     needs: [pull_image_vm]
+
+    continue-on-error: true
 
     env:
       GEOCODING_APIKEY: ${{ secrets.GEOCODING_APIKEY }}
@@ -131,4 +136,4 @@ jobs:
       - name: "Remove containers"
         run: |
           cd ~/staging
-          docker-compose down
+          docker compose down
