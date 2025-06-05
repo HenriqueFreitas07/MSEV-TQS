@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import app.getxray.xray.junit.customjunitxml.annotations.Requirement;
 import tqs.msev.backend.entity.ChargeSession;
+import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.exception.GlobalExceptionHandler;
 import tqs.msev.backend.configuration.TestSecurityConfig;
 import tqs.msev.backend.service.ChargerService;
@@ -16,6 +19,7 @@ import tqs.msev.backend.service.JwtService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
@@ -53,5 +57,47 @@ class ChargeSessionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @WithUserDetails("test")
+    @Test
+    void whenGetChargeSessionByChargerId_thenReturnChargeSession() throws Exception {
+        UUID chargerId = UUID.randomUUID();
+
+        Charger charger = Charger.builder().build();
+
+        ChargeSession session1 = ChargeSession.builder()
+                .charger(charger)
+                .startTimestamp(LocalDateTime.now())
+                .build();
+
+        when(chargerService.getChargeSessionByChargerId(chargerId)).thenReturn(session1);
+
+        mockMvc.perform(get("/api/v1/charge-sessions/{chargerId}/statistics", chargerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isNotEmpty());
+    }
+
+    @WithUserDetails("test_operator")
+    @Test
+    @Requirement("MSEV-25")
+    void whenGetChargerStats_thenReturnChargeSessions() throws Exception {
+        UUID chargerId = UUID.randomUUID();
+        ChargeSession session1 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .build();
+
+        ChargeSession session2 = ChargeSession.builder()
+                .startTimestamp(LocalDateTime.now())
+                .endTimestamp((LocalDateTime.now().plusSeconds(30)))
+                .build();
+
+        when(chargerService.getChargeSessionsByCharger(Mockito.any())).thenReturn(List.of(session1, session2));
+
+        mockMvc.perform(get("/api/v1/charge-sessions/stats/{chargerId}", chargerId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$", hasSize(2)));
+
     }
 }

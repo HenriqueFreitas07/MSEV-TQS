@@ -35,7 +35,7 @@ public class Charger {
 
     @Min(value = 0)
     @Column(nullable = false)
-    private int chargingSpeed;
+    private double chargingSpeed;
 
     @Column(nullable = false)
     @Builder.Default

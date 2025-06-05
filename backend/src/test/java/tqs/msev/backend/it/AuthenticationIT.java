@@ -29,12 +29,8 @@ class AuthenticationIT {
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
-    }
-
-    @AfterEach
-    void reset() {
         RestAssured.reset();
+        RestAssured.port = port;
     }
 
     @DynamicPropertySource

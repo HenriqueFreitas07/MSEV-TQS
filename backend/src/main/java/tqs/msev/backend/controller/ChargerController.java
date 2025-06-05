@@ -87,4 +87,10 @@ public class ChargerController {
     public Charger createCharger(@Valid @RequestBody Charger charger) {
         return chargerService.createCharger(charger);
     }
+
+    @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
+    @PutMapping("/{chargerId}/update")
+    public Charger updateChargerPrice(@PathVariable UUID chargerId, @RequestBody double price) {
+        return chargerService.updateChargerPrice(chargerId, price);
+    }
 }

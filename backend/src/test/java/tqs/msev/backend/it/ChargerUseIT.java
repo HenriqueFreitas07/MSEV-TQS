@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Import(TestDatabaseConfig.class)
 class ChargerUseIT {
     @LocalServerPort
@@ -42,8 +43,24 @@ class ChargerUseIT {
     @Autowired
     private ChargeSessionRepository chargeSessionRepository;
 
-    @BeforeEach
-    void setUp() {
+    @BeforeAll
+    void beforeAll() {
+        User operator = User.builder()
+                .email("test_operator")
+                .name("test_operator")
+                .password("test_operator")
+                .isOperator(true)
+                .build();
+        userRepository.saveAndFlush(operator);
+
+        User user2= User.builder()
+                .email("test")
+                .name("test")
+                .password("test_user")
+                .isOperator(false)
+                .build();
+        userRepository.saveAndFlush(user2);
+
         RestAssured.port = port;
 
         User user = User.builder()
@@ -54,6 +71,7 @@ class ChargerUseIT {
                 .build();
 
         user = userRepository.saveAndFlush(user);
+        
 
         String jwtToken = jwtService.generateToken(user);
 
@@ -62,14 +80,19 @@ class ChargerUseIT {
                 .build();
     }
 
+    @AfterAll
+    void afterAll() {
+        userRepository.deleteAll();
+    }
+
+
     @AfterEach
     void resetDb() {
         reservationRepository.deleteAll();
         chargeSessionRepository.deleteAll();
+        chargerRepository.deleteAll();
         stationRepository.deleteAll();
-        userRepository.deleteAll();
-
-        RestAssured.reset();
+        
     }
 
     @DynamicPropertySource
@@ -158,7 +181,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test2@gmail.com")
+                .email("test1@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -303,7 +326,7 @@ class ChargerUseIT {
 
         User user2 = User.builder()
                 .name("Teste")
-                .email("test2@gmail.com")
+                .email("test3@gmail.com")
                 .password("123")
                 .isOperator(false)
                 .build();
@@ -326,4 +349,6 @@ class ChargerUseIT {
                 .statusCode(400)
                 .body("message", containsString("another user"));
     }
+
+    
 }
