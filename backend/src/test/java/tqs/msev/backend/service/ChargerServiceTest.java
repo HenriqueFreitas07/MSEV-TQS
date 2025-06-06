@@ -291,7 +291,7 @@ class ChargerServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void whenCreateValidCharger_thenReturnCharger() {
         Station station = Station.builder()
                 .id(UUID.randomUUID())
@@ -311,7 +311,7 @@ class ChargerServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void whenCreateChargerWithNullStatus_thenSetDefaultStatus() {
         Station station = Station.builder()
                 .id(UUID.randomUUID())
@@ -333,7 +333,7 @@ class ChargerServiceTest {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void whenCreateChargerWithNoStation_thenThrowException() {
         Charger charger = Charger.builder()
                 .id(UUID.randomUUID())

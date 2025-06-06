@@ -37,7 +37,7 @@ export function ChargerCard({ charger, updateCharger }: Props) {
   };
 
   return (
-    <div className={`w-full flex  justify-between gap-2 rounded-md border p-6 ${charger.status === "OUT_OF_ORDER" || charger.status === "TEMPORARILY_DISABLED" ? " border-red-400" : " border-zinc-400"}`}>
+    <div className={`w-full flex  justify-between gap-2 rounded-md border p-6 ${charger.status === "OUT_OF_ORDER" || charger.status === "TEMPORARILY_DISABLED" ? " border-red-400" : " border-zinc-400"}`} data-testid="charger-card">
       <div className="flex flex-col">
         <span>Connector Type: {charger.connectorType}</span>
         <span>Status: {charger.status}</span>

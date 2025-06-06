@@ -23,7 +23,7 @@ function UserReserves() {
       setReservations(reservationsResponse);
     }
     fetchData();
-  }, [setReservations]);
+  }, []);
 
   const deleteReserve = async (e: React.MouseEvent, reservationID: string) => {
     e.preventDefault();
@@ -61,7 +61,7 @@ function UserReserves() {
           </div>
           :
           reservations.map((reserve, idx) => (
-            <div className="p-4 ml-12 mr-12 rounded-xl mt-3 mb-3 shadow-md bg-base-200" key={idx}>
+            <div className="p-4 ml-12 mr-12 rounded-xl mt-3 mb-3 shadow-md bg-base-200" key={idx} data-testid="reserve">
               <div className="text-end text-xl text-red-500"><button onClick={(e) => deleteReserve(e, reserve.id)}>X</button></div>
               <div className="justify-between flex">
                 <div className="flex" style={{ "width": "50%" }} >
