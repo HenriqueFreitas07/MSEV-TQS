@@ -27,6 +27,7 @@ public class PaymentService {
             response.put("clientSecret", paymentIntent.getClientSecret());
         } catch (Exception e) {
             response.put("error", e.getMessage());
+            throw new IllegalArgumentException("Payment creation failed: " + e.getMessage());
         }
          return response; 
     }
