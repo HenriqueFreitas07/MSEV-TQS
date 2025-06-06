@@ -38,6 +38,7 @@ function MapContent({ markers, fitBounds }: { markers?: markerProps[], fitBounds
     <>
       {markers?.map((markerProps, index) => (
         <AdvancedMarker
+          data-testid="marker"
           onClick={markerProps.callback} // for redirecting to the station page
           key={index}
           {...markerProps.markerOptions}>

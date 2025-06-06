@@ -32,6 +32,20 @@ export default function StationDetailsDashboard() {
     loadData();
   }, [stationId]);
 
+  async function updateCharger(chargerId: string, status: string) {
+    await ChargerService.updateChargerStatus(chargerId, status);
+
+    setChargers(prev => {
+      const charger = prev.find(s => s.id === chargerId)!;
+      charger.status = status
+
+      return [
+        ...prev.filter(s => s.id !== chargerId),
+        charger
+      ]
+    });
+  }
+
   async function handleCreateCharger(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -60,7 +74,7 @@ export default function StationDetailsDashboard() {
       <div className="p-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-bold text-2xl">{station.name} station</h2>
-          <button className="btn btn-primary" onClick={() => modalRef.current?.showModal()}>
+          <button className="btn btn-primary" onClick={() => modalRef.current?.showModal()} data-testid="add-charger-btn">
             Add Charger
           </button>
         </div>
@@ -68,7 +82,7 @@ export default function StationDetailsDashboard() {
 
         <div className="flex flex-col gap-4 mt-6">
           {
-            chargers.map(charger => <ChargerCard key={charger.id} charger={charger} />)
+            chargers.map(charger => <ChargerCard key={charger.id} charger={charger} updateCharger={updateCharger} />)
           }
         </div>
       </div>
@@ -82,7 +96,7 @@ export default function StationDetailsDashboard() {
           <form onSubmit={handleCreateCharger} className="flex flex-col mt-4">
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Connector Type</legend>
-              <select className="select w-full" value={connectorType} onChange={e => setConnectorType(e.target.value)}>
+              <select className="select w-full" value={connectorType} onChange={e => setConnectorType(e.target.value)} data-testid="connector-select">
                 <option value="" disabled>Pick a connector type</option>
                 <option value="Type 1 (J1772)">Type 1 (J1772)</option>
                 <option value="Type 2 (Mennekes)">Type 2 (Mennekes)</option>
@@ -95,15 +109,15 @@ export default function StationDetailsDashboard() {
 
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Price</legend>
-              <input type="number" className="input w-full" placeholder="Price (€)" value={price} onChange={e => setPrice(Number(e.target.value))} required />
+              <input type="number" className="input w-full" placeholder="Price (€)" value={price} onChange={e => setPrice(Number(e.target.value))} required data-testid="price" />
             </fieldset>
 
             <fieldset className="fieldset">
               <legend className="fieldset-legend">Charging Speed</legend>
-              <input type="number" className="input w-full" placeholder="Charging Speed (kW)" value={chargingSpeed} onChange={e => setChargingSpeed(Number(e.target.value))} required />
+              <input type="number" className="input w-full" placeholder="Charging Speed (kW)" value={chargingSpeed} onChange={e => setChargingSpeed(Number(e.target.value))} required data-testid="speed" />
             </fieldset>
 
-            <button type="submit" className="btn btn-primary mt-4">
+            <button type="submit" className="btn btn-primary mt-4" data-testid="create-btn">
               Create
             </button>
           </form>

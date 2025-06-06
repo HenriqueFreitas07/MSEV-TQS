@@ -1,3 +1,4 @@
+@MSEV-19
 Feature: Register in the application
   Scenario: Valid sign up
     When I open the app

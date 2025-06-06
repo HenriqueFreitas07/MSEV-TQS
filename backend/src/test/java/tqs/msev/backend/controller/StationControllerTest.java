@@ -120,7 +120,7 @@ class StationControllerTest {
 
     @Test
     @WithUserDetails("test_operator")
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void givenValidStation_whenCreateStation_thenReturnCreatedStation() throws Exception {
         Station station = new Station();
         station.setName("New Station");
@@ -142,7 +142,7 @@ class StationControllerTest {
 
     @Test
     @WithUserDetails("test_operator")
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void givenInvalidStation_whenCreateStation_thenReturnBadRequest() throws Exception {
         Station station = new Station();
         station.setName("");
@@ -157,7 +157,7 @@ class StationControllerTest {
     }
 
     @Test
-    @Requirement("MSEV-13")
+    @Requirement("MSEV-23")
     void whenCreateStationWithoutAuthentication_thenReturnUnauthorized() throws Exception {
         Station station = new Station();
         station.setName("Unauthorized Station");

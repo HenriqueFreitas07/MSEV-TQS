@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router";
 import { ChargerService, ReservationService } from "../requests.js";
 import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 import type { Reservation } from "../types/Reservation.js";
 import type { Charger } from "../types/Charger.js";
 import { TbGasStation, TbGasStationOff } from "react-icons/tb";
@@ -65,7 +67,7 @@ function Reserve() {
       setReservations(reservationsResponse);
     }
     fetchData();
-  }, [setReservations]);
+  }, []);
 
   const handleReserve = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -73,8 +75,8 @@ function Reserve() {
     if (auth.user && charger) {
 
       for (const reserve of slots) {
-        const startTimestamp = dayjs(reserve.date + " " + reserve.slots.start, "YYYY-MM-DD HH:mm").toISOString();
-        const endTimestamp = dayjs(reserve.date + " " + reserve.slots.end, "YYYY-MM-DD HH:mm").toISOString();
+        const startTimestamp = dayjs.utc(reserve.date + " " + reserve.slots.start, "YYYY-MM-DD HH:mm").toISOString();
+        const endTimestamp = dayjs.utc(reserve.date + " " + reserve.slots.end, "YYYY-MM-DD HH:mm").toISOString();
         const reservation = {
           user: auth.user,
           startTimestamp: startTimestamp,
@@ -85,7 +87,7 @@ function Reserve() {
 
         setReservations((prev) => [...prev, response])
       }
-      
+
       setCar([]);
     }
 
@@ -190,7 +192,7 @@ function Reserve() {
             </div>
           </div>
           <div>
-            <button className="btn btn-lg w-full bg-green-600 text-white" onClick={() => { modalRef.current?.showModal(); concat(); }}>Reserve now</button>
+            <button className="btn btn-lg w-full bg-green-600 text-white" onClick={() => { modalRef.current?.showModal(); concat(); }} data-testid="reserve-now-btn">Reserve now</button>
           </div>
         </div>
         <dialog className="modal" ref={modalRef}>
@@ -213,7 +215,7 @@ function Reserve() {
                     <tbody>
                       {
                         slots.map((reservation, i) => (
-                          <tr key={i}>
+                          <tr key={i} data-testid="tr-timeslot">
                             <th>{reservation.date}</th>
                             <td>{reservation.slots.start}</td>
                             <td>{reservation.slots.end}</td>
@@ -224,7 +226,7 @@ function Reserve() {
                   </table>
                   <div className="justify-center items-center mt-3">
                     <form>
-                      <button className="btn btn-md  bg-green-600 text-white" onClick={(e) => handleReserve(e)}>Confirm Reserve</button>
+                      <button className="btn btn-md  bg-green-600 text-white" onClick={(e) => handleReserve(e)} data-testid="confirm-reservation-btn">Confirm Reserve</button>
                     </form>
                   </div>
                 </div>
@@ -266,11 +268,11 @@ function Reserve() {
 
                             ) ?
                               <button key={idx} className={`btn btn-sm w-full ${car.some(item => item.date === day.date && item.slots.start === slot.start && item.slots.end === slot.end) ? "bg-red-400" : "bg-blue-400"}`}
-                                onClick={() => addToCar(slot, day.date)}>
+                                onClick={() => addToCar(slot, day.date)} data-testid="timeslot">
                                 {slot.start} - {slot.end}
                               </button>
                               :
-                              <button className="btn btn-sm w-full bg-gray-400">
+                              <button className="btn btn-sm w-full bg-gray-400" data-testid="gray-timeslot">
                                 {slot.start} - {slot.end}
                               </button>
                             }

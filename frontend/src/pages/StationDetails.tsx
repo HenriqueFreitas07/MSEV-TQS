@@ -103,13 +103,13 @@ function StationDetails() {
     return (
       <div className="items-center justify-center bg-base-200">
         <NavLayout title="Station" footer={false}>
-          <p data-test-id="station" className={`text-4xl p-4 text-center ${getColorStation(station.status)}`}>Station {station.name}</p>
+          <p data-test-id="station" className={`text-4xl p-4 text-center ${getColorStation(station.status)}`} data-testid="station-name">Station {station.name}</p>
 
           <p className="text-4xl p-4 text-center">Chargers</p>
           <div className="grid grid-cols-2" data-test-id="chargers">
             {chargers.map(
               (charger) =>
-                <div className="card p-3 m-4 card-side card-sm bg-base-100 shadow-sm" key={charger.id}>
+                <div className="card p-3 m-4 card-side card-sm bg-base-100 shadow-sm" key={charger.id} data-testid="charger-card">
                   <figure className="w-2/3">
                     <img
                       src="https://www.ayvens.com/-/media/leaseplan-digital/pt/blog/closeupofachargingelectriccarjpgs1024x1024wisk20ckeuxnuhyqyacvxmhzorzeru0rnlkt8gmrr91setym.jpg?rev=5b11d8a3cb184493bb742f8ae7e1a41f"
@@ -117,19 +117,23 @@ function StationDetails() {
                     />
                   </figure>
                   <div className="card-body">
-                    <h2 className="card-title" data-test-id="type">{charger.connectorType}</h2>
-                    <p className="font-bold" data-test-id="price">Price: </p><p> {charger.price}</p>
+                    <h2 className="card-title" data-testid="type">{charger.connectorType}</h2>
+                    <p className="font-bold" data-testid="price">Price: </p><p> {charger.price}</p>
                     <p className="font-bold">Connector Type: </p><p> {charger.connectorType}</p>
                     <p className="font-bold">Charging Speed: </p><p> {charger.chargingSpeed}</p>
-                    <p className="font-bold">Status: </p><p className={`${getColorChargers(charger.status)}`}> {charger.status}</p>
+                    <p className="font-bold" data-testid="status">Status: </p><p className={`${getColorChargers(charger.status)}`}> {charger.status}</p>
                     <p className="font-bold">Reservations for the next 5 days: </p><p>{reservations[charger.id]?.length ?? 0}</p>
 
                     <div className="flex flex-col gap-2">
                       <div className="flex gap-2 w-full">
-                        <button className="btn btn-info flex-1" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }}>Availability</button>
-                        <button className="btn btn-primary flex-1" onClick={() => handleUnlockCharger(charger.id)} disabled={!canUnlockCharger(charger.id, charger.status)}>Unlock</button>
+                        <button className="btn btn-info flex-1" onClick={() => { modalRef.current?.showModal(); setSelectedCharger(charger.id) }} data-testid="availability-btn">Availability</button>
+                        <button className="btn btn-primary flex-1" onClick={() => handleUnlockCharger(charger.id)} disabled={!canUnlockCharger(charger.id, charger.status)} data-testid="unlock-btn">Unlock</button>
                       </div>
-                      <button className="btn btn-success w-full" onClick={() => { navigate(`/reserve/${charger.id}`) }}>Reserve now</button>
+                      {charger.status === "AVAILABLE" || charger.status === "IN_USE" ?
+                        <button className="btn btn-success w-full" onClick={() => { navigate(`/reserve/${charger.id}`) }} data-testid="reserve-btn">Reserve now</button>
+                        :
+                        <></>
+                      }
                     </div>
                   </div>
                 </div>
@@ -141,7 +145,7 @@ function StationDetails() {
               <form method="dialog">
                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
               </form>
-              <h3 className="font-bold text-lg">Charger Reservations</h3>
+              <h3 className="font-bold text-lg" data-testid="charger-reservations">Charger Reservations</h3>
               {
                 selectedCharger && reservations[selectedCharger].length > 0 ? (
                   <div className="overflow-x-auto">

@@ -1,9 +1,11 @@
 package tqs.msev.backend.service;
 
+import lombok.Value;
 import org.springframework.stereotype.Service;
 import tqs.msev.backend.entity.ChargeSession;
 import tqs.msev.backend.entity.Charger;
 import tqs.msev.backend.entity.Reservation;
+import tqs.msev.backend.entity.Station;
 import tqs.msev.backend.repository.ChargeSessionRepository;
 import tqs.msev.backend.repository.ChargerRepository;
 import tqs.msev.backend.repository.ReservationRepository;
@@ -23,7 +25,8 @@ public class ChargerService {
     private final StationRepository stationRepository;
 
     private Random random = new Random();
-
+    private int decimalPlaces = 2;
+    private double multiplier = Math.pow(10, decimalPlaces);
     public ChargerService(ChargerRepository chargerRepository, ReservationRepository reservationRepository, ChargeSessionRepository chargeSessionRepository, UserRepository userRepository, StationRepository stationRepository) {
         this.chargerRepository = chargerRepository;
         this.reservationRepository = reservationRepository;
@@ -145,8 +148,12 @@ public class ChargerService {
         ChargeSession chargeSession = chargeSessionRepository.findByChargerIdAndEndTimestamp(chargerId, null);
         if (chargeSession != null && chargeSession.getCharger() != null) {
             double randomDouble = random.nextDouble();
-            chargeSession.setConsumption(randomDouble * chargeSession.getConsumption() + chargeSession.getConsumption());
-            chargeSession.setChargingSpeed(randomDouble + chargeSession.getCharger().getChargingSpeed() - 0.5);
+            double consumption= 14.3;
+            int toAdd= randomDouble < 0.5 ? -1 : 1;
+            double newConsumption= toAdd*(consumption)*randomDouble + consumption;
+            chargeSession.setConsumption(Math.round(newConsumption*multiplier)/multiplier);
+            double speedRounded=(Math.round(randomDouble + chargeSession.getCharger().getChargingSpeed() - 0.5) * multiplier ) / multiplier;
+            chargeSession.setChargingSpeed(speedRounded);
 
             chargeSessionRepository.saveAndFlush(chargeSession);
             return chargeSession;
@@ -154,7 +161,7 @@ public class ChargerService {
 
         return null;
     }
-        
+
     public Charger updateChargerPrice(UUID chargerId, double price) {
         Charger existingCharger = getChargerById(chargerId);
         if (price < 0) {
@@ -163,13 +170,13 @@ public class ChargerService {
         existingCharger.setPrice(price);
         return chargerRepository.save(existingCharger);
     }
-    
+
     public List<ChargeSession> getChargeSessionsByCharger(UUID chargerId) {
         List<ChargeSession> sessions = chargeSessionRepository.findAllByChargerId(chargerId);
         if (sessions.isEmpty()) {
             throw new NoSuchElementException("No charge sessions found for this charger");
         }
-        
+
         return sessions.stream()
                 .filter(session -> session.getEndTimestamp() != null)
                 .toList();
@@ -194,5 +201,13 @@ public class ChargerService {
         }
         return sessions;
     }
-}
 
+    public void updateChargerStatus(UUID chargerId, Charger.ChargerStatus status) {
+        Charger charger = chargerRepository.findById(chargerId).orElseThrow(() -> new NoSuchElementException("Invalid charger id"));
+        if (charger.getStation().getStatus() == Station.StationStatus.DISABLED && (status == Charger.ChargerStatus.AVAILABLE ||status == Charger.ChargerStatus.IN_USE) ) {
+            throw new IllegalStateException("Station is disabled");
+        }
+        charger.setStatus(status);
+        chargerRepository.save(charger);
+    }
+}
