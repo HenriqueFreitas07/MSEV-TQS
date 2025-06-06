@@ -254,6 +254,15 @@ export const ChargerService = {
       throw error;
     }
   },
+  getStatistics: async(chargerId:string):Promise<ChargeSession> =>{
+    try {
+      const { data } = await api.get<ChargeSession>(`/charge-sessions/${chargerId}/statistics`);
+      return data;
+    } catch (error) {
+      console.log("Error fetching charge sessions");
+      throw error;
+    }
+  },
   disableCharger: async (chargerId: string) => {
     try {
       await api.patch(`/chargers/${chargerId}/disable`);
@@ -277,8 +286,16 @@ export const ChargerService = {
       console.error("Error updating charger:", error);
       throw error;
     }
-  }
+  },
 
+  updateChargerPrice: async (chargerId: string, price: number) => {
+    try {
+      await api.patch(`/chargers/${chargerId}/update`, { price });
+    } catch (error) {
+      console.error("Error updating charger price:", error);
+      throw error;
+    }
+  }
 }
 
 
