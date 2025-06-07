@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @ExtendWith(MockitoExtension.class)
-public class PaymentServiceTest {
+class PaymentServiceTest {
 
     @InjectMocks
     private  PaymentService paymentService;
@@ -28,7 +28,7 @@ public class PaymentServiceTest {
     @Test
     @WithUserDetails("test")
     @Requirement("MSEV-14")
-    void whenPaymentRequestIsValid_thenReturnPaymentResponse() throws Exception {
+    void whenPaymentRequestIsValid_thenReturnPaymentResponse(){
 
         PaymentIntent mockIntent = new PaymentIntent();
         mockIntent.setId("pi_test_123");
@@ -53,7 +53,7 @@ public class PaymentServiceTest {
     @Test
     @WithUserDetails("test")
     @Requirement("MSEV-14")
-    void whenPaymentRequestIsInvalid_thenReturnErrorResponse() throws Exception {
+    void whenPaymentRequestIsInvalid_thenReturnErrorResponse() {
        PaymentIntent mockIntent = new PaymentIntent();
         mockIntent.setId("pi_test_123");
         mockIntent.setStatus("error");
