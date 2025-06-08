@@ -48,7 +48,7 @@ public class Init implements CommandLineRunner {
                     .name("Test User")
                     .email("test_user@gmail.com")
                     .password(bCryptPasswordEncoder.encode(operatorPassword))
-                    .isOperator(true)
+                    .isOperator(false)
                     .build();
 
             userRepository.save(user);
