@@ -74,6 +74,7 @@ public class StationController {
 
     @PreAuthorize("@userService.getCurrentUser(authentication).isOperator()")
     @GetMapping("/stats/{stationId}")
+    @Operation(summary = "Get statistics of a station by id")
     public List<ChargeSession> getStationStats(@PathVariable UUID stationId) {
         if (stationId == null) {
             throw new IllegalArgumentException("Station ID cannot be null");
