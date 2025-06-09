@@ -308,17 +308,15 @@ public class CucumberSteps {
     public void fillTheChargerFormWithInvalidDetails() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("[data-testid='connector-select']")));
 
-        Select select = new Select(driver.findElement(By.cssSelector("[data-testid='connector-select']")));
-        select.selectByIndex(1);
-
         driver.findElement(By.cssSelector("[data-testid='price']")).sendKeys("10");
         driver.findElement(By.cssSelector("[data-testid='create-btn']")).click();
     }
 
     @Then("The charger won't be created")
     public void theChargerWonTBeCreated() {
-        var elements = driver.findElements(By.cssSelector(".swal2-confirm"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#swal2-title")));
 
-        assertThat(elements).isEmpty();
+        assertThat(driver.findElement(By.cssSelector("#swal2-title")).getText()).isEqualTo("Error");
+        assertThat(driver.findElement(By.cssSelector("#swal2-html-container")).getText()).isEqualTo("Invalid connector type");
     }
 }

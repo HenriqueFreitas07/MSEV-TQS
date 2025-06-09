@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/prometheus").permitAll()
                         .requestMatchers("/api/v1/login", "/api/v1/signup").permitAll()
-                        .requestMatchers( "/api/v1/docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers( "/api/v1/docs/**", "/api/docs", "/api/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider)

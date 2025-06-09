@@ -2,8 +2,9 @@ import { format } from "date-fns";
 import type { ChargeSession } from "../types/charge-session";
 import LineChart from "../components/LineChart";
 import { ChargerService } from "../requests";
-import { useEffect ,useState} from "react";
+import { useEffect, useState } from "react";
 import type { ChartData } from "chart.js";
+import { showAlert } from "../alerts";
 
 type Props = {
   session: ChargeSession;
@@ -18,24 +19,34 @@ const options = {
   },
 }
 
+
 export function ChargeSessionCard({ session, endSession }: Props) {
   const [points, setPoints] = useState<number[]>([])
   const [data, setData] = useState<ChartData<"line"> | null>(null)
+  
   async function handleLockCharger(chargerId: string) {
-    await ChargerService.lockCharger(chargerId);
-    endSession();
+    // make the payment first to strapi
+    try {
+      await ChargerService.lockCharger(chargerId);
+      endSession();
+      window.location.href = import.meta.env.VITE_STRIPE_PAYMENT_URL;
+    }
+    catch (error) {
+      showAlert("End Session Error", `There was an unexpected error:${error}`, "error")
+
+    }
   }
 
   const addPoints = () => {
     setTimeout(async () => {
       const response = await ChargerService.getStatistics(session.charger.id)
-      const stats:ChargeSession=response
-      const labels:string[] = []
+      const stats: ChargeSession = response
+      const labels: string[] = []
       setPoints((prev) => [...prev, stats.consumption])
       if (points.length > 60) {
         setPoints((prev) => prev.slice(1, -1))
       }
-      points.map(()=>{
+      points.map(() => {
         const d = new Date()
         labels.push(d.getHours() + ":" + d.getMinutes())
       })
@@ -57,8 +68,7 @@ export function ChargeSessionCard({ session, endSession }: Props) {
   }
 
   useEffect(() => {
-    if(session.endTimestamp==null) 
-    {
+    if (session.endTimestamp == null) {
       addPoints()
     }
   }, [data])
@@ -83,7 +93,7 @@ export function ChargeSessionCard({ session, endSession }: Props) {
       </div>
 
       {
-        session.endTimestamp === null  && (
+        session.endTimestamp === null && (
           <button className="btn btn-primary" onClick={() => handleLockCharger(session.charger.id)}>
             Lock Charger
           </button>

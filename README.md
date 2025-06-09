@@ -18,3 +18,10 @@ This project, developed in the scope of TQS, aims to develop a full stack web ap
 ## Project Backlog
 
 https://tqs-msev.atlassian.net/jira/software/projects/MSEV/boards/1/backlog
+
+## Changelog since friday
+
+- Add Product Specification Report
+- Add Quality Manual report
+- Add payment system in frontend
+- Set API documentation path to /api/docs
